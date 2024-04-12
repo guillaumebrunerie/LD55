@@ -11,8 +11,8 @@ import {
 	Logo,
 	SoundOff,
 	SoundOn,
-	StartBtnDefault,
-	StartBtnOn,
+	StartButtonDefault,
+	StartButtonPressed,
 } from "./assets";
 import { Game } from "./Game";
 
@@ -21,7 +21,7 @@ const StartButton = ({ onClick }: { onClick: () => void }) => {
 
 	return (
 		<Sprite
-			texture={isActive ? StartBtnOn : StartBtnDefault}
+			texture={isActive ? StartButtonPressed : StartButtonDefault}
 			anchor={0.5}
 			position={[360, 960]}
 			hitArea={new Rectangle(-200, -100, 400, 200)}

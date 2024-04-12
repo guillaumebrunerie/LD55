@@ -1,4 +1,4 @@
-/** Generated on Thu Apr 11 19:16:16 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Fri Apr 12 18:58:18 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -8,16 +8,11 @@ import Bg_ from "../gfx/Bg.png?texture";
 import Logo_ from "../gfx/Logo.png?texture";
 import SoundOff_ from "../gfx/SoundOff.png?texture";
 import SoundOn_ from "../gfx/SoundOn.png?texture";
-import StartBtnDefault_ from "../gfx/StartBtnDefault.png?texture";
-import StartBtnOn_ from "../gfx/StartBtnOn.png?texture";
-import UIArrow_ from "../gfx/UIArrow.png?texture";
-import UIArrow_01_ from "../gfx/UIArrow_01.png?texture";
-import UIArrow_02_ from "../gfx/UIArrow_02.png?texture";
+import StartButtonDefault_ from "../gfx/StartButtonDefault.png?texture";
+import StartButtonPressed_ from "../gfx/StartButtonPressed.png?texture";
 
 /** Spritesheets */
 import Font_ from "../gfx/Font.png?spritesheet";
-import UIClickingHand_ from "../gfx/UIClickingHand.png?spritesheet";
-import UIClickingTarget_ from "../gfx/UIClickingTarget.png?spritesheet";
 
 /** Sounds */
 import Click_ from "../audio/Click.mp3?sound";
@@ -30,14 +25,9 @@ export const [
 	Logo,
 	SoundOff,
 	SoundOn,
-	StartBtnDefault,
-	StartBtnOn,
-	UIArrow,
-	UIArrow_01,
-	UIArrow_02,
+	StartButtonDefault,
+	StartButtonPressed,
 	Font,
-	UIClickingHand,
-	UIClickingTarget,
 	Click,
 	Music,
 	Pop,
@@ -47,14 +37,9 @@ export const [
 	Logo_,
 	SoundOff_,
 	SoundOn_,
-	StartBtnDefault_,
-	StartBtnOn_,
-	UIArrow_,
-	UIArrow_01_,
-	UIArrow_02_,
+	StartButtonDefault_,
+	StartButtonPressed_,
 	Font_,
-	UIClickingHand_,
-	UIClickingTarget_,
 	Click_,
 	Music_,
 	Pop_,
