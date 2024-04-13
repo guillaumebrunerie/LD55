@@ -1,9 +1,7 @@
 import { Polygon } from "pixi.js";
 
 export const initialMana = 5;
-export const initialManaItems = Array(20)
-	.fill(null)
-	.map(() => [2, 3, 4][Math.floor(Math.random() * 3)]);
+export const initialManaItems = [];
 export const initialDefenseItems = [4, 4, 4, 4, 4];
 export const initialAttackItems = Array(0)
 	.fill(null)
