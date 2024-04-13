@@ -48,7 +48,10 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 	}
 	const deltaS = delta / 60;
 	game.timer -= deltaS;
-	game.timer = Math.max(game.timer, 0);
+	if (game.timer <= 0) {
+		game.timer = 0;
+		return;
+	}
 	game.player.mana += deltaS * manaRate(game);
 };
 
