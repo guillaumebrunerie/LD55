@@ -108,7 +108,7 @@ export const App = () => {
 	return (
 		<Container>
 			<Sprite texture={Bg} x={0} y={0} />
-			<CustomText text={"SCORE: " + toTxt(game.score)} x={10} y={40} />
+			{/* <CustomText text={"SCORE: " + toTxt(game.score)} x={10} y={40} /> */}
 			{game.isGameOver && (
 				<Sprite texture={Logo} x={640} y={250} anchor={0.5} />
 			)}

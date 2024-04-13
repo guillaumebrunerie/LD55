@@ -1,6 +1,26 @@
+type Player = {
+	mana: number;
+	items: {
+		mana: number[];
+		defense: number[];
+		attack: number[];
+	};
+};
+
+const newPlayer = (): Player => ({
+	mana: 10,
+	items: {
+		mana: [],
+		defense: [1, 1, 1],
+		attack: [],
+	},
+});
+
 export const newGame = (isGameOver = false) => ({
-	score: 0,
 	isGameOver,
+	timer: 60_000,
+	player: newPlayer(),
+	opponent: newPlayer(),
 });
 
 export type Game = ReturnType<typeof newGame>;
@@ -13,5 +33,5 @@ export const tickGame = (game: Game, _gameOver: () => void, delta: number) => {
 	if (game.isGameOver) {
 		return;
 	}
-	game.score += delta / 60;
+	game.timer -= delta / 60;
 };
