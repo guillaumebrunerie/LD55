@@ -10,7 +10,7 @@ export const Game = ({ game }: { game: GameT }) => {
 			<DefenseItems items={game.player.items.defense} />
 			<ManaItems items={game.player.items.mana} />
 			<AttackItems items={game.player.items.attack} />
-			<Sprite texture={Hero} x={200} y={400} />
+			<Sprite texture={Hero} x={200} y={300} />
 			<CustomText x={1920 / 2} y={100} text={game.timer.toFixed(2)} />
 			<CustomText
 				x={10}
