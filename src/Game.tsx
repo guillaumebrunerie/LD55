@@ -14,6 +14,7 @@ import {
 	ManaPoint,
 	Runes,
 } from "./assets";
+import { BLEND_MODES } from "pixi.js";
 
 export const Game = ({ game }: { game: GameT }) => {
 	return (
@@ -90,6 +91,7 @@ const MonsterItems = ({ items }: { items: Item[] }) => {
 					<Sprite
 						key={i}
 						anchor={0.5}
+						blendMode={BLEND_MODES.ADD}
 						texture={Monster3Dies.animations.Monster3Dies[j]}
 						position={item.tmpPosition || item.position}
 					/>
