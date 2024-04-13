@@ -1,25 +1,39 @@
 import {
+	attackBounds,
+	defenseBounds,
 	initialAttackItems,
 	initialDefenseItems,
 	initialMana,
 	initialManaItems,
 	initialTimer,
+	manaBounds,
+	type Bounds,
 } from "./configuration";
+
+export type Item = {
+	x: number;
+	y: number;
+};
 
 type Player = {
 	mana: number;
 	items: {
-		mana: number[];
-		defense: number[];
-		attack: number[];
+		mana: Item[];
+		defense: Item[];
+		attack: Item[];
 	};
 };
+
+const newItem = (bounds: Bounds): Item => ({
+	x: bounds.x + Math.random() * bounds.width,
+	y: bounds.y + Math.random() * bounds.height,
+});
 
 const newPlayer = (): Player => ({
 	mana: initialMana,
 	items: {
 		mana: initialManaItems,
-		defense: initialDefenseItems,
+		defense: initialDefenseItems.map((_) => newItem(defenseBounds)),
 		attack: initialAttackItems,
 	},
 });
@@ -64,7 +78,7 @@ export const buyManaItem = (game: GameT) => {
 		return;
 	}
 	game.player.mana -= itemCost(game);
-	game.player.items.mana.push(1);
+	game.player.items.mana.push(newItem(manaBounds));
 };
 
 export const buyAttackItem = (game: GameT) => {
@@ -72,7 +86,7 @@ export const buyAttackItem = (game: GameT) => {
 		return;
 	}
 	game.player.mana -= itemCost(game);
-	game.player.items.attack.push(1);
+	game.player.items.attack.push(newItem(attackBounds));
 };
 
 export const buyDefenseItem = (game: GameT) => {
@@ -80,5 +94,5 @@ export const buyDefenseItem = (game: GameT) => {
 		return;
 	}
 	game.player.mana -= itemCost(game);
-	game.player.items.defense.push(1);
+	game.player.items.defense.push(newItem(defenseBounds));
 };
