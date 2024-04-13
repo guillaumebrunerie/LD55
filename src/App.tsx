@@ -1,5 +1,5 @@
 import { useState, useEffect, useReducer } from "react";
-import { Rectangle, Texture } from "pixi.js";
+import { Polygon, Rectangle, Texture } from "pixi.js";
 import { Container, Sprite } from "@pixi/react";
 import { useButton } from "./useButton";
 import { newApp, startApp, startNewGame } from "./appLogic";
@@ -27,6 +27,8 @@ import {
 } from "./gameLogic";
 import { Game } from "./Game";
 import { CustomText } from "./CustomText";
+import { PolygonShape } from "./Polygon";
+import { attackBounds, manaBounds, manaPointsBounds } from "./configuration";
 
 const StartButton = ({
 	onClick,
@@ -91,7 +93,7 @@ const UIButton = ({
 	x: number;
 	player: Player;
 }) => {
-	const tint = player.mana < itemCost(player) ? 0x333333 : 0xffffff;
+	const tint = player.mana.length < itemCost(player) ? 0x333333 : 0xffffff;
 	// const proportion = (player.mana / itemCost(player)) * 100;
 	// const i = Math.min(Math.round(proportion), 99);
 	return (
@@ -142,7 +144,16 @@ export const App = () => {
 
 	return (
 		<Container>
-			<Sprite texture={Bg} x={0} y={0} />
+			<Sprite
+				texture={Bg}
+				x={0}
+				y={0}
+				eventMode="static"
+				pointerdown={(e) => {
+					const { x, y } = e.global;
+					console.log(`${Math.round(x)}, ${Math.round(y)}`);
+				}}
+			/>
 			{/* <CustomText text={"SCORE: " + toTxt(game.score)} x={10} y={40} /> */}
 			{game.isGameOver && (
 				<Sprite texture={Logo} x={1920 / 2} y={400} anchor={0.5} />
@@ -163,6 +174,7 @@ export const App = () => {
 				})}
 			/>
 			<SoundButton />
+			{/* <PolygonShape polygon={manaPointsBounds.polygon} alpha={0.4} /> */}
 		</Container>
 	);
 };

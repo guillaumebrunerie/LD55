@@ -1,4 +1,4 @@
-/** Generated on Sat Apr 13 21:43:28 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sat Apr 13 23:31:07 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -16,6 +16,7 @@ import Division_ from "../gfx/Division.png?texture";
 import Hero_ from "../gfx/Hero.png?texture";
 import Logo_ from "../gfx/Logo.png?texture";
 import Mana1_ from "../gfx/Mana1.png?texture";
+import ManaPoint_ from "../gfx/ManaPoint.png?texture";
 import Monster1_ from "../gfx/Monster1.png?texture";
 import Monster2_ from "../gfx/Monster2.png?texture";
 import Monster3_ from "../gfx/Monster3.png?texture";
@@ -29,6 +30,7 @@ import StartButtonPressed_ from "../gfx/StartButtonPressed.png?texture";
 import BtnBar_ from "../gfx/BtnBar.png?spritesheet";
 import Font_ from "../gfx/Font.png?spritesheet";
 import Monster3Dies_ from "../gfx/Monster3Dies.png?spritesheet";
+import Runes_ from "../gfx/Runes.png?spritesheet";
 
 /** Sounds */
 import Click_ from "../audio/Click.mp3?sound";
@@ -49,6 +51,7 @@ export const [
 	Hero,
 	Logo,
 	Mana1,
+	ManaPoint,
 	Monster1,
 	Monster2,
 	Monster3,
@@ -60,6 +63,7 @@ export const [
 	BtnBar,
 	Font,
 	Monster3Dies,
+	Runes,
 	Click,
 	Music,
 	Pop,
@@ -77,6 +81,7 @@ export const [
 	Hero_,
 	Logo_,
 	Mana1_,
+	ManaPoint_,
 	Monster1_,
 	Monster2_,
 	Monster3_,
@@ -88,6 +93,7 @@ export const [
 	BtnBar_,
 	Font_,
 	Monster3Dies_,
+	Runes_,
 	Click_,
 	Music_,
 	Pop_,

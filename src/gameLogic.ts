@@ -3,11 +3,13 @@ import {
 	attackSpeed,
 	defenseBounds,
 	fightDuration,
+	initialAttackItems,
 	initialDefenseItems,
 	initialMana,
 	initialManaItems,
 	initialTimer,
 	manaBounds,
+	manaPointsBounds,
 	phase1Duration,
 	phase2Duration,
 	phase3Duration,
@@ -26,10 +28,11 @@ export type Item = {
 	hp: number;
 	state: "visible" | "hidden" | "fighting";
 	nt?: number;
+	scale?: number;
 };
 
 export type Player = {
-	mana: number;
+	mana: Item[];
 	items: {
 		mana: Item[];
 		defense: Item[];
@@ -39,14 +42,37 @@ export type Player = {
 
 const delta = 150;
 
-const addItem = (array: Item[], bounds: Bounds, strength: number) => {
+const addItem = (
+	array: Item[],
+	bounds: Bounds,
+	strength: number,
+	props?: Partial<Item>,
+) => {
 	let bestPosition = { x: 0, y: 0 };
 	let bestDistance = 0;
+	const left =
+		bounds.x ??
+		Math.min(...bounds.polygon.points.filter((_, i) => i % 2 == 0));
+	const top =
+		bounds.y ??
+		Math.min(...bounds.polygon.points.filter((_, i) => i % 2 == 1));
+	const width =
+		bounds.width ??
+		Math.max(...bounds.polygon.points.filter((_, i) => i % 2 == 0)) - left;
+	const height =
+		bounds.height ??
+		Math.max(...bounds.polygon.points.filter((_, i) => i % 2 == 0)) - top;
 	for (let iteration = 0; iteration < 100; iteration++) {
 		const position = {
-			x: bounds.x + Math.random() * bounds.width,
-			y: bounds.y + Math.random() * bounds.height,
+			x: left + Math.random() * width,
+			y: top + Math.random() * height,
 		};
+		if (
+			bounds.polygon &&
+			!bounds.polygon.contains(position.x, position.y)
+		) {
+			continue;
+		}
 		const distance = Math.min(
 			...array.map((item) => {
 				const dx = item.position.x - position.x;
@@ -68,25 +94,38 @@ const addItem = (array: Item[], bounds: Bounds, strength: number) => {
 		strength,
 		hp: strength,
 		state: "visible",
+		...props,
 	});
 };
 
 const newPlayer = (): Player => {
 	const player: Player = {
-		mana: initialMana,
+		mana: [],
 		items: {
 			mana: [],
 			defense: [],
 			attack: [],
 		},
 	};
+	addManaPoints(player, initialMana);
 	for (const manaItem of initialManaItems) {
 		addItem(player.items.mana, manaBounds, manaItem);
 	}
 	for (const defenseItem of initialDefenseItems) {
 		addItem(player.items.defense, defenseBounds, defenseItem);
 	}
+	for (const attackItem of initialAttackItems) {
+		addItem(player.items.attack, attackBounds, attackItem);
+	}
 	return player;
+};
+
+const addManaPoints = (player: Player, points: number) => {
+	for (let i = 0; i < points; i++) {
+		addItem(player.mana, manaPointsBounds, 1, {
+			scale: 0.7 + Math.random() * 0.3,
+		});
+	}
 };
 
 export type GameT = {
@@ -124,7 +163,7 @@ const opponentMove = (
 	manaChance: number,
 	attackChance: number,
 ) => {
-	while (opponent.mana > 0) {
+	while (opponent.mana.length > 0) {
 		let type;
 		if (Math.random() < manaChance) {
 			type = "mana";
@@ -200,17 +239,14 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 			// }
 			// opponentMove(game, game.player, 0.4);
 			// opponentMove(game, game.opponent, 0.6);
-			if (game.player.mana == 0) {
-				opponentMove(game, game.opponent, 0.1, 0.9);
-				game.timer = phase1Duration + phase2Duration + phase3Duration;
-				game.phase = "attackFight";
+			if (game.player.mana.length == 0) {
+				opponentMove(game, game.opponent, 0.25, 0.75);
 				pickFightingPair(game);
 			}
 			break;
 		case "attackFight":
 			game.timer -= deltaS;
 			if (game.timer <= 0) {
-				game.timer = phase1Duration + phase2Duration + phase3Duration;
 				pickFightingPair(game);
 				break;
 			}
@@ -219,9 +255,7 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 		case "defenseFight":
 			game.timer -= deltaS;
 			if (game.timer <= 0) {
-				game.timer = fightDuration;
-				game.phase = "finish";
-				doDefenseFight(game);
+				pickDefensePair(game);
 				break;
 			}
 			moveAttack(game);
@@ -246,20 +280,35 @@ const pickFighter = (items: Item[]) => {
 	);
 };
 
-const pickFightingPair = (game: GameT) => {
+const cleanUp = (game: GameT) => {
 	game.player.items.attack = game.player.items.attack.filter(
 		(item) => item.hp > 0,
 	);
 	game.opponent.items.attack = game.opponent.items.attack.filter(
 		(item) => item.hp > 0,
 	);
+	game.player.items.defense = game.player.items.defense.filter(
+		(item) => item.hp > 0,
+	);
+	game.opponent.items.defense = game.opponent.items.defense.filter(
+		(item) => item.hp > 0,
+	);
+};
+
+const pickFightingPair = (game: GameT) => {
+	cleanUp(game);
 	if (
 		game.player.items.attack.length == 0 ||
 		game.opponent.items.attack.length == 0
 	) {
+		game.timer = -1;
 		game.phase = "defenseFight";
+		console.log("NOT fighting");
 		return;
 	}
+	game.timer = phase1Duration + phase2Duration + phase3Duration;
+	game.phase = "attackFight";
+	console.log("Fighting");
 	const playerAttacker = pickFighter(game.player.items.attack);
 	const opponentAttacker = pickFighter(game.opponent.items.attack);
 	game.attackers = [playerAttacker, opponentAttacker];
@@ -274,13 +323,58 @@ const pickFightingPair = (game: GameT) => {
 	opponentAttacker.hp -= fightStrength;
 };
 
+const pickDefensePair = (game: GameT) => {
+	cleanUp(game);
+	if (
+		game.player.items.attack.length == 0 &&
+		game.opponent.items.attack.length == 0
+	) {
+		game.timer = -1;
+		game.phase = "finish";
+		console.log("NOT defending");
+		return;
+	}
+
+	const attacker =
+		game.player.items.attack.length > 0 ? game.player : game.opponent;
+	const defender =
+		game.player.items.attack.length > 0 ? game.opponent : game.player;
+	if (defender.items.defense.length == 0) {
+		game.timer = -1;
+		game.phase = "finish";
+		console.log("Game over");
+		return;
+	}
+
+	game.timer = phase1Duration + phase2Duration + phase3Duration;
+	game.phase = "defenseFight";
+	console.log("Fighting");
+	const fighter = pickFighter(attacker.items.attack);
+	const shield = defender.items.defense[0];
+	game.attackers = [fighter, shield];
+	fighter.hp = 0;
+	shield.hp = 0;
+};
+
 const nextRound = (game: GameT) => {
-	game.player.mana =
+	game.player.mana = [];
+	addManaPoints(
+		game.player,
 		initialMana +
-		game.player.items.mana.reduce((acc, item) => acc + item.strength, 0);
-	game.opponent.mana =
+			game.player.items.mana.reduce(
+				(acc, item) => acc + item.strength,
+				0,
+			),
+	);
+	game.opponent.mana = [];
+	addManaPoints(
+		game.opponent,
 		initialMana +
-		game.opponent.items.mana.reduce((acc, item) => acc + item.strength, 0);
+			game.opponent.items.mana.reduce(
+				(acc, item) => acc + item.strength,
+				0,
+			),
+	);
 	game.player.items.mana = [];
 	game.opponent.items.mana = [];
 };
@@ -398,14 +492,14 @@ export const itemCost = (_player: Player) => {
 };
 
 const canBuy = (game: GameT, player: Player) => {
-	return player.mana >= itemCost(player) && game.phase === "buildUp";
+	return player.mana.length >= itemCost(player) && game.phase === "buildUp";
 };
 
 export const buyManaItem = (game: GameT, player: Player) => {
 	if (!canBuy(game, player)) {
 		return;
 	}
-	player.mana -= itemCost(player);
+	player.mana.pop();
 	const strength = [1, 2][Math.floor(Math.random() * 2)];
 	addItem(player.items.mana, manaBounds, strength);
 };
@@ -414,7 +508,7 @@ export const buyAttackItem = (game: GameT, player: Player) => {
 	if (!canBuy(game, player)) {
 		return;
 	}
-	player.mana -= itemCost(player);
+	player.mana.pop();
 	const strength = [2, 3, 4][Math.floor(Math.random() * 3)];
 	addItem(player.items.attack, attackBounds, strength);
 };
@@ -423,7 +517,7 @@ export const buyDefenseItem = (game: GameT, player: Player) => {
 	if (!canBuy(game, player)) {
 		return;
 	}
-	player.mana -= itemCost(player);
+	player.mana.pop();
 	const strength = [2, 3, 4][Math.floor(Math.random() * 3)];
 	addItem(player.items.defense, defenseBounds, strength);
 };
