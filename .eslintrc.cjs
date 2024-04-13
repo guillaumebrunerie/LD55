@@ -48,10 +48,10 @@ module.exports = {
 		"react-hooks/exhaustive-deps": "error",
 		"react-hooks/rules-of-hooks": "error",
 
-		"import/named": "error",
-		"import/no-duplicates": ["warn", { "prefer-inline": true }],
-		"import/no-named-as-default": "off",
-		"import/no-unused-modules": [1, { unusedExports: true }],
+		// "import/named": "error",
+		// "import/no-duplicates": ["warn", { "prefer-inline": true }],
+		// "import/no-named-as-default": "off",
+		// "import/no-unused-modules": [1, { unusedExports: true }],
 		"import/no-cycle": "warn",
 
 		"@typescript-eslint/consistent-type-definitions": "off",
@@ -74,14 +74,14 @@ module.exports = {
 			{ checksVoidReturn: { arguments: false } },
 		],
 		"@typescript-eslint/no-unused-vars": [
-			"warn",
+			"off",
 			{ argsIgnorePattern: "^_" },
 		],
 		"@typescript-eslint/prefer-nullish-coalescing": "off",
 
 		"@typescript-eslint/no-unnecessary-condition": "warn",
 		"@typescript-eslint/no-unsafe-argument": "warn",
-		"@typescript-eslint/no-unsafe-assignment": "warn",
+		"@typescript-eslint/no-unsafe-assignment": "off",
 		"@typescript-eslint/no-unsafe-call": "warn",
 		"@typescript-eslint/no-unsafe-member-access": "warn",
 		"@typescript-eslint/no-unsafe-return": "warn",

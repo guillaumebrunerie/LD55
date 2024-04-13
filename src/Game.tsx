@@ -12,8 +12,10 @@ import {
 	Division,
 	Hero,
 	Mana1,
+	Monster3Dies,
 } from "./assets";
-import { fightDuration } from "./configuration";
+import { fightDuration, phase1Duration, phase2Duration } from "./configuration";
+import { getFrame } from "./Animation";
 
 const cubicOut = (t: number) => {
 	const f = t - 1.0;
@@ -94,14 +96,34 @@ const MonsterTexture = {
 } as const;
 
 const MonsterItems = ({ items }: { items: Item[] }) => {
-	return items.map((item, i) => (
-		<Sprite
-			key={i}
-			anchor={0.5}
-			texture={MonsterTexture[item.strength]}
-			position={item.tmpPosition || item.position}
-		/>
-	));
+	return items.map((item, i) => {
+		switch (item.state) {
+			case "visible":
+				return (
+					<Sprite
+						key={i}
+						anchor={0.5}
+						texture={MonsterTexture[item.strength]}
+						position={item.tmpPosition || item.position}
+					/>
+				);
+			case "fighting": {
+				const j = Math.floor(
+					(item.nt || 0) *
+						(Monster3Dies.animations.Monster3Dies.length - 1),
+				);
+				return (
+					<Sprite
+						key={i}
+						anchor={0.5}
+						texture={Monster3Dies.animations.Monster3Dies[j]}
+						position={item.tmpPosition || item.position}
+					/>
+				);
+			}
+		}
+		return null;
+	});
 };
 
 const ManaItems = ({ items }: { items: Item[] }) => {

@@ -4,25 +4,24 @@ const duration = (spritesheet: Spritesheet, fps: number) =>
 	((spritesheet.animations.animation?.length || 0) * 1000) / fps;
 
 export const getFrame = (
-	spritesheet: Spritesheet,
+	animation: Texture[],
 	fps: number,
 	t: number,
 	time: "hold" | "loop" | "remove" = "loop",
 ) => {
-	const textures = spritesheet.animations.animation;
 	switch (time) {
 		case "loop":
-			return textures?.[Math.floor((t * fps) / 1000) % textures.length];
+			return animation[Math.floor((t * fps) / 1000) % animation.length];
 		case "hold":
-			return textures?.[
-				Math.min(Math.floor((t * fps) / 1000), textures.length - 1)
+			return animation[
+				Math.min(Math.floor((t * fps) / 1000), animation.length - 1)
 			];
 		case "remove": {
 			const i = Math.floor((t * fps) / 1000);
-			if (!textures || i >= textures.length) {
+			if (i >= animation.length) {
 				return Texture.EMPTY;
 			} else {
-				return textures[i];
+				return animation[i];
 			}
 		}
 	}

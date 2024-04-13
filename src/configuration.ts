@@ -7,6 +7,11 @@ export const initialTimer = 10;
 export const fightDuration = 3;
 export const attackSpeed = 150;
 
+const factor = 1;
+export const phase1Duration = 0.15 * factor;
+export const phase2Duration = 0.15 * factor;
+export const phase3Duration = 0.3 * factor;
+
 export type Bounds = {
 	x: number;
 	y: number;

@@ -8,6 +8,9 @@ import {
 	initialManaItems,
 	initialTimer,
 	manaBounds,
+	phase1Duration,
+	phase2Duration,
+	phase3Duration,
 	type Bounds,
 } from "./configuration";
 
@@ -21,6 +24,8 @@ export type Item = {
 	tmpPosition?: Point;
 	strength: number;
 	hp: number;
+	state: "visible" | "hidden" | "fighting";
+	nt?: number;
 };
 
 export type Player = {
@@ -62,6 +67,7 @@ const addItem = (array: Item[], bounds: Bounds, strength: number) => {
 		position: bestPosition,
 		strength,
 		hp: strength,
+		state: "visible",
 	});
 };
 
@@ -104,13 +110,13 @@ export const startGame = (game: GameT) => {
 	game.isGameOver = false;
 };
 
-const manaRate = (player: Player) => {
-	return player.items.mana.length; // Mana per second
-};
+// const manaRate = (player: Player) => {
+// 	return player.items.mana.length; // Mana per second
+// };
 
-const manaRateIfMataItemBought = (player: Player) => {
-	return player.items.mana.length + 1;
-};
+// const manaRateIfMataItemBought = (player: Player) => {
+// 	return player.items.mana.length + 1;
+// };
 
 const opponentMove = (
 	game: GameT,
@@ -195,7 +201,7 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 			// opponentMove(game, game.player, 0.4);
 			// opponentMove(game, game.opponent, 0.6);
 			if (game.player.mana == 0) {
-				opponentMove(game, game.opponent, 0.2, 0.5);
+				opponentMove(game, game.opponent, 0.1, 0.9);
 				game.timer = phase1Duration + phase2Duration + phase3Duration;
 				game.phase = "attackFight";
 				pickFightingPair(game);
@@ -218,7 +224,7 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 				doDefenseFight(game);
 				break;
 			}
-			moveAttack(game, deltaS);
+			moveAttack(game);
 			break;
 		case "finish":
 			game.timer -= deltaS;
@@ -228,25 +234,44 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 				nextRound(game);
 				break;
 			}
-			moveBackAttack(game, deltaS);
+			// moveBackAttack(game, deltaS);
 			break;
 	}
 };
 
+const pickFighter = (items: Item[]) => {
+	return (
+		items.find((item) => item.hp != item.strength) ||
+		items[Math.floor(Math.random() * items.length)]
+	);
+};
+
 const pickFightingPair = (game: GameT) => {
-	const playerAttacker =
-		game.player.items.attack[
-			Math.floor(Math.random() * game.player.items.attack.length)
-		];
-	const opponentAttacker =
-		game.opponent.items.attack[
-			Math.floor(Math.random() * game.opponent.items.attack.length)
-		];
-	if (!playerAttacker || !opponentAttacker) {
+	game.player.items.attack = game.player.items.attack.filter(
+		(item) => item.hp > 0,
+	);
+	game.opponent.items.attack = game.opponent.items.attack.filter(
+		(item) => item.hp > 0,
+	);
+	if (
+		game.player.items.attack.length == 0 ||
+		game.opponent.items.attack.length == 0
+	) {
 		game.phase = "defenseFight";
 		return;
 	}
+	const playerAttacker = pickFighter(game.player.items.attack);
+	const opponentAttacker = pickFighter(game.opponent.items.attack);
 	game.attackers = [playerAttacker, opponentAttacker];
+	const fightStrength = Math.min(playerAttacker.hp, opponentAttacker.hp);
+
+	// playerAttacker.hp =
+	// 	playerAttacker.hp == fightStrength ? 0 : playerAttacker.hp;
+	// opponentAttacker.hp =
+	// 	opponentAttacker.hp == fightStrength ? 0 : opponentAttacker.hp;
+
+	playerAttacker.hp -= fightStrength;
+	opponentAttacker.hp -= fightStrength;
 };
 
 const nextRound = (game: GameT) => {
@@ -260,10 +285,6 @@ const nextRound = (game: GameT) => {
 	game.opponent.items.mana = [];
 };
 
-const phase1Duration = 0.2;
-const phase2Duration = 0.1;
-const phase3Duration = 0.1;
-
 const moveAttack = (game: GameT) => {
 	if (!game.attackers) {
 		return;
@@ -275,10 +296,19 @@ const moveAttack = (game: GameT) => {
 		(opponentAttacker.position.y - playerAttacker.position.y) / 2;
 	let t;
 	if (game.timer <= phase1Duration) {
+		playerAttacker.state = playerAttacker.hp == 0 ? "hidden" : "visible";
+		opponentAttacker.state =
+			opponentAttacker.hp == 0 ? "hidden" : "visible";
 		t = Math.pow(game.timer / phase1Duration, 2);
 	} else if (game.timer <= phase1Duration + phase2Duration) {
+		playerAttacker.state = "fighting";
+		playerAttacker.nt =
+			(phase1Duration + phase2Duration - game.timer) / phase2Duration;
+		opponentAttacker.state = "hidden";
 		t = 1;
 	} else {
+		playerAttacker.state = "visible";
+		opponentAttacker.state = "visible";
 		t =
 			1 -
 			Math.pow(
@@ -307,16 +337,16 @@ const moveAttack = (game: GameT) => {
 // 	}
 // };
 
-const moveBackAttack = (game: GameT, delta: number) => {
-	const player = game.player;
-	const opponent = game.opponent;
-	for (const item of player.items.attack) {
-		item.x -= delta * 2 * attackSpeed;
-	}
-	for (const item of opponent.items.attack) {
-		item.x -= delta * 2 * attackSpeed;
-	}
-};
+// const moveBackAttack = (game: GameT, delta: number) => {
+// 	const player = game.player;
+// 	const opponent = game.opponent;
+// 	for (const item of player.items.attack) {
+// 		item.x -= delta * 2 * attackSpeed;
+// 	}
+// 	for (const item of opponent.items.attack) {
+// 		item.x -= delta * 2 * attackSpeed;
+// 	}
+// };
 
 const shaveItems = (items: Item[], strength: number) => {
 	let removedStrength = 0;
@@ -340,9 +370,9 @@ const attackItems = (attack: Item[], defense: Item[]) => {
 	shaveItems(defense, strength);
 };
 
-const doAttackFight = (game: GameT) => {
-	attackItems(game.player.items.attack, game.opponent.items.attack);
-};
+// const doAttackFight = (game: GameT) => {
+// 	attackItems(game.player.items.attack, game.opponent.items.attack);
+// };
 
 const doDefenseFight = (game: GameT) => {
 	const attack = game.player.items.attack.length;
@@ -356,10 +386,10 @@ const doDefenseFight = (game: GameT) => {
 	}
 };
 
-const clearDefense = (game: GameT) => {
-	game.player.items.defense = [];
-	game.opponent.items.defense = [];
-};
+// const clearDefense = (game: GameT) => {
+// 	game.player.items.defense = [];
+// 	game.opponent.items.defense = [];
+// };
 
 export const itemCost = (_player: Player) => {
 	return 1;
