@@ -15,7 +15,6 @@ import {
 } from "./assets";
 import { BLEND_MODES } from "pixi.js";
 import { Fragment } from "react/jsx-runtime";
-import { getFrame } from "./Animation";
 
 export const Game = ({ game }: { game: GameT }) => {
 	return (
@@ -25,11 +24,7 @@ export const Game = ({ game }: { game: GameT }) => {
 				<Player player={game.player} monsterTint={0xffffff} />
 			</Container>
 			<Container scale={[-1, 1]} x={1920}>
-				<Player
-					player={game.opponent}
-					flipRunes
-					monsterTint={0xff4444}
-				/>
+				<Player player={game.opponent} monsterTint={0xff4444} />
 			</Container>
 		</Container>
 	);
@@ -37,22 +32,15 @@ export const Game = ({ game }: { game: GameT }) => {
 
 const Player = ({
 	player,
-	flipRunes,
 	monsterTint,
 }: {
 	player: GameT["player"];
-	flipRunes?: boolean;
 	monsterTint: number;
 }) => {
 	return (
 		<Container>
 			<ManaPoints items={player.mana} />
-			<Container scale={flipRunes ? [-1, 1] : 1} x={flipRunes ? 456 : 0}>
-				<DefenseItems
-					items={player.items.defense}
-					flipRunes={flipRunes}
-				/>
-			</Container>
+			<DefenseItems items={player.items.defense} />
 			<ManaItems items={player.items.mana} />
 			<MonsterItems items={player.items.attack} tint={monsterTint} />
 			<Sprite texture={Hero} x={180} y={290} />
@@ -123,13 +111,7 @@ const ManaItems = ({ items }: { items: Item[] }) => {
 	));
 };
 
-const DefenseItems = ({
-	items,
-	flipRunes,
-}: {
-	items: Item[];
-	flipRunes: boolean;
-}) => {
+const DefenseItems = ({ items }: { items: Item[] }) => {
 	return items.map((item, i) => {
 		return (
 			<Fragment key={i}>
@@ -161,8 +143,8 @@ const DefenseItems = ({
 						}
 						blendMode={BLEND_MODES.ADD}
 						position={[18, -70]}
-						anchor={flipRunes ? [1, 0] : 0}
-						scale={flipRunes ? [-2, 2] : 2}
+						anchor={0}
+						scale={2}
 					/>
 				)}
 			</Fragment>
