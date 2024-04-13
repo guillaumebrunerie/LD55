@@ -1,0 +1,103 @@
+{"frames": {
+
+"ShieldHit_000.png":
+{
+	"frame": {"x":934,"y":1,"w":165,"h":279},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":29,"y":107,"w":165,"h":279},
+	"sourceSize": {"w":212,"h":422}
+},
+"ShieldHit_001.png":
+{
+	"frame": {"x":600,"y":1,"w":165,"h":284},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":29,"y":104,"w":165,"h":284},
+	"sourceSize": {"w":212,"h":422}
+},
+"ShieldHit_002.png":
+{
+	"frame": {"x":767,"y":1,"w":165,"h":284},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":29,"y":105,"w":165,"h":284},
+	"sourceSize": {"w":212,"h":422}
+},
+"ShieldHit_003.png":
+{
+	"frame": {"x":443,"y":1,"w":155,"h":288},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":39,"y":101,"w":155,"h":288},
+	"sourceSize": {"w":212,"h":422}
+},
+"ShieldHit_004.png":
+{
+	"frame": {"x":1,"y":1,"w":149,"h":292},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":45,"y":98,"w":149,"h":292},
+	"sourceSize": {"w":212,"h":422}
+},
+"ShieldHit_005.png":
+{
+	"frame": {"x":152,"y":1,"w":141,"h":292},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":53,"y":98,"w":141,"h":292},
+	"sourceSize": {"w":212,"h":422}
+},
+"ShieldHit_006.png":
+{
+	"frame": {"x":280,"y":295,"w":144,"h":291},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":49,"y":99,"w":144,"h":291},
+	"sourceSize": {"w":212,"h":422}
+},
+"ShieldHit_007.png":
+{
+	"frame": {"x":295,"y":1,"w":146,"h":289},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":47,"y":101,"w":146,"h":289},
+	"sourceSize": {"w":212,"h":422}
+},
+"ShieldHit_008.png":
+{
+	"frame": {"x":573,"y":291,"w":147,"h":285},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":46,"y":105,"w":147,"h":285},
+	"sourceSize": {"w":212,"h":422}
+},
+"ShieldHit_009.png":
+{
+	"frame": {"x":1,"y":295,"w":145,"h":277},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":48,"y":113,"w":145,"h":277},
+	"sourceSize": {"w":212,"h":422}
+},
+"ShieldHit_010.png":
+{
+	"frame": {"x":860,"y":287,"w":137,"h":266},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":56,"y":123,"w":137,"h":266},
+	"sourceSize": {"w":212,"h":422}
+}},
+"animations": {
+	"ShieldHit": ["ShieldHit_000.png","ShieldHit_001.png","ShieldHit_002.png","ShieldHit_003.png","ShieldHit_004.png","ShieldHit_005.png","ShieldHit_006.png","ShieldHit_007.png","ShieldHit_008.png","ShieldHit_009.png","ShieldHit_010.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "ShieldHit.png",
+	"format": "RGBA8888",
+	"size": {"w":1127,"h":441},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:bbb4a01de482a871c351d0ee76d25179:a67aeb31f2f3fc50b10d4ab495a45863:ca10ebee2d5d43592379d9df07546e92$"
+}
+}
