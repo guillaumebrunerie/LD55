@@ -61,7 +61,7 @@ const addItem = (
 		Math.max(...bounds.polygon.points.filter((_, i) => i % 2 == 0)) - left;
 	const height =
 		bounds.height ??
-		Math.max(...bounds.polygon.points.filter((_, i) => i % 2 == 0)) - top;
+		Math.max(...bounds.polygon.points.filter((_, i) => i % 2 == 1)) - top;
 	for (let iteration = 0; iteration < 100; iteration++) {
 		const position = {
 			x: left + Math.random() * width,

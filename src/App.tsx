@@ -174,7 +174,7 @@ export const App = () => {
 				})}
 			/>
 			<SoundButton />
-			{/* <PolygonShape polygon={manaPointsBounds.polygon} alpha={0.4} /> */}
+			{/* <PolygonShape polygon={manaBounds.polygon} alpha={0.4} /> */}
 		</Container>
 	);
 };

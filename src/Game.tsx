@@ -23,17 +23,25 @@ export const Game = ({ game }: { game: GameT }) => {
 				<Player player={game.player} />
 			</Container>
 			<Container scale={[-1, 1]} x={1920}>
-				<Player player={game.opponent} />
+				<Player player={game.opponent} flipRunes />
 			</Container>
 		</Container>
 	);
 };
 
-const Player = ({ player }: { player: GameT["player"] }) => {
+const Player = ({
+	player,
+	flipRunes,
+}: {
+	player: GameT["player"];
+	flipRunes?: boolean;
+}) => {
 	return (
 		<Container>
 			<ManaPoints items={player.mana} />
-			<DefenseItems items={player.items.defense} />
+			<Container scale={flipRunes ? [-1, 1] : 1} x={flipRunes ? 456 : 0}>
+				<DefenseItems items={player.items.defense} />
+			</Container>
 			<ManaItems items={player.items.mana} />
 			<MonsterItems items={player.items.attack} />
 			<Sprite texture={Hero} x={180} y={290} />
@@ -94,15 +102,9 @@ const MonsterItems = ({ items }: { items: Item[] }) => {
 
 const ManaItems = ({ items }: { items: Item[] }) => {
 	return items.map((item, i) => (
-		<Sprite key={i} texture={Mana1} position={item.position} />
+		<Sprite key={i} texture={Mana1} anchor={0.5} position={item.position} />
 	));
 };
-
-const DefenseTexture = {
-	2: Defense1,
-	3: Defense2,
-	4: Defense3,
-} as const;
 
 const DefenseItems = ({ items }: { items: Item[] }) => {
 	return items.map((item, i) => (
