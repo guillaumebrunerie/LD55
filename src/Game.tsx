@@ -1,7 +1,18 @@
 import { Container, Sprite } from "@pixi/react";
 import type { GameT as GameT, Item } from "./gameLogic";
 import { CustomText } from "./CustomText";
-import { Attack1, CloudFight, Defense1, Division, Hero, Mana1 } from "./assets";
+import {
+	Attack1,
+	Attack2,
+	Attack3,
+	CloudFight,
+	Defense1,
+	Defense2,
+	Defense3,
+	Division,
+	Hero,
+	Mana1,
+} from "./assets";
 import { fightDuration } from "./configuration";
 
 const cubicOut = (t: number) => {
@@ -76,9 +87,20 @@ const Player = ({ player }: { player: GameT["player"] }) => {
 	);
 };
 
+const AttackTexture = {
+	2: Attack1,
+	3: Attack2,
+	4: Attack3,
+} as const;
+
 const AttackItems = ({ items }: { items: Item[] }) => {
 	return items.map((item, i) => (
-		<Sprite key={i} texture={Attack1} x={item.x} y={item.y} />
+		<Sprite
+			key={i}
+			texture={AttackTexture[item.strength]}
+			x={item.x}
+			y={item.y}
+		/>
 	));
 };
 
@@ -88,8 +110,19 @@ const ManaItems = ({ items }: { items: Item[] }) => {
 	));
 };
 
+const DefenseTexture = {
+	2: Defense1,
+	3: Defense2,
+	4: Defense3,
+} as const;
+
 const DefenseItems = ({ items }: { items: Item[] }) => {
 	return items.map((item, i) => (
-		<Sprite key={i} texture={Defense1} x={item.x} y={item.y} />
+		<Sprite
+			key={i}
+			texture={DefenseTexture[item.strength]}
+			x={item.x}
+			y={item.y}
+		/>
 	));
 };

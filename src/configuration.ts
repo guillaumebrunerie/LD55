@@ -1,6 +1,6 @@
-export const initialMana = 0;
-export const initialManaItems = [1];
-export const initialDefenseItems = [1, 1];
+export const initialMana = 5;
+export const initialManaItems = [];
+export const initialDefenseItems = [4, 4, 4, 4, 4];
 export const initialAttackItems = [];
 
 export const initialTimer = 10;
@@ -30,7 +30,7 @@ export const manaBounds: Bounds = {
 
 export const attackBounds: Bounds = {
 	x: 400,
-	y: 20,
+	y: 120,
 	width: 300,
-	height: 700,
+	height: 500,
 };
