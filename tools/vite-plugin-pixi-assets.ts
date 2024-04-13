@@ -43,7 +43,7 @@ export const pixiAssetPlugin = (): Plugin => {
 			const code = `
 import { Assets } from "pixi.js";
 import "@pixi/sound";
-const asset = Assets.load("${dir}/${isSpriteSheet ? baseName + ".json" : fileName}");
+const asset = Assets.load("${dir}/${isSpriteSheet ? baseName + ".json" : fileName}?t=${Date.now()}");
 export default asset;
 `;
 			return code;
