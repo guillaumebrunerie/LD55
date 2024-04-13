@@ -5,6 +5,13 @@ declare module "*.png?texture" {
 	export default texture;
 }
 
+declare module "*.jpg?texture" {
+	import type { Texture } from "pixi.js";
+	const texture: Texture;
+	// eslint-disable-next-line import/no-unused-modules
+	export default texture;
+}
+
 declare module "*.png?spritesheet" {
 	import type { Spritesheet } from "pixi.js";
 	const spritesheet: Spritesheet;

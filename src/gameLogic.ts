@@ -1,3 +1,12 @@
+import {
+	initialAttackItems,
+	initialDefenseItems,
+	initialMana,
+	initialManaItems,
+	initialTimer,
+	itemCost,
+} from "./configuration";
+
 type Player = {
 	mana: number;
 	items: {
@@ -8,30 +17,61 @@ type Player = {
 };
 
 const newPlayer = (): Player => ({
-	mana: 10,
+	mana: initialMana,
 	items: {
-		mana: [],
-		defense: [1, 1, 1],
-		attack: [],
+		mana: initialManaItems,
+		defense: initialDefenseItems,
+		attack: initialAttackItems,
 	},
 });
 
 export const newGame = (isGameOver = false) => ({
 	isGameOver,
-	timer: 60_000,
+	timer: initialTimer,
 	player: newPlayer(),
 	opponent: newPlayer(),
 });
 
-export type Game = ReturnType<typeof newGame>;
+export type GameT = ReturnType<typeof newGame>;
 
-export const startGame = (game: Game) => {
+export const startGame = (game: GameT) => {
 	game.isGameOver = false;
 };
 
-export const tickGame = (game: Game, _gameOver: () => void, delta: number) => {
+const manaRate = (game: GameT) => {
+	return game.player.items.mana.length + 1; // Mana per second
+};
+
+export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 	if (game.isGameOver) {
 		return;
 	}
-	game.timer -= delta / 60;
+	const deltaS = delta / 60;
+	game.timer -= deltaS;
+	game.timer = Math.max(game.timer, 0);
+	game.player.mana += deltaS * manaRate(game);
+};
+
+export const buyManaItem = (game: GameT) => {
+	if (game.player.mana < itemCost) {
+		return;
+	}
+	game.player.mana -= itemCost;
+	game.player.items.mana.push(1);
+};
+
+export const buyAttackItem = (game: GameT) => {
+	if (game.player.mana < itemCost) {
+		return;
+	}
+	game.player.mana -= itemCost;
+	game.player.items.attack.push(1);
+};
+
+export const buyDefenseItem = (game: GameT) => {
+	if (game.player.mana < itemCost) {
+		return;
+	}
+	game.player.mana -= itemCost;
+	game.player.items.defense.push(1);
 };
