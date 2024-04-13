@@ -1,6 +1,6 @@
 import { useState, useEffect, useReducer } from "react";
 import { Rectangle, Texture } from "pixi.js";
-import { Container, Sprite, useTick } from "@pixi/react";
+import { Container, Sprite } from "@pixi/react";
 import { useButton } from "./useButton";
 import { newApp, startApp, startNewGame } from "./appLogic";
 import { observable, action } from "mobx";
@@ -115,19 +115,19 @@ const UIButtons = ({ game }: { game: GameT }) => {
 			<UIButton
 				texture={BtnDefense}
 				x={120}
-				onClick={action(() => buyDefenseItem(game.player))}
+				onClick={action(() => buyDefenseItem(game, game.player))}
 				player={game.player}
 			/>
 			<UIButton
 				texture={BtnMana}
 				x={350}
-				onClick={action(() => buyManaItem(game.player))}
+				onClick={action(() => buyManaItem(game, game.player))}
 				player={game.player}
 			/>
 			<UIButton
 				texture={BtnAttack}
 				x={580}
-				onClick={action(() => buyAttackItem(game.player))}
+				onClick={action(() => buyAttackItem(game, game.player))}
 				player={game.player}
 			/>
 		</>

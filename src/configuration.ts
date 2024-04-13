@@ -3,7 +3,9 @@ export const initialManaItems = [1];
 export const initialDefenseItems = [1, 1];
 export const initialAttackItems = [];
 
-export const initialTimer = 30;
+export const initialTimer = 10;
+export const fightDuration = 3;
+export const attackSpeed = 150;
 
 export type Bounds = {
 	x: number;
