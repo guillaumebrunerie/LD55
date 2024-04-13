@@ -112,7 +112,7 @@ const DefenseItems = ({ items }: { items: Item[] }) => {
 			key={i}
 			texture={Runes.animations.Rune[i]}
 			anchor={0}
-			position={[-14, 612]}
+			position={[-14, 613]}
 		/>
 	));
 };
