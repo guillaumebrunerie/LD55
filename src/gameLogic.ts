@@ -32,7 +32,7 @@ const newItem = (bounds: Bounds): Item => ({
 const newPlayer = (): Player => ({
 	mana: initialMana,
 	items: {
-		mana: initialManaItems,
+		mana: initialManaItems.map((_) => newItem(manaBounds)),
 		defense: initialDefenseItems.map((_) => newItem(defenseBounds)),
 		attack: initialAttackItems,
 	},
@@ -51,8 +51,26 @@ export const startGame = (game: GameT) => {
 	game.isGameOver = false;
 };
 
-const manaRate = (game: GameT) => {
-	return game.player.items.mana.length + 1; // Mana per second
+const manaRate = (player: Player) => {
+	return player.items.mana.length; // Mana per second
+};
+
+const opponentMove = (opponent: Player) => {
+	if (opponent.mana < itemCost(opponent)) {
+		return;
+	}
+	const type = ["mana", "attack", "defense"][Math.floor(Math.random() * 3)];
+	switch (type) {
+		case "mana":
+			buyManaItem(opponent);
+			break;
+		case "attack":
+			buyAttackItem(opponent);
+			break;
+		case "defense":
+			buyDefenseItem(opponent);
+			break;
+	}
 };
 
 export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
@@ -65,34 +83,36 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 		game.timer = 0;
 		return;
 	}
-	game.player.mana += deltaS * manaRate(game);
+	game.player.mana += deltaS * manaRate(game.player);
+	game.opponent.mana += deltaS * manaRate(game.opponent);
+	opponentMove(game.opponent);
 };
 
-export const itemCost = (game: GameT) => {
-	const items = game.player.items;
+export const itemCost = (player: Player) => {
+	const items = player.items;
 	return (items.mana.length + items.attack.length + items.defense.length) / 3;
 };
 
-export const buyManaItem = (game: GameT) => {
-	if (game.player.mana < itemCost(game)) {
+export const buyManaItem = (player: Player) => {
+	if (player.mana < itemCost(player)) {
 		return;
 	}
-	game.player.mana -= itemCost(game);
-	game.player.items.mana.push(newItem(manaBounds));
+	player.mana -= itemCost(player);
+	player.items.mana.push(newItem(manaBounds));
 };
 
-export const buyAttackItem = (game: GameT) => {
-	if (game.player.mana < itemCost(game)) {
+export const buyAttackItem = (player: Player) => {
+	if (player.mana < itemCost(player)) {
 		return;
 	}
-	game.player.mana -= itemCost(game);
-	game.player.items.attack.push(newItem(attackBounds));
+	player.mana -= itemCost(player);
+	player.items.attack.push(newItem(attackBounds));
 };
 
-export const buyDefenseItem = (game: GameT) => {
-	if (game.player.mana < itemCost(game)) {
+export const buyDefenseItem = (player: Player) => {
+	if (player.mana < itemCost(player)) {
 		return;
 	}
-	game.player.mana -= itemCost(game);
-	game.player.items.defense.push(newItem(defenseBounds));
+	player.mana -= itemCost(player);
+	player.items.defense.push(newItem(defenseBounds));
 };

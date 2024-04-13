@@ -7,16 +7,29 @@ export const Game = ({ game }: { game: GameT }) => {
 	return (
 		<Container>
 			<Sprite texture={Division} anchor={[0.5, 0]} x={1920 / 2} y={0} />
-			<DefenseItems items={game.player.items.defense} />
-			<ManaItems items={game.player.items.mana} />
-			<AttackItems items={game.player.items.attack} />
-			<Sprite texture={Hero} x={200} y={300} />
+			<Container>
+				<Player player={game.player} />
+			</Container>
+			<Container scale={[-1, 1]} x={1920}>
+				<Player player={game.opponent} />
+			</Container>
 			<CustomText x={1920 / 2} y={100} text={game.timer.toFixed(2)} />
 			<CustomText
 				x={10}
 				y={90}
 				text={`MANA: ${game.player.mana.toFixed(0)}`}
 			/>
+		</Container>
+	);
+};
+
+const Player = ({ player }: { player: GameT["player"] }) => {
+	return (
+		<Container>
+			<DefenseItems items={player.items.defense} />
+			<ManaItems items={player.items.mana} />
+			<AttackItems items={player.items.attack} />
+			<Sprite texture={Hero} x={80} y={300} />
 		</Container>
 	);
 };

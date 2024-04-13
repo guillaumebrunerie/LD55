@@ -26,14 +26,20 @@ import {
 import { Game } from "./Game";
 import { CustomText } from "./CustomText";
 
-const StartButton = ({ onClick }: { onClick: () => void }) => {
+const StartButton = ({
+	onClick,
+	position,
+}: {
+	onClick: () => void;
+	position: [number, number];
+}) => {
 	const { isActive, props } = useButton({ onClick });
 
 	return (
 		<Sprite
 			texture={isActive ? StartButtonPressed : StartButtonDefault}
 			anchor={0.5}
-			position={[1920 / 2, 800]}
+			position={position}
 			hitArea={new Rectangle(-200, -100, 400, 200)}
 			{...props}
 		/>
@@ -73,7 +79,7 @@ const SoundButton = () => {
 };
 
 const UIButtons = ({ game }: { game: GameT }) => {
-	const tint = game.player.mana < itemCost(game) ? 0x333333 : 0xffffff;
+	const tint = game.player.mana < itemCost(game.player) ? 0x333333 : 0xffffff;
 	return (
 		<>
 			<Sprite
@@ -84,7 +90,7 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				cursor="pointer"
 				eventMode="static"
 				tint={tint}
-				pointerdown={action(() => buyDefenseItem(game))}
+				pointerdown={action(() => buyDefenseItem(game.player))}
 			/>
 			<Sprite
 				texture={BtnMana}
@@ -94,7 +100,7 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				cursor="pointer"
 				eventMode="static"
 				tint={tint}
-				pointerdown={action(() => buyManaItem(game))}
+				pointerdown={action(() => buyManaItem(game.player))}
 			/>
 			<Sprite
 				texture={BtnAttack}
@@ -104,7 +110,7 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				cursor="pointer"
 				eventMode="static"
 				tint={tint}
-				pointerdown={action(() => buyAttackItem(game))}
+				pointerdown={action(() => buyAttackItem(game.player))}
 			/>
 		</>
 	);
@@ -130,15 +136,14 @@ export const App = () => {
 					text={`HIGHSCORE: ${toTxt(highScore)}`}
 				/>
 			)}
-			{game.isGameOver && (
-				<StartButton
-					onClick={action(() => {
-						startNewGame(app);
-					})}
-				/>
-			)}
 			{!game.isGameOver && <Game game={game} />}
 			{!game.isGameOver && <UIButtons game={game} />}
+			<StartButton
+				position={game.isGameOver ? [1920 / 2, 800] : [1920 / 2, 1000]}
+				onClick={action(() => {
+					startNewGame(app);
+				})}
+			/>
 			<SoundButton />
 		</Container>
 	);
