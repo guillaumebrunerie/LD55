@@ -104,7 +104,7 @@ const UIButton = ({
 				tint={tint}
 				pointerdown={onClick}
 			/>
-			<Sprite texture={BtnBar.animations.BtnBar[i]} anchor={0.5} />
+			{/* <Sprite texture={BtnBar.animations.BtnBar[i]} anchor={0.5} /> */}
 		</Container>
 	);
 };

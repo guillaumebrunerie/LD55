@@ -181,7 +181,7 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 			// opponentMove(game, game.player, 0.4);
 			// opponentMove(game, game.opponent, 0.6);
 			if (game.player.mana == 0) {
-				opponentMove(game, game.opponent, 0.1, 0.1);
+				opponentMove(game, game.opponent, 0.2, 0.5);
 				game.timer = fightDuration;
 				game.phase = "attackFight";
 			}
