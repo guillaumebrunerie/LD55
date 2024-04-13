@@ -2,9 +2,9 @@ import { Container, Sprite } from "@pixi/react";
 import type { GameT as GameT, Item } from "./gameLogic";
 import { CustomText } from "./CustomText";
 import {
-	Attack1,
-	Attack2,
-	Attack3,
+	Monster1,
+	Monster2,
+	Monster3,
 	CloudFight,
 	Defense1,
 	Defense2,
@@ -36,42 +36,42 @@ export const Game = ({ game }: { game: GameT }) => {
 				y={90}
 				text={`MANA: ${game.player.mana.toFixed(0)}`}
 			/>
-			{game.phase == "attackFight" && (
-				<Sprite
-					anchor={0.5}
-					x={1920 / 2}
-					y={1080 / 2}
-					texture={CloudFight}
-					scale={cubicOut(1 - game.timer / fightDuration)}
-				/>
-			)}
-			{game.phase == "defenseFight" && (
-				<Sprite
-					anchor={0.5}
-					x={1920 / 2}
-					y={1080 / 2}
-					texture={CloudFight}
-					scale={1 - cubicOut(1 - game.timer / fightDuration)}
-				/>
-			)}
-			{game.phase == "defenseFight" && (
-				<Sprite
-					anchor={0.5}
-					x={game.player.items.attack.length > 0 ? 1920 - 400 : 400}
-					y={400}
-					texture={CloudFight}
-					scale={0.7 * cubicOut(1 - game.timer / fightDuration)}
-				/>
-			)}
-			{game.phase == "finish" && (
-				<Sprite
-					anchor={0.5}
-					x={game.player.items.attack.length > 0 ? 1920 - 400 : 400}
-					y={400}
-					texture={CloudFight}
-					scale={0.7 * (1 - cubicOut(1 - game.timer / fightDuration))}
-				/>
-			)}
+			{/* {game.phase == "attackFight" && ( */}
+			{/* 	<Sprite */}
+			{/* 		anchor={0.5} */}
+			{/* 		x={1920 / 2} */}
+			{/* 		y={1080 / 2} */}
+			{/* 		texture={CloudFight} */}
+			{/* 		scale={cubicOut(1 - game.timer / fightDuration)} */}
+			{/* 	/> */}
+			{/* )} */}
+			{/* {game.phase == "defenseFight" && ( */}
+			{/* 	<Sprite */}
+			{/* 		anchor={0.5} */}
+			{/* 		x={1920 / 2} */}
+			{/* 		y={1080 / 2} */}
+			{/* 		texture={CloudFight} */}
+			{/* 		scale={1 - cubicOut(1 - game.timer / fightDuration)} */}
+			{/* 	/> */}
+			{/* )} */}
+			{/* {game.phase == "defenseFight" && ( */}
+			{/* 	<Sprite */}
+			{/* 		anchor={0.5} */}
+			{/* 		x={game.player.items.attack.length > 0 ? 1920 - 400 : 400} */}
+			{/* 		y={400} */}
+			{/* 		texture={CloudFight} */}
+			{/* 		scale={0.7 * cubicOut(1 - game.timer / fightDuration)} */}
+			{/* 	/> */}
+			{/* )} */}
+			{/* {game.phase == "finish" && ( */}
+			{/* 	<Sprite */}
+			{/* 		anchor={0.5} */}
+			{/* 		x={game.player.items.attack.length > 0 ? 1920 - 400 : 400} */}
+			{/* 		y={400} */}
+			{/* 		texture={CloudFight} */}
+			{/* 		scale={0.7 * (1 - cubicOut(1 - game.timer / fightDuration))} */}
+			{/* 	/> */}
+			{/* )} */}
 		</Container>
 	);
 };
@@ -81,32 +81,32 @@ const Player = ({ player }: { player: GameT["player"] }) => {
 		<Container>
 			<DefenseItems items={player.items.defense} />
 			<ManaItems items={player.items.mana} />
-			<AttackItems items={player.items.attack} />
+			<MonsterItems items={player.items.attack} />
 			<Sprite texture={Hero} x={80} y={300} />
 		</Container>
 	);
 };
 
-const AttackTexture = {
-	2: Attack1,
-	3: Attack2,
-	4: Attack3,
+const MonsterTexture = {
+	2: Monster1,
+	3: Monster2,
+	4: Monster3,
 } as const;
 
-const AttackItems = ({ items }: { items: Item[] }) => {
+const MonsterItems = ({ items }: { items: Item[] }) => {
 	return items.map((item, i) => (
 		<Sprite
 			key={i}
-			texture={AttackTexture[item.strength]}
-			x={item.x}
-			y={item.y}
+			anchor={0.5}
+			texture={MonsterTexture[item.strength]}
+			position={item.tmpPosition || item.position}
 		/>
 	));
 };
 
 const ManaItems = ({ items }: { items: Item[] }) => {
 	return items.map((item, i) => (
-		<Sprite key={i} texture={Mana1} x={item.x} y={item.y} />
+		<Sprite key={i} texture={Mana1} position={item.position} />
 	));
 };
 
@@ -121,8 +121,7 @@ const DefenseItems = ({ items }: { items: Item[] }) => {
 		<Sprite
 			key={i}
 			texture={DefenseTexture[item.strength]}
-			x={item.x}
-			y={item.y}
+			position={item.position}
 		/>
 	));
 };

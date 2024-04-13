@@ -30,7 +30,7 @@ export const manaBounds: Bounds = {
 
 export const attackBounds: Bounds = {
 	x: 400,
-	y: 120,
+	y: 200,
 	width: 300,
 	height: 500,
 };

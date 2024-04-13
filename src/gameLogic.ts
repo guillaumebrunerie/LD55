@@ -11,10 +11,16 @@ import {
 	type Bounds,
 } from "./configuration";
 
-export type Item = {
+export type Point = {
 	x: number;
 	y: number;
+};
+
+export type Item = {
+	position: Point;
+	tmpPosition?: Point;
 	strength: number;
+	hp: number;
 };
 
 export type Player = {
@@ -38,8 +44,8 @@ const addItem = (array: Item[], bounds: Bounds, strength: number) => {
 		};
 		const distance = Math.min(
 			...array.map((item) => {
-				const dx = item.x - position.x;
-				const dy = item.y - position.y;
+				const dx = item.position.x - position.x;
+				const dy = item.position.y - position.y;
 				return Math.sqrt(dx * dx + dy * dy);
 			}),
 		);
@@ -53,8 +59,9 @@ const addItem = (array: Item[], bounds: Bounds, strength: number) => {
 		}
 	}
 	array.push({
-		...bestPosition,
+		position: bestPosition,
 		strength,
+		hp: strength,
 	});
 };
 
@@ -76,15 +83,22 @@ const newPlayer = (): Player => {
 	return player;
 };
 
-export const newGame = (isGameOver = false) => ({
+export type GameT = {
+	isGameOver: boolean;
+	phase: "buildUp" | "attackFight" | "defenseFight" | "finish";
+	timer: number;
+	player: Player;
+	opponent: Player;
+	attackers?: [Item, Item];
+};
+
+export const newGame = (isGameOver = false): GameT => ({
 	isGameOver,
 	phase: "buildUp" as "buildUp" | "attackFight" | "defenseFight" | "finish",
 	timer: initialTimer,
 	player: newPlayer(),
 	opponent: newPlayer(),
 });
-
-export type GameT = ReturnType<typeof newGame>;
 
 export const startGame = (game: GameT) => {
 	game.isGameOver = false;
@@ -182,19 +196,19 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 			// opponentMove(game, game.opponent, 0.6);
 			if (game.player.mana == 0) {
 				opponentMove(game, game.opponent, 0.2, 0.5);
-				game.timer = fightDuration;
+				game.timer = phase1Duration + phase2Duration + phase3Duration;
 				game.phase = "attackFight";
+				pickFightingPair(game);
 			}
 			break;
 		case "attackFight":
 			game.timer -= deltaS;
 			if (game.timer <= 0) {
-				game.timer = fightDuration;
-				game.phase = "defenseFight";
-				doAttackFight(game);
+				game.timer = phase1Duration + phase2Duration + phase3Duration;
+				pickFightingPair(game);
 				break;
 			}
-			moveAttack(game, deltaS);
+			moveAttack(game);
 			break;
 		case "defenseFight":
 			game.timer -= deltaS;
@@ -219,6 +233,22 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 	}
 };
 
+const pickFightingPair = (game: GameT) => {
+	const playerAttacker =
+		game.player.items.attack[
+			Math.floor(Math.random() * game.player.items.attack.length)
+		];
+	const opponentAttacker =
+		game.opponent.items.attack[
+			Math.floor(Math.random() * game.opponent.items.attack.length)
+		];
+	if (!playerAttacker || !opponentAttacker) {
+		game.phase = "defenseFight";
+		return;
+	}
+	game.attackers = [playerAttacker, opponentAttacker];
+};
+
 const nextRound = (game: GameT) => {
 	game.player.mana =
 		initialMana +
@@ -230,16 +260,52 @@ const nextRound = (game: GameT) => {
 	game.opponent.items.mana = [];
 };
 
-const moveAttack = (game: GameT, delta: number) => {
-	const player = game.player;
-	const opponent = game.opponent;
-	for (const item of player.items.attack) {
-		item.x += delta * attackSpeed;
+const phase1Duration = 0.2;
+const phase2Duration = 0.1;
+const phase3Duration = 0.1;
+
+const moveAttack = (game: GameT) => {
+	if (!game.attackers) {
+		return;
 	}
-	for (const item of opponent.items.attack) {
-		item.x += delta * attackSpeed;
+	const [playerAttacker, opponentAttacker] = game.attackers;
+	const deltaX =
+		(1920 - opponentAttacker.position.x - playerAttacker.position.x) / 2;
+	const deltaY =
+		(opponentAttacker.position.y - playerAttacker.position.y) / 2;
+	let t;
+	if (game.timer <= phase1Duration) {
+		t = Math.pow(game.timer / phase1Duration, 2);
+	} else if (game.timer <= phase1Duration + phase2Duration) {
+		t = 1;
+	} else {
+		t =
+			1 -
+			Math.pow(
+				(game.timer - phase1Duration - phase2Duration) / phase3Duration,
+				2,
+			);
 	}
+	playerAttacker.tmpPosition = {
+		x: playerAttacker.position.x + t * deltaX,
+		y: playerAttacker.position.y + t * deltaY,
+	};
+	opponentAttacker.tmpPosition = {
+		x: opponentAttacker.position.x + t * deltaX,
+		y: opponentAttacker.position.y - t * deltaY,
+	};
 };
+
+// const moveAttack = (game: GameT, delta: number) => {
+// 	const player = game.player;
+// 	const opponent = game.opponent;
+// 	for (const item of player.items.attack) {
+// 		item.x += delta * attackSpeed;
+// 	}
+// 	for (const item of opponent.items.attack) {
+// 		item.x += delta * attackSpeed;
+// 	}
+// };
 
 const moveBackAttack = (game: GameT, delta: number) => {
 	const player = game.player;

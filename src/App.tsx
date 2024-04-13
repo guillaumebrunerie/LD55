@@ -8,7 +8,7 @@ import { sound } from "@pixi/sound";
 import {
 	Bg,
 	BtnAttack,
-	BtnBar,
+	// BtnBar,
 	BtnDefense,
 	BtnMana,
 	Logo,
@@ -92,8 +92,8 @@ const UIButton = ({
 	player: Player;
 }) => {
 	const tint = player.mana < itemCost(player) ? 0x333333 : 0xffffff;
-	const proportion = (player.mana / itemCost(player)) * 100;
-	const i = Math.min(Math.round(proportion), 99);
+	// const proportion = (player.mana / itemCost(player)) * 100;
+	// const i = Math.min(Math.round(proportion), 99);
 	return (
 		<Container x={x} y={1080 - 120}>
 			<Sprite
