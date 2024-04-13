@@ -4,7 +4,6 @@ import {
 	initialMana,
 	initialManaItems,
 	initialTimer,
-	itemCost,
 } from "./configuration";
 
 type Player = {
@@ -55,26 +54,31 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 	game.player.mana += deltaS * manaRate(game);
 };
 
+export const itemCost = (game: GameT) => {
+	const items = game.player.items;
+	return (items.mana.length + items.attack.length + items.defense.length) / 3;
+};
+
 export const buyManaItem = (game: GameT) => {
-	if (game.player.mana < itemCost) {
+	if (game.player.mana < itemCost(game)) {
 		return;
 	}
-	game.player.mana -= itemCost;
+	game.player.mana -= itemCost(game);
 	game.player.items.mana.push(1);
 };
 
 export const buyAttackItem = (game: GameT) => {
-	if (game.player.mana < itemCost) {
+	if (game.player.mana < itemCost(game)) {
 		return;
 	}
-	game.player.mana -= itemCost;
+	game.player.mana -= itemCost(game);
 	game.player.items.attack.push(1);
 };
 
 export const buyDefenseItem = (game: GameT) => {
-	if (game.player.mana < itemCost) {
+	if (game.player.mana < itemCost(game)) {
 		return;
 	}
-	game.player.mana -= itemCost;
+	game.player.mana -= itemCost(game);
 	game.player.items.defense.push(1);
 };

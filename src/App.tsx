@@ -20,6 +20,7 @@ import {
 	buyAttackItem,
 	buyDefenseItem,
 	buyManaItem,
+	itemCost,
 	type GameT,
 } from "./gameLogic";
 import { Game } from "./Game";
@@ -72,6 +73,7 @@ const SoundButton = () => {
 };
 
 const UIButtons = ({ game }: { game: GameT }) => {
+	const tint = game.player.mana < itemCost(game) ? 0x333333 : 0xffffff;
 	return (
 		<>
 			<Sprite
@@ -81,6 +83,7 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				y={1080 - 20}
 				cursor="pointer"
 				eventMode="static"
+				tint={tint}
 				pointerdown={action(() => buyDefenseItem(game))}
 			/>
 			<Sprite
@@ -90,6 +93,7 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				y={1080 - 20}
 				cursor="pointer"
 				eventMode="static"
+				tint={tint}
 				pointerdown={action(() => buyManaItem(game))}
 			/>
 			<Sprite
@@ -99,6 +103,7 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				y={1080 - 20}
 				cursor="pointer"
 				eventMode="static"
+				tint={tint}
 				pointerdown={action(() => buyAttackItem(game))}
 			/>
 		</>
