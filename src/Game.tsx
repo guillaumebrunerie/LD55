@@ -48,7 +48,10 @@ const Player = ({
 		<Container>
 			<ManaPoints items={player.mana} />
 			<Container scale={flipRunes ? [-1, 1] : 1} x={flipRunes ? 456 : 0}>
-				<DefenseItems items={player.items.defense} />
+				<DefenseItems
+					items={player.items.defense}
+					flipRunes={flipRunes}
+				/>
 			</Container>
 			<ManaItems items={player.items.mana} />
 			<MonsterItems items={player.items.attack} tint={monsterTint} />
@@ -120,7 +123,13 @@ const ManaItems = ({ items }: { items: Item[] }) => {
 	));
 };
 
-const DefenseItems = ({ items }: { items: Item[] }) => {
+const DefenseItems = ({
+	items,
+	flipRunes,
+}: {
+	items: Item[];
+	flipRunes: boolean;
+}) => {
 	return items.map((item, i) => {
 		return (
 			<Fragment key={i}>
@@ -152,8 +161,8 @@ const DefenseItems = ({ items }: { items: Item[] }) => {
 						}
 						blendMode={BLEND_MODES.ADD}
 						position={[18, -70]}
-						anchor={0}
-						scale={2}
+						anchor={flipRunes ? [1, 0] : 0}
+						scale={flipRunes ? [-2, 2] : 2}
 					/>
 				)}
 			</Fragment>
