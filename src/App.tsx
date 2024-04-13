@@ -21,14 +21,11 @@ import {
 	buyAttackItem,
 	buyDefenseItem,
 	buyManaItem,
-	itemCost,
 	type GameT,
 	type Player,
 } from "./gameLogic";
 import { Game } from "./Game";
 import { CustomText } from "./CustomText";
-import { PolygonShape } from "./Polygon";
-import { attackBounds, manaBounds, manaPointsBounds } from "./configuration";
 
 const StartButton = ({
 	onClick,
@@ -93,7 +90,7 @@ const UIButton = ({
 	x: number;
 	player: Player;
 }) => {
-	const tint = player.mana.length < itemCost(player) ? 0x333333 : 0xffffff;
+	const tint = player.mana.length == 0 ? 0x333333 : 0xffffff;
 	// const proportion = (player.mana / itemCost(player)) * 100;
 	// const i = Math.min(Math.round(proportion), 99);
 	return (

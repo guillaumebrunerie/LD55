@@ -1,4 +1,4 @@
-/** Generated on Sat Apr 13 23:31:07 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sun Apr 14 01:10:52 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -21,6 +21,7 @@ import Monster1_ from "../gfx/Monster1.png?texture";
 import Monster2_ from "../gfx/Monster2.png?texture";
 import Monster3_ from "../gfx/Monster3.png?texture";
 import Moon_ from "../gfx/Moon.png?texture";
+import ShieldLoop_ from "../gfx/ShieldLoop.png?texture";
 import SoundOff_ from "../gfx/SoundOff.png?texture";
 import SoundOn_ from "../gfx/SoundOn.png?texture";
 import StartButtonDefault_ from "../gfx/StartButtonDefault.png?texture";
@@ -31,6 +32,7 @@ import BtnBar_ from "../gfx/BtnBar.png?spritesheet";
 import Font_ from "../gfx/Font.png?spritesheet";
 import Monster3Dies_ from "../gfx/Monster3Dies.png?spritesheet";
 import Runes_ from "../gfx/Runes.png?spritesheet";
+import ShieldHit_ from "../gfx/ShieldHit.png?spritesheet";
 
 /** Sounds */
 import Click_ from "../audio/Click.mp3?sound";
@@ -56,6 +58,7 @@ export const [
 	Monster2,
 	Monster3,
 	Moon,
+	ShieldLoop,
 	SoundOff,
 	SoundOn,
 	StartButtonDefault,
@@ -64,6 +67,7 @@ export const [
 	Font,
 	Monster3Dies,
 	Runes,
+	ShieldHit,
 	Click,
 	Music,
 	Pop,
@@ -86,6 +90,7 @@ export const [
 	Monster2_,
 	Monster3_,
 	Moon_,
+	ShieldLoop_,
 	SoundOff_,
 	SoundOn_,
 	StartButtonDefault_,
@@ -94,6 +99,7 @@ export const [
 	Font_,
 	Monster3Dies_,
 	Runes_,
+	ShieldHit_,
 	Click_,
 	Music_,
 	Pop_,

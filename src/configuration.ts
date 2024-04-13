@@ -2,25 +2,21 @@ import { Polygon } from "pixi.js";
 
 export const initialMana = 5;
 export const initialManaItems = [];
-export const initialDefenseItems = [4, 4, 4, 4, 4];
+export const initialDefenseItems = Array(16)
+	.fill(null)
+	.map(() => 2);
 export const initialAttackItems = Array(0)
 	.fill(null)
 	.map(() => [2, 3, 4][Math.floor(Math.random() * 3)]);
 
 export const initialTimer = 10;
-export const fightDuration = 3;
 export const attackSpeed = 150;
 
 const factor = 1;
-export const phase1Duration = 0.15 * factor;
-export const phase2Duration = 0.15 * factor;
-export const phase3Duration = 0.3 * factor;
+export const fightDuration = 0.15 * factor;
+export const attackApproachDuration = 0.3 * factor;
 
 export type Bounds = {
-	x: number;
-	y: number;
-	width: number;
-	height: number;
 	polygon: Polygon;
 };
 
@@ -33,10 +29,7 @@ export const manaPointsBounds: Bounds = {
 };
 
 export const defenseBounds: Bounds = {
-	x: 20,
-	y: 20,
-	width: 300,
-	height: 500,
+	polygon: new Polygon([411, 404, 411, 641, 386, 640, 386, 422]),
 };
 
 export const manaBounds: Bounds = {

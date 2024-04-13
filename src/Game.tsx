@@ -4,27 +4,32 @@ import {
 	Monster1,
 	Monster2,
 	Monster3,
-	Defense1,
-	Defense2,
-	Defense3,
 	Hero,
 	Mana1,
 	Monster3Dies,
 	Moon,
 	ManaPoint,
 	Runes,
+	ShieldLoop,
+	ShieldHit,
 } from "./assets";
 import { BLEND_MODES } from "pixi.js";
+import { Fragment } from "react/jsx-runtime";
+import { getFrame } from "./Animation";
 
 export const Game = ({ game }: { game: GameT }) => {
 	return (
 		<Container>
 			<Sprite texture={Moon} anchor={[0.5, 0.5]} x={1920 / 2} y={-100} />
 			<Container>
-				<Player player={game.player} />
+				<Player player={game.player} monsterTint={0xffffff} />
 			</Container>
 			<Container scale={[-1, 1]} x={1920}>
-				<Player player={game.opponent} flipRunes />
+				<Player
+					player={game.opponent}
+					flipRunes
+					monsterTint={0xff4444}
+				/>
 			</Container>
 		</Container>
 	);
@@ -33,9 +38,11 @@ export const Game = ({ game }: { game: GameT }) => {
 const Player = ({
 	player,
 	flipRunes,
+	monsterTint,
 }: {
 	player: GameT["player"];
 	flipRunes?: boolean;
+	monsterTint: number;
 }) => {
 	return (
 		<Container>
@@ -44,7 +51,7 @@ const Player = ({
 				<DefenseItems items={player.items.defense} />
 			</Container>
 			<ManaItems items={player.items.mana} />
-			<MonsterItems items={player.items.attack} />
+			<MonsterItems items={player.items.attack} tint={monsterTint} />
 			<Sprite texture={Hero} x={180} y={290} />
 		</Container>
 	);
@@ -57,6 +64,7 @@ const ManaPoints = ({ items }: { items: Item[] }) => {
 				key={i}
 				anchor={0.5}
 				scale={item.scale}
+				blendMode={BLEND_MODES.NORMAL}
 				texture={ManaPoint}
 				position={item.position}
 			/>
@@ -70,7 +78,7 @@ const MonsterTexture = {
 	4: Monster3,
 } as const;
 
-const MonsterItems = ({ items }: { items: Item[] }) => {
+const MonsterItems = ({ items, tint }: { items: Item[]; tint: number }) => {
 	return items.map((item, i) => {
 		switch (item.state) {
 			case "visible":
@@ -78,6 +86,9 @@ const MonsterItems = ({ items }: { items: Item[] }) => {
 					<Sprite
 						key={i}
 						anchor={0.5}
+						tint={tint}
+						blendMode={BLEND_MODES.NORMAL}
+						// blendMode={BLEND_MODES.NORMAL}
 						texture={MonsterTexture[item.strength]}
 						position={item.tmpPosition || item.position}
 					/>
@@ -91,6 +102,7 @@ const MonsterItems = ({ items }: { items: Item[] }) => {
 					<Sprite
 						key={i}
 						anchor={0.5}
+						tint={0xffffff}
 						blendMode={BLEND_MODES.ADD}
 						texture={Monster3Dies.animations.Monster3Dies[j]}
 						position={item.tmpPosition || item.position}
@@ -109,12 +121,42 @@ const ManaItems = ({ items }: { items: Item[] }) => {
 };
 
 const DefenseItems = ({ items }: { items: Item[] }) => {
-	return items.map((item, i) => (
-		<Sprite
-			key={i}
-			texture={Runes.animations.Rune[i]}
-			anchor={0}
-			position={[-14, 613]}
-		/>
-	));
+	return items.map((item, i) => {
+		return (
+			<Fragment key={i}>
+				<Sprite
+					key={i}
+					texture={Runes.animations.Rune[i]}
+					anchor={0}
+					position={[-14, 613]}
+				/>
+				{i == 0 && (
+					<Sprite
+						texture={ShieldLoop}
+						blendMode={BLEND_MODES.ADD}
+						position={[18, -70]}
+						anchor={0}
+						scale={2}
+					/>
+				)}
+				{item.state == "fighting" && (
+					<Sprite
+						texture={
+							ShieldHit.animations.ShieldHit[
+								Math.floor(
+									item.nt *
+										(ShieldHit.animations.ShieldHit.length -
+											1),
+								)
+							]
+						}
+						blendMode={BLEND_MODES.ADD}
+						position={[18, -70]}
+						anchor={0}
+						scale={2}
+					/>
+				)}
+			</Fragment>
+		);
+	});
 };
