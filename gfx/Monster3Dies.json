@@ -1,0 +1,47 @@
+{"frames": {
+
+"Monster3Dies_000.png":
+{
+	"frame": {"x":285,"y":129,"w":119,"h":152},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":89,"y":78,"w":119,"h":152},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster3Dies_001.png":
+{
+	"frame": {"x":285,"y":1,"w":126,"h":150},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":83,"y":81,"w":126,"h":150},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster3Dies_002.png":
+{
+	"frame": {"x":1,"y":1,"w":138,"h":165},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":73,"y":76,"w":138,"h":165},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster3Dies_003.png":
+{
+	"frame": {"x":141,"y":1,"w":142,"h":149},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":66,"y":71,"w":142,"h":149},
+	"sourceSize": {"w":300,"h":300}
+}},
+"animations": {
+	"Monster3Dies": ["Monster3Dies_000.png","Monster3Dies_001.png","Monster3Dies_002.png","Monster3Dies_003.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "Monster3Dies.png",
+	"format": "RGBA8888",
+	"size": {"w":438,"h":249},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:233dfc4124f0b48842a3024908f145b8:f1f78c7b55224e2d64bbb909c1246abb:c22fae1c8eb5f3e33894252667bf5b91$"
+}
+}
