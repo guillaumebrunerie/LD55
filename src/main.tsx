@@ -6,8 +6,8 @@ import { Application } from "pixi.js";
 // Setup PIXI app
 
 const app = new Application({
-	width: 1280,
-	height: 720,
+	width: 1920,
+	height: 1080,
 	backgroundColor: 0x10bb99,
 	view: document.getElementById("canvas") as HTMLCanvasElement,
 });

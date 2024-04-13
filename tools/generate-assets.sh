@@ -12,13 +12,14 @@ echo
 names=()
 
 echo "/** Textures */"
-for file in $root/gfx/*.png
+for file in $root/gfx/*.(png|jpg)
 do
-	texture=$(basename ${file%.*})
-	if [[ ! -a "$root/gfx/${texture}.json" ]]
+	texture=$(basename ${file})
+	name=${texture%.*}
+	if [[ ! -a "$root/gfx/${name}.json" ]]
 	then
-		echo "import ${texture}_ from \"../gfx/$texture.png?texture\";"
-		names+=($texture)
+		echo "import ${name}_ from \"../gfx/$texture?texture\";"
+		names+=(${name})
 	fi
 done
 

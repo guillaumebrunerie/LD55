@@ -1,10 +1,10 @@
-/** Generated on Fri Apr 12 18:58:18 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sat Apr 13 14:15:21 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
 
 /** Textures */
-import Bg_ from "../gfx/Bg.png?texture";
+import Bg_ from "../gfx/Bg.jpg?texture";
 import Logo_ from "../gfx/Logo.png?texture";
 import SoundOff_ from "../gfx/SoundOff.png?texture";
 import SoundOn_ from "../gfx/SoundOn.png?texture";
