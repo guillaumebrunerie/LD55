@@ -13,6 +13,7 @@ import {
 	Hero,
 	Mana1,
 	Monster3Dies,
+	Moon,
 } from "./assets";
 import { fightDuration, phase1Duration, phase2Duration } from "./configuration";
 import { getFrame } from "./Animation";
@@ -25,19 +26,20 @@ const cubicOut = (t: number) => {
 export const Game = ({ game }: { game: GameT }) => {
 	return (
 		<Container>
-			<Sprite texture={Division} anchor={[0.5, 0]} x={1920 / 2} y={0} />
+			<Sprite texture={Moon} anchor={[0.5, 0.5]} x={1920 / 2} y={-100} />
+			{/* <Sprite texture={Division} anchor={[0.5, 0]} x={1920 / 2} y={0} /> */}
 			<Container>
 				<Player player={game.player} />
 			</Container>
 			<Container scale={[-1, 1]} x={1920}>
 				<Player player={game.opponent} />
 			</Container>
-			<CustomText x={1920 / 2} y={100} text={game.timer.toFixed(2)} />
-			<CustomText
-				x={10}
-				y={90}
-				text={`MANA: ${game.player.mana.toFixed(0)}`}
-			/>
+			{/* <CustomText x={1920 / 2} y={100} text={game.timer.toFixed(2)} /> */}
+			{/* <CustomText */}
+			{/* 	x={10} */}
+			{/* 	y={90} */}
+			{/* 	text={`MANA: ${game.player.mana.toFixed(0)}`} */}
+			{/* /> */}
 			{/* {game.phase == "attackFight" && ( */}
 			{/* 	<Sprite */}
 			{/* 		anchor={0.5} */}
