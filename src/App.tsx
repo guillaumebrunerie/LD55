@@ -23,7 +23,7 @@ const StartButton = ({ onClick }: { onClick: () => void }) => {
 		<Sprite
 			texture={isActive ? StartButtonPressed : StartButtonDefault}
 			anchor={0.5}
-			position={[360, 960]}
+			position={[640, 600]}
 			hitArea={new Rectangle(-200, -100, 400, 200)}
 			{...props}
 		/>
@@ -90,7 +90,7 @@ const SoundButton = () => {
 		<Sprite
 			texture={sound.volumeAll === 1 ? SoundOn : SoundOff}
 			anchor={[1, 0]}
-			x={700}
+			x={1260}
 			y={20}
 			cursor="pointer"
 			eventMode="static"
@@ -110,7 +110,7 @@ export const App = () => {
 			<Sprite texture={Bg} x={0} y={0} />
 			<CustomText text={"SCORE: " + toTxt(game.score)} x={10} y={40} />
 			{game.isGameOver && (
-				<Sprite texture={Logo} x={360} y={450} anchor={0.5} />
+				<Sprite texture={Logo} x={640} y={250} anchor={0.5} />
 			)}
 			{game.isGameOver && app.highScore > 0 && (
 				<CustomText
