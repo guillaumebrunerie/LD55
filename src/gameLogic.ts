@@ -15,7 +15,7 @@ export type Item = {
 	y: number;
 };
 
-type Player = {
+export type Player = {
 	mana: number;
 	items: {
 		mana: Item[];

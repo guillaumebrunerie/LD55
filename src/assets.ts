@@ -1,4 +1,4 @@
-/** Generated on Sat Apr 13 15:00:24 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sat Apr 13 16:07:07 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -21,6 +21,7 @@ import StartButtonDefault_ from "../gfx/StartButtonDefault.png?texture";
 import StartButtonPressed_ from "../gfx/StartButtonPressed.png?texture";
 
 /** Spritesheets */
+import BtnBar_ from "../gfx/BtnBar.png?spritesheet";
 import Font_ from "../gfx/Font.png?spritesheet";
 
 /** Sounds */
@@ -45,6 +46,7 @@ export const [
 	SoundOn,
 	StartButtonDefault,
 	StartButtonPressed,
+	BtnBar,
 	Font,
 	Click,
 	Music,
@@ -66,6 +68,7 @@ export const [
 	SoundOn_,
 	StartButtonDefault_,
 	StartButtonPressed_,
+	BtnBar_,
 	Font_,
 	Click_,
 	Music_,

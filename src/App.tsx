@@ -1,6 +1,6 @@
 import { useState, useEffect, useReducer } from "react";
-import { Rectangle } from "pixi.js";
-import { Container, Sprite } from "@pixi/react";
+import { Rectangle, Texture } from "pixi.js";
+import { Container, Sprite, useTick } from "@pixi/react";
 import { useButton } from "./useButton";
 import { newApp, startApp, startNewGame } from "./appLogic";
 import { observable, action } from "mobx";
@@ -8,6 +8,7 @@ import { sound } from "@pixi/sound";
 import {
 	Bg,
 	BtnAttack,
+	BtnBar,
 	BtnDefense,
 	BtnMana,
 	Logo,
@@ -22,6 +23,7 @@ import {
 	buyManaItem,
 	itemCost,
 	type GameT,
+	type Player,
 } from "./gameLogic";
 import { Game } from "./Game";
 import { CustomText } from "./CustomText";
@@ -78,39 +80,55 @@ const SoundButton = () => {
 	);
 };
 
+const UIButton = ({
+	onClick,
+	texture,
+	x,
+	player,
+}: {
+	onClick: () => void;
+	texture: Texture;
+	x: number;
+	player: Player;
+}) => {
+	const tint = player.mana < itemCost(player) ? 0x333333 : 0xffffff;
+	const proportion = (player.mana / itemCost(player)) * 100;
+	const i = Math.min(Math.round(proportion), 99);
+	return (
+		<Container x={x} y={1080 - 120}>
+			<Sprite
+				texture={texture}
+				anchor={0.5}
+				cursor="pointer"
+				eventMode="static"
+				tint={tint}
+				pointerdown={onClick}
+			/>
+			<Sprite texture={BtnBar.animations.BtnBar[i]} anchor={0.5} />
+		</Container>
+	);
+};
+
 const UIButtons = ({ game }: { game: GameT }) => {
-	const tint = game.player.mana < itemCost(game.player) ? 0x333333 : 0xffffff;
 	return (
 		<>
-			<Sprite
+			<UIButton
 				texture={BtnDefense}
-				anchor={[0, 1]}
-				x={20}
-				y={1080 - 20}
-				cursor="pointer"
-				eventMode="static"
-				tint={tint}
-				pointerdown={action(() => buyDefenseItem(game.player))}
+				x={120}
+				onClick={action(() => buyDefenseItem(game.player))}
+				player={game.player}
 			/>
-			<Sprite
+			<UIButton
 				texture={BtnMana}
-				anchor={[0, 1]}
-				x={220}
-				y={1080 - 20}
-				cursor="pointer"
-				eventMode="static"
-				tint={tint}
-				pointerdown={action(() => buyManaItem(game.player))}
+				x={350}
+				onClick={action(() => buyManaItem(game.player))}
+				player={game.player}
 			/>
-			<Sprite
+			<UIButton
 				texture={BtnAttack}
-				anchor={[0, 1]}
-				x={420}
-				y={1080 - 20}
-				cursor="pointer"
-				eventMode="static"
-				tint={tint}
-				pointerdown={action(() => buyAttackItem(game.player))}
+				x={580}
+				onClick={action(() => buyAttackItem(game.player))}
+				player={game.player}
 			/>
 		</>
 	);
