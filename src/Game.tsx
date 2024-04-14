@@ -52,7 +52,8 @@ export const Game = ({ game }: { game: GameT }) => {
 			</Container>
 			<Sprite
 				texture={InactiveSide}
-				x={1920 / 2}
+				anchor={[1, 0]}
+				x={1920}
 				y={0}
 				alpha={screenAlpha}
 			/>
