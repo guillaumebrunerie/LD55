@@ -1,0 +1,383 @@
+{"frames": {
+
+"WizardIdle_000.png":
+{
+	"frame": {"x":1,"y":1,"w":199,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":199,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_001.png":
+{
+	"frame": {"x":202,"y":1,"w":198,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":198,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_002.png":
+{
+	"frame": {"x":1,"y":1261,"w":196,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":196,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_003.png":
+{
+	"frame": {"x":201,"y":841,"w":195,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":195,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_004.png":
+{
+	"frame": {"x":398,"y":841,"w":193,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":193,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_005.png":
+{
+	"frame": {"x":397,"y":1261,"w":192,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":192,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_006.png":
+{
+	"frame": {"x":597,"y":421,"w":190,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":190,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_007.png":
+{
+	"frame": {"x":993,"y":1,"w":188,"h":418},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":188,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_008.png":
+{
+	"frame": {"x":1413,"y":1,"w":187,"h":418},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":187,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_009.png":
+{
+	"frame": {"x":993,"y":385,"w":185,"h":418},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":185,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_010.png":
+{
+	"frame": {"x":789,"y":421,"w":183,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":183,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_011.png":
+{
+	"frame": {"x":787,"y":841,"w":181,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":181,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_012.png":
+{
+	"frame": {"x":974,"y":765,"w":180,"h":418},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":180,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_013.png":
+{
+	"frame": {"x":970,"y":1139,"w":178,"h":418},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":178,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_014.png":
+{
+	"frame": {"x":591,"y":1261,"w":177,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":177,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_015.png":
+{
+	"frame": {"x":963,"y":1510,"w":176,"h":418},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":176,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_016.png":
+{
+	"frame": {"x":409,"y":1688,"w":175,"h":418},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":175,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_017.png":
+{
+	"frame": {"x":829,"y":1688,"w":175,"h":418},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":175,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_018.png":
+{
+	"frame": {"x":1413,"y":190,"w":176,"h":418},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":176,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_019.png":
+{
+	"frame": {"x":1413,"y":561,"w":177,"h":416},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":34,"w":177,"h":416},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_020.png":
+{
+	"frame": {"x":1833,"y":1,"w":178,"h":413},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":37,"w":178,"h":413},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_021.png":
+{
+	"frame": {"x":1394,"y":932,"w":178,"h":408},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":42,"w":178,"h":408},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_022.png":
+{
+	"frame": {"x":1390,"y":1302,"w":180,"h":406},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":161,"y":44,"w":180,"h":406},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_023.png":
+{
+	"frame": {"x":1831,"y":416,"w":181,"h":406},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":161,"y":44,"w":181,"h":406},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_024.png":
+{
+	"frame": {"x":1,"y":1681,"w":182,"h":406},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":161,"y":44,"w":182,"h":406},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_025.png":
+{
+	"frame": {"x":1383,"y":1675,"w":183,"h":405},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":161,"y":45,"w":183,"h":405},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_026.png":
+{
+	"frame": {"x":1798,"y":1231,"w":185,"h":405},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":160,"y":45,"w":185,"h":405},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_027.png":
+{
+	"frame": {"x":1804,"y":824,"w":187,"h":405},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":159,"y":45,"w":187,"h":405},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_028.png":
+{
+	"frame": {"x":1390,"y":1112,"w":188,"h":405},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":159,"y":45,"w":188,"h":405},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_029.png":
+{
+	"frame": {"x":1383,"y":1484,"w":189,"h":404},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":159,"y":46,"w":189,"h":404},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_030.png":
+{
+	"frame": {"x":1394,"y":740,"w":190,"h":404},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":158,"y":46,"w":190,"h":404},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_031.png":
+{
+	"frame": {"x":1413,"y":368,"w":191,"h":404},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":158,"y":46,"w":191,"h":404},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_032.png":
+{
+	"frame": {"x":770,"y":1261,"w":191,"h":405},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":159,"y":45,"w":191,"h":405},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_033.png":
+{
+	"frame": {"x":963,"y":1319,"w":189,"h":407},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":43,"w":189,"h":407},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_034.png":
+{
+	"frame": {"x":970,"y":947,"w":190,"h":409},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":41,"w":190,"h":409},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_035.png":
+{
+	"frame": {"x":974,"y":572,"w":191,"h":412},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":38,"w":191,"h":412},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_036.png":
+{
+	"frame": {"x":993,"y":191,"w":192,"h":414},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":36,"w":192,"h":414},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_037.png":
+{
+	"frame": {"x":593,"y":841,"w":192,"h":416},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":34,"w":192,"h":416},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_038.png":
+{
+	"frame": {"x":798,"y":1,"w":193,"h":417},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":33,"w":193,"h":417},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_039.png":
+{
+	"frame": {"x":401,"y":421,"w":194,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":194,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_040.png":
+{
+	"frame": {"x":601,"y":1,"w":195,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":195,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_041.png":
+{
+	"frame": {"x":199,"y":1261,"w":196,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":196,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_042.png":
+{
+	"frame": {"x":202,"y":421,"w":197,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":197,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_043.png":
+{
+	"frame": {"x":402,"y":1,"w":197,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":197,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_044.png":
+{
+	"frame": {"x":1,"y":841,"w":198,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":198,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardIdle_045.png":
+{
+	"frame": {"x":1,"y":421,"w":199,"h":418},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":199,"h":418},
+	"sourceSize": {"w":500,"h":500}
+}},
+"animations": {
+	"WizardIdle": ["WizardIdle_000.png","WizardIdle_001.png","WizardIdle_002.png","WizardIdle_003.png","WizardIdle_004.png","WizardIdle_005.png","WizardIdle_006.png","WizardIdle_007.png","WizardIdle_008.png","WizardIdle_009.png","WizardIdle_010.png","WizardIdle_011.png","WizardIdle_012.png","WizardIdle_013.png","WizardIdle_014.png","WizardIdle_015.png","WizardIdle_016.png","WizardIdle_017.png","WizardIdle_018.png","WizardIdle_019.png","WizardIdle_020.png","WizardIdle_021.png","WizardIdle_022.png","WizardIdle_023.png","WizardIdle_024.png","WizardIdle_025.png","WizardIdle_026.png","WizardIdle_027.png","WizardIdle_028.png","WizardIdle_029.png","WizardIdle_030.png","WizardIdle_031.png","WizardIdle_032.png","WizardIdle_033.png","WizardIdle_034.png","WizardIdle_035.png","WizardIdle_036.png","WizardIdle_037.png","WizardIdle_038.png","WizardIdle_039.png","WizardIdle_040.png","WizardIdle_041.png","WizardIdle_042.png","WizardIdle_043.png","WizardIdle_044.png","WizardIdle_045.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "WizardIdle.png",
+	"format": "RGBA8888",
+	"size": {"w":2013,"h":1864},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:c6e81924a941dfc4189c28105bf7492b:9d355912fd4447ae75bbf88116ebe467:552440761b81f6a1f9bddfc0ed36bb22$"
+}
+}
