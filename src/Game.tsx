@@ -7,7 +7,6 @@ import {
 	Hero,
 	Mana1,
 	Monster3Dies,
-	Moon,
 	ManaPoint,
 	Runes,
 	ShieldLoop,
@@ -15,6 +14,8 @@ import {
 	CloudFight,
 	Mana2,
 	Spawn,
+	Mana1End,
+	ManaPointBlurred,
 } from "./assets";
 import { BLEND_MODES } from "pixi.js";
 import { Fragment } from "react/jsx-runtime";
@@ -74,20 +75,46 @@ const Player = ({
 };
 
 const ManaPoints = ({ items }: { items: Item[] }) => {
+	return items.map((item, i) => <ManaPointC key={i} item={item} />);
+};
+
+const ManaPointC = ({ item }: { item: Item }) => {
 	const lt = useLocalTime();
-	return items.map((item, i) => {
-		return (
-			<Sprite
-				key={i}
-				anchor={0.5}
-				scale={item.scale}
-				rotation={lt * 3 + item.offset}
-				blendMode={BLEND_MODES.NORMAL}
-				texture={ManaPoint}
-				position={item.position}
-			/>
-		);
-	});
+	switch (item.state) {
+		case "visible":
+			return (
+				<Sprite
+					anchor={0.5}
+					scale={item.scale}
+					rotation={lt * 3 + item.offset}
+					blendMode={BLEND_MODES.NORMAL}
+					texture={ManaPoint}
+					position={item.position}
+				/>
+			);
+		case "spawning":
+			return (
+				<Sprite
+					anchor={0.5}
+					scale={1}
+					rotation={0}
+					blendMode={BLEND_MODES.NORMAL}
+					texture={Mana1End.animations.Mana1End[0]}
+					position={item.manaPoint?.position || item.position}
+				/>
+			);
+		case "postSpawning":
+			return (
+				<Sprite
+					anchor={0.5}
+					scale={1}
+					rotation={0}
+					blendMode={BLEND_MODES.NORMAL}
+					texture={ManaPoint}
+					position={item.tmpPosition}
+				/>
+			);
+	}
 };
 
 const MonsterItems = ({ items, tint }: { items: Item[]; tint: number }) => {
@@ -143,17 +170,21 @@ const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
 				/>
 			);
 		}
-		case "preSpawning":
+		case "preSpawning": {
+			const dx = item.manaPoint.position.x - item.position.x;
+			const dy = item.manaPoint.position.y - item.position.y;
+			const angle = Math.atan2(dy, dx);
 			return (
 				<Sprite
 					anchor={0.5}
 					scale={item.manaPoint.scale}
-					rotation={lt * 3 + item.manaPoint.offset}
+					rotation={angle + Math.PI / 2}
 					blendMode={BLEND_MODES.NORMAL}
-					texture={ManaPoint}
+					texture={ManaPointBlurred}
 					position={item.tmpPosition}
 				/>
 			);
+		}
 		case "spawning":
 			return (
 				<>
@@ -197,17 +228,21 @@ const ManaItem = ({ item }: { item: Item }) => {
 	switch (item.state) {
 		case "visible":
 			return visible;
-		case "preSpawning":
+		case "preSpawning": {
+			const dx = item.manaPoint.position.x - item.position.x;
+			const dy = item.manaPoint.position.y - item.position.y;
+			const angle = Math.atan2(dy, dx);
 			return (
 				<Sprite
 					anchor={0.5}
 					scale={item.manaPoint.scale}
-					rotation={lt * 3 + item.manaPoint.offset}
+					rotation={angle + Math.PI / 2}
 					blendMode={BLEND_MODES.NORMAL}
-					texture={ManaPoint}
+					texture={ManaPointBlurred}
 					position={item.tmpPosition}
 				/>
 			);
+		}
 		case "spawning":
 			return (
 				<>
@@ -275,21 +310,25 @@ const DefenseItem = ({ item, i }: { item: Item; i: number }) => {
 		</>
 	);
 
-	const lt = useLocalTime();
+	// const lt = useLocalTime();
 	switch (item.state) {
 		case "visible":
 			return visible;
-		case "preSpawning":
+		case "preSpawning": {
+			const dx = item.manaPoint.position.x - item.position.x;
+			const dy = item.manaPoint.position.y - item.position.y;
+			const angle = Math.atan2(dy, dx);
 			return (
 				<Sprite
 					anchor={0.5}
 					scale={item.manaPoint.scale}
-					rotation={lt * 3 + item.manaPoint.offset}
+					rotation={angle + Math.PI / 2}
 					blendMode={BLEND_MODES.NORMAL}
-					texture={ManaPoint}
+					texture={ManaPointBlurred}
 					position={item.tmpPosition}
 				/>
 			);
+		}
 		case "spawning":
 			return (
 				<>

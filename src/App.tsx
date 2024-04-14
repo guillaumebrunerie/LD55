@@ -182,12 +182,24 @@ const LogoMoon = ({ app }: { app: AppT }) => {
 	}
 };
 
+const mod = (a: number, b: number) => (b + (a % b)) % b;
+
 export const App = () => {
 	const [app] = useState(() => observable(newApp()));
 	const { game } = app;
 	useEffect(() => startApp(app), [app]);
 
 	const lt = useLocalTime();
+	// useEffect(() => {
+	// 	const callback = action((event: React.KeyboardEvent) => {
+
+	// 		app.speed *= 2;
+	// 	});
+	// 	window.addEventListener("keydown", callback);
+	// 	return () => {
+	// 		window.removeEventListener("keydown", callback);
+	// 	}
+	// })
 
 	return (
 		<Container>
@@ -204,15 +216,15 @@ export const App = () => {
 			<LogoMoon app={app} />
 			<Sprite
 				texture={Cloud3}
-				x={(((lt + 250) * 70) % 2800) - 800}
+				x={mod(10 * lt + 2800 / 3, 2800) - 800}
 				y={50}
 			/>
 			<Sprite
 				texture={Cloud2}
-				x={2800 + (((lt + 50) * -55) % 2800) - 800}
+				x={mod(-15 * lt + (2800 * 2) / 3, 2800) - 800}
 				y={200}
 			/>
-			<Sprite texture={Cloud1} x={((lt * 40) % 2800) - 800} y={500} />
+			<Sprite texture={Cloud1} x={mod(20 * lt, 2800) - 800} y={500} />
 			<Sprite texture={BgFront} x={0} y={0} />
 			{!game.isGameOver && <Game game={game} />}
 			{!game.isGameOver && <UIButtons game={game} />}

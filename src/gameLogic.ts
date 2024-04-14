@@ -25,7 +25,13 @@ export type Item = {
 	tmpPosition?: Point;
 	strength: number;
 	hp: number;
-	state: "visible" | "hidden" | "fighting" | "preSpawning" | "spawning";
+	state:
+		| "visible"
+		| "hidden"
+		| "fighting"
+		| "preSpawning"
+		| "spawning"
+		| "postSpawning";
 	nt?: number;
 	scale?: number;
 	offset?: number;
@@ -43,7 +49,6 @@ export type Player = {
 		mana: Item[];
 		defense: Item[];
 		attack: Item[];
-		hasBoughtDefense: boolean;
 	};
 	boughtThisRound: Buys;
 	boughtPreviousRound: Buys;
@@ -62,7 +67,7 @@ const spawnItem = (
 ) => {
 	addItem(array, bounds, strength, {
 		...props,
-		tmpPosition: manaPoint.position,
+		tmpPosition: manaPoint?.position,
 		manaPoint,
 		state: "preSpawning",
 	});
@@ -121,7 +126,6 @@ const newPlayer = (): Player => {
 			mana: [],
 			defense: [],
 			attack: [],
-			hasBoughtDefense: false,
 		},
 		boughtThisRound: {
 			mana: 0,
@@ -148,8 +152,34 @@ const newPlayer = (): Player => {
 	return player;
 };
 
-const addManaPoints = (player: Player, points: number) => {
-	for (let i = 0; i < points; i++) {
+// const addManaPoints = (player: Player, points: number) => {
+// 	for (let i = 0; i < points; i++) {
+// 		addItem(player.mana, manaPointsBounds, 1, {
+// 			scale: 0.7 + Math.random() * 0.3,
+// 			offset: Math.random() * 2 * Math.PI,
+// 		});
+// 	}
+// };
+
+const spawnManaPoints = (player: Player) => {
+	for (let i = 0; i < initialMana; i++) {
+		spawnItem(player.mana, manaPointsBounds, 1, null, {
+			scale: 0.7 + Math.random() * 0.3,
+			offset: Math.random() * 2 * Math.PI,
+		});
+	}
+	for (const item of player.items.mana) {
+		for (let i = 0; i < item.strength; i++) {
+			spawnItem(player.mana, manaPointsBounds, 1, item, {
+				scale: 0.7 + Math.random() * 0.3,
+				offset: Math.random() * 2 * Math.PI,
+			});
+		}
+	}
+};
+
+const addManaPoints = (player: Player) => {
+	for (let i = 0; i < initialMana; i++) {
 		addItem(player.mana, manaPointsBounds, 1, {
 			scale: 0.7 + Math.random() * 0.3,
 			offset: Math.random() * 2 * Math.PI,
@@ -260,7 +290,7 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 			game.nt = game.lt / rebuildDuration;
 			if (game.lt >= rebuildDuration) {
 				game.timer = initialTimer;
-				nextRound(game);
+				game.phase = "buildUp";
 				break;
 			}
 			break;
@@ -268,7 +298,7 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 			game.timer -= delta;
 			if (game.timer <= 0) {
 				game.timer = initialTimer;
-				nextRound(game);
+				game.phase = "buildUp";
 				break;
 			}
 			// moveBackAttack(game, deltaS);
@@ -285,6 +315,9 @@ const tickItems = (player: Player, delta: number) => {
 	}
 	for (const item of player.items.defense) {
 		tickItem(item, delta);
+	}
+	for (const item of player.mana) {
+		tickManaItem(item, delta);
 	}
 };
 
@@ -310,14 +343,18 @@ const tickItem = (item: Item, delta: number) => {
 				break;
 			}
 			const nt = item.lt / preSpawnDuration;
-			item.tmpPosition = {
-				x:
-					item.manaPoint.position.x +
-					(item.position.x - item.manaPoint.position.x) * nt,
-				y:
-					item.manaPoint.position.y +
-					(item.position.y - item.manaPoint.position.y) * nt,
-			};
+			if (!item.manaPoint) {
+				item.tmpPosition = item.position;
+			} else {
+				item.tmpPosition = {
+					x:
+						item.manaPoint.position.x +
+						(item.position.x - item.manaPoint.position.x) * nt,
+					y:
+						item.manaPoint.position.y +
+						(item.position.y - item.manaPoint.position.y) * nt,
+				};
+			}
 			break;
 		}
 		case "spawning": {
@@ -326,6 +363,46 @@ const tickItem = (item: Item, delta: number) => {
 				item.lt = 0;
 				break;
 			}
+		}
+	}
+};
+
+const tickManaItem = (item: Item, delta: number) => {
+	item.lt += delta;
+	switch (item.state) {
+		case "preSpawning":
+			item.lt = 0;
+			item.state = "spawning";
+			break;
+		case "spawning": {
+			if (item.lt >= spawnDuration) {
+				item.state = "postSpawning";
+				item.lt = 0;
+				break;
+			}
+			break;
+		}
+		case "postSpawning": {
+			if (item.lt >= spawnDuration) {
+				item.state = "visible";
+				item.lt = 0;
+				item.tmpPosition = undefined;
+				break;
+			}
+			const nt = item.lt / spawnDuration;
+			if (!item.manaPoint) {
+				item.tmpPosition = item.position;
+			} else {
+				item.tmpPosition = {
+					x:
+						item.manaPoint.position.x +
+						(item.position.x - item.manaPoint.position.x) * nt,
+					y:
+						item.manaPoint.position.y +
+						(item.position.y - item.manaPoint.position.y) * nt,
+				};
+			}
+			break;
 		}
 	}
 };
@@ -400,6 +477,7 @@ const pickDefensePair = (game: GameT) => {
 		game.lt = 0;
 		game.nt = 0;
 		game.phase = "rebuild";
+		nextRound(game);
 		return;
 	}
 
@@ -444,29 +522,13 @@ const pickDefensePair = (game: GameT) => {
 };
 
 const nextRound = (game: GameT) => {
-	game.phase = "buildUp";
-	game.player.mana = [];
-	addManaPoints(
-		game.player,
-		initialMana +
-			game.player.items.mana.reduce(
-				(acc, item) => acc + item.strength,
-				0,
-			),
-	);
-	game.opponent.mana = [];
-	addManaPoints(
-		game.opponent,
-		initialMana +
-			game.opponent.items.mana.reduce(
-				(acc, item) => acc + item.strength,
-				0,
-			),
-	);
+	// game.player.mana = [];
+	// game.opponent.mana = [];
+	spawnManaPoints(game.player);
+	spawnManaPoints(game.opponent);
 	game.player.items.mana = [];
 	game.opponent.items.mana = [];
-	game.player.items.hasBoughtDefense = false;
-	game.opponent.items.hasBoughtDefense = false;
+
 	game.player.boughtPreviousRound = game.player.boughtThisRound;
 	game.opponent.boughtPreviousRound = game.opponent.boughtThisRound;
 	game.player.boughtThisRound = {
@@ -574,7 +636,7 @@ export const buyAttackItem = (game: GameT, player: Player) => {
 	} else if (
 		Math.random() < 0.5 ||
 		// false
-		(player.items.mana.length > 0 && player.items.hasBoughtDefense)
+		(player.items.mana.length > 0 && player.boughtThisRound.defense > 0)
 	) {
 		strength = 2;
 	} else {
@@ -597,7 +659,6 @@ export const buyDefenseItem = (game: GameT, player: Player) => {
 	}
 	player.boughtThisRound.defense++;
 	const manaPoint = player.mana.pop();
-	player.items.hasBoughtDefense = true;
 	const add = () => {
 		if (player == game.player) {
 			spawnItem(player.items.defense, defenseBounds, 4, manaPoint);

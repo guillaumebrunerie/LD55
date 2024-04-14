@@ -7,6 +7,7 @@ import { newGame, startGame, tickGame, type GameT } from "./gameLogic";
 import { wave } from "./ease";
 
 export type AppT = {
+	speed: number;
 	state: "intro" | "transition" | "game";
 	lt: number;
 	nt: number;
@@ -14,6 +15,7 @@ export type AppT = {
 };
 
 export const newApp = (): AppT => ({
+	speed: 1,
 	state: "intro",
 	lt: 0,
 	nt: 0,
@@ -24,7 +26,7 @@ export const startApp = (app: AppT) => {
 	sound.init();
 	void Music.play();
 	const tick = action((delta: number) => {
-		tickApp(app, delta / 60);
+		tickApp(app, delta / 60 / app.speed);
 	});
 	Ticker.shared.add(tick);
 	return () => {

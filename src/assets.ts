@@ -1,4 +1,4 @@
-/** Generated on Sun Apr 14 19:31:41 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sun Apr 14 21:31:17 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -22,6 +22,7 @@ import Logo_ from "../gfx/Logo.png?texture";
 import Mana1_ from "../gfx/Mana1.png?texture";
 import Mana2_ from "../gfx/Mana2.png?texture";
 import ManaPoint_ from "../gfx/ManaPoint.png?texture";
+import ManaPointBlurred_ from "../gfx/ManaPointBlurred.png?texture";
 import Monster1_ from "../gfx/Monster1.png?texture";
 import Monster2_ from "../gfx/Monster2.png?texture";
 import Monster3_ from "../gfx/Monster3.png?texture";
@@ -37,6 +38,7 @@ import BtnBar_ from "../gfx/BtnBar.png?spritesheet";
 import Font_ from "../gfx/Font.png?spritesheet";
 import Mana1End_ from "../gfx/Mana1End.png?spritesheet";
 import Mana2End_ from "../gfx/Mana2End.png?spritesheet";
+import ManaPointStart_ from "../gfx/ManaPointStart.png?spritesheet";
 import Monster3Dies_ from "../gfx/Monster3Dies.png?spritesheet";
 import Runes_ from "../gfx/Runes.png?spritesheet";
 import ShieldHit_ from "../gfx/ShieldHit.png?spritesheet";
@@ -67,6 +69,7 @@ export const [
 	Mana1,
 	Mana2,
 	ManaPoint,
+	ManaPointBlurred,
 	Monster1,
 	Monster2,
 	Monster3,
@@ -80,6 +83,7 @@ export const [
 	Font,
 	Mana1End,
 	Mana2End,
+	ManaPointStart,
 	Monster3Dies,
 	Runes,
 	ShieldHit,
@@ -107,6 +111,7 @@ export const [
 	Mana1_,
 	Mana2_,
 	ManaPoint_,
+	ManaPointBlurred_,
 	Monster1_,
 	Monster2_,
 	Monster3_,
@@ -120,6 +125,7 @@ export const [
 	Font_,
 	Mana1End_,
 	Mana2End_,
+	ManaPointStart_,
 	Monster3Dies_,
 	Runes_,
 	ShieldHit_,
