@@ -7,6 +7,7 @@ import { observable, action } from "mobx";
 import { sound } from "@pixi/sound";
 import {
 	Bg,
+	BgFront,
 	BtnAttack,
 	// BtnBar,
 	BtnDefense,
@@ -212,6 +213,7 @@ export const App = () => {
 				y={200}
 			/>
 			<Sprite texture={Cloud1} x={((lt * 40) % 2800) - 800} y={500} />
+			<Sprite texture={BgFront} x={0} y={0} />
 			{!game.isGameOver && <Game game={game} />}
 			{!game.isGameOver && <UIButtons game={game} />}
 			<StartButton

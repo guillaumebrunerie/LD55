@@ -1,10 +1,11 @@
-/** Generated on Sun Apr 14 17:54:03 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sun Apr 14 19:31:41 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
 
 /** Textures */
 import Bg_ from "../gfx/Bg.jpg?texture";
+import BgFront_ from "../gfx/BgFront.png?texture";
 import BtnAttack_ from "../gfx/BtnAttack.png?texture";
 import BtnDefense_ from "../gfx/BtnDefense.png?texture";
 import BtnMana_ from "../gfx/BtnMana.png?texture";
@@ -34,6 +35,8 @@ import StartButtonPressed_ from "../gfx/StartButtonPressed.png?texture";
 /** Spritesheets */
 import BtnBar_ from "../gfx/BtnBar.png?spritesheet";
 import Font_ from "../gfx/Font.png?spritesheet";
+import Mana1End_ from "../gfx/Mana1End.png?spritesheet";
+import Mana2End_ from "../gfx/Mana2End.png?spritesheet";
 import Monster3Dies_ from "../gfx/Monster3Dies.png?spritesheet";
 import Runes_ from "../gfx/Runes.png?spritesheet";
 import ShieldHit_ from "../gfx/ShieldHit.png?spritesheet";
@@ -47,6 +50,7 @@ import StartButton_ from "../audio/StartButton.mp3?sound";
 
 export const [
 	Bg,
+	BgFront,
 	BtnAttack,
 	BtnDefense,
 	BtnMana,
@@ -74,6 +78,8 @@ export const [
 	StartButtonPressed,
 	BtnBar,
 	Font,
+	Mana1End,
+	Mana2End,
 	Monster3Dies,
 	Runes,
 	ShieldHit,
@@ -84,6 +90,7 @@ export const [
 	StartButton,
 ] = await Promise.all([
 	Bg_,
+	BgFront_,
 	BtnAttack_,
 	BtnDefense_,
 	BtnMana_,
@@ -111,6 +118,8 @@ export const [
 	StartButtonPressed_,
 	BtnBar_,
 	Font_,
+	Mana1End_,
+	Mana2End_,
 	Monster3Dies_,
 	Runes_,
 	ShieldHit_,
