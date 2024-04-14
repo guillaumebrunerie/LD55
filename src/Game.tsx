@@ -18,18 +18,38 @@ import {
 } from "./assets";
 import { BLEND_MODES } from "pixi.js";
 import { Fragment } from "react/jsx-runtime";
-import { CustomText } from "./CustomText";
 import { useLocalTime } from "./useLocalTime";
 import { getFrame } from "./Animation";
+import { Rectangle } from "./Rectangle";
+import { wave } from "./ease";
 
 export const Game = ({ game }: { game: GameT }) => {
+	let screenAlpha = 0;
+	switch (game.phase) {
+		case "buildUp":
+			screenAlpha = 1;
+			break;
+		case "toAttack":
+			screenAlpha = wave(1 - game.nt);
+			break;
+		case "rebuild":
+			screenAlpha = wave(game.nt);
+			break;
+	}
 	return (
 		<Container>
-			<Container>
-				<Player player={game.player} monsterTint={0xffffff} />
-			</Container>
 			<Container scale={[-1, 1]} x={1920}>
 				<Player player={game.opponent} monsterTint={0xff4444} />
+			</Container>
+			<Rectangle
+				x={1920 / 2}
+				y={0}
+				width={1920 / 2}
+				height={1080}
+				alpha={screenAlpha}
+			/>
+			<Container>
+				<Player player={game.player} monsterTint={0xffffff} />
 			</Container>
 		</Container>
 	);

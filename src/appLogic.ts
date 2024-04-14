@@ -4,6 +4,7 @@ import { Ticker } from "pixi.js";
 import { sound } from "@pixi/sound";
 import { Music, StartButton } from "./assets";
 import { newGame, startGame, tickGame, type GameT } from "./gameLogic";
+import { wave } from "./ease";
 
 export type AppT = {
 	state: "intro" | "transition" | "game";
@@ -42,8 +43,6 @@ export const startNewGame = (app: AppT) => {
 };
 
 const transitionDuration = 0.5;
-
-const wave = (nt: number) => (1 - Math.cos(nt * Math.PI)) / 2;
 
 const tickApp = (app: AppT, delta: number) => {
 	app.lt += delta;

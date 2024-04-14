@@ -22,7 +22,7 @@ export const Rectangle = ({
 	const draw = useCallback<Draw>(
 		(g) => {
 			g.clear();
-			g.beginFill(0xff00ff, alpha);
+			g.beginFill(0x222222, alpha);
 			g.drawRect(x, y, width, height);
 			g.endFill();
 		},

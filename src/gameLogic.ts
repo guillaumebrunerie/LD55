@@ -159,7 +159,9 @@ const addManaPoints = (player: Player, points: number) => {
 
 export type GameT = {
 	isGameOver: boolean;
-	phase: "buildUp" | "attackFight" | "defenseFight" | "finish";
+	phase: "buildUp" | "toAttack" | "attack" | "defense" | "rebuild" | "finish";
+	nt: number;
+	lt: number;
 	timer: number;
 	player: Player;
 	opponent: Player;
@@ -168,7 +170,9 @@ export type GameT = {
 
 export const newGame = (isGameOver = false): GameT => ({
 	isGameOver,
-	phase: "buildUp" as "buildUp" | "attackFight" | "defenseFight" | "finish",
+	phase: "buildUp" as "buildUp" | "attack" | "defense" | "finish",
+	nt: 0,
+	lt: 0,
 	timer: initialTimer,
 	player: newPlayer(),
 	opponent: newPlayer(),
@@ -200,16 +204,20 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 	}
 };
 
+const toAttackDuration = 0.5;
+const rebuildDuration = 0.5;
+
 export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 	if (game.isGameOver) {
 		return;
 	}
+	game.lt += delta;
 	tickItems(game.player, delta);
 	switch (game.phase) {
 		case "buildUp":
 			// if (game.timer <= 0) {
 			// 	game.timer = fightDuration;
-			// 	game.phase = "attackFight";
+			// 	game.phase = "attack";
 			// 	break;
 			// }
 			// opponentMove(game, game.player, 0.4);
@@ -218,11 +226,21 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 				game.player.mana.length == 0 &&
 				areAllItemsVisible(game.player)
 			) {
+				game.lt = 0;
+				game.nt = 0;
 				opponentMove(game, game.opponent, smartStrategy);
+				game.phase = "toAttack";
+			}
+			break;
+		case "toAttack":
+			game.nt = game.lt / toAttackDuration;
+			if (game.lt >= toAttackDuration) {
+				game.lt = 0;
+				game.nt = 0;
 				pickAttackPair(game);
 			}
 			break;
-		case "attackFight":
+		case "attack":
 			game.timer -= delta;
 			if (game.timer <= 0) {
 				pickAttackPair(game);
@@ -230,13 +248,21 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 			}
 			moveAttack(game);
 			break;
-		case "defenseFight":
+		case "defense":
 			game.timer -= delta;
 			if (game.timer <= 0) {
 				pickDefensePair(game);
 				break;
 			}
 			moveDefense(game);
+			break;
+		case "rebuild":
+			game.nt = game.lt / rebuildDuration;
+			if (game.lt >= rebuildDuration) {
+				game.timer = initialTimer;
+				nextRound(game);
+				break;
+			}
 			break;
 		case "finish":
 			game.timer -= delta;
@@ -350,11 +376,11 @@ const pickAttackPair = (game: GameT) => {
 		game.opponent.items.attack.length == 0
 	) {
 		game.timer = -1;
-		game.phase = "defenseFight";
+		game.phase = "defense";
 		return;
 	}
 	game.timer = fightDuration + attackApproachDuration;
-	game.phase = "attackFight";
+	game.phase = "attack";
 	const playerAttacker = pickFighter(game.player.items.attack);
 	const opponentAttacker = pickFighter(game.opponent.items.attack);
 	game.attackers = [playerAttacker, opponentAttacker];
@@ -371,7 +397,9 @@ const pickDefensePair = (game: GameT) => {
 		game.opponent.items.attack.length == 0
 	) {
 		game.timer = -1;
-		game.phase = "finish";
+		game.lt = 0;
+		game.nt = 0;
+		game.phase = "rebuild";
 		return;
 	}
 
@@ -386,7 +414,7 @@ const pickDefensePair = (game: GameT) => {
 	}
 
 	game.timer = fightDuration + attackApproachDuration;
-	game.phase = "defenseFight";
+	game.phase = "defense";
 	const fighter = pickFighter(attacker.items.attack);
 	let hasFought = false;
 	while (fighter.hp > 0 && defender.items.defense.length > 0) {
@@ -725,10 +753,10 @@ export const testStrategiesOnce = (
 	const playRound = (game: GameT) => {
 		do {
 			pickAttackPair(game);
-		} while (game.phase === "attackFight");
+		} while (game.phase === "attack");
 		do {
 			pickDefensePair(game);
-		} while (game.phase === "defenseFight");
+		} while (game.phase === "defense");
 	};
 	const printPlayer = (player: Player, label: string) => {
 		console.log(label, "flowers", player.items.mana.length);
