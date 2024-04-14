@@ -1,0 +1,100 @@
+{"frames": {
+
+"WizardMagicStart_000_1.png":
+{
+	"frame": {"x":1,"y":707,"w":199,"h":418},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":199,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardMagicStart_001_1.png":
+{
+	"frame": {"x":1,"y":517,"w":188,"h":419},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":31,"w":188,"h":419},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardMagicStart_002_1.png":
+{
+	"frame": {"x":424,"y":474,"w":175,"h":420},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":30,"w":175,"h":420},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardMagicStart_003_1.png":
+{
+	"frame": {"x":1,"y":1,"w":164,"h":422},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":28,"w":164,"h":422},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardMagicStart_004_1.png":
+{
+	"frame": {"x":1,"y":353,"w":162,"h":421},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":29,"w":162,"h":421},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardMagicStart_005_1.png":
+{
+	"frame": {"x":1,"y":167,"w":184,"h":421},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":29,"w":184,"h":421},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardMagicStart_006_1.png":
+{
+	"frame": {"x":424,"y":253,"w":219,"h":420},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":30,"w":219,"h":420},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardMagicStart_007_1.png":
+{
+	"frame": {"x":425,"y":1,"w":250,"h":419},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":31,"w":250,"h":419},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardMagicStart_008_1.png":
+{
+	"frame": {"x":422,"y":651,"w":271,"h":418},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":32,"w":271,"h":418},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardMagicStart_009_1.png":
+{
+	"frame": {"x":1,"y":908,"w":278,"h":416},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":34,"w":278,"h":416},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardMagicStart_010_1.png":
+{
+	"frame": {"x":419,"y":924,"w":273,"h":414},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":36,"w":273,"h":414},
+	"sourceSize": {"w":500,"h":500}
+}},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "WizardMagicStart.png",
+	"format": "RGBA8888",
+	"size": {"w":845,"h":1198},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:0a9ddc29a5367f9587aacdff6e012ac9:011f7b037bcbc70740f15e735a8c9db6:199bb516ae68cbc39761b7fb8e468725$"
+}
+}
