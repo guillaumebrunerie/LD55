@@ -30,9 +30,11 @@ import { CustomText } from "./CustomText";
 const StartButton = ({
 	onClick,
 	position,
+	scale,
 }: {
 	onClick: () => void;
 	position: [number, number];
+	scale: number;
 }) => {
 	const { isActive, props } = useButton({ onClick });
 
@@ -41,6 +43,7 @@ const StartButton = ({
 			texture={isActive ? StartButtonPressed : StartButtonDefault}
 			anchor={0.5}
 			position={position}
+			scale={scale}
 			hitArea={new Rectangle(-200, -100, 400, 200)}
 			{...props}
 		/>
@@ -113,24 +116,30 @@ const UIButtons = ({ game }: { game: GameT }) => {
 		<>
 			<UIButton
 				texture={BtnDefense}
-				x={120}
+				x={600}
 				onClick={action(() => buyDefenseItem(game, game.player))}
 				player={game.player}
 			/>
 			<UIButton
 				texture={BtnMana}
-				x={350}
+				x={960}
 				onClick={action(() => buyManaItem(game, game.player))}
 				player={game.player}
 			/>
 			<UIButton
 				texture={BtnAttack}
-				x={580}
+				x={1320}
 				onClick={action(() => buyAttackItem(game, game.player))}
 				player={game.player}
 			/>
 		</>
 	);
+};
+
+const requestFullScreen = async () => {
+	const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+	// await canvas.requestFullscreen();
+	// await screen.orientation.lock("landscape");
 };
 
 export const App = () => {
@@ -165,8 +174,12 @@ export const App = () => {
 			{!game.isGameOver && <Game game={game} />}
 			{!game.isGameOver && <UIButtons game={game} />}
 			<StartButton
-				position={game.isGameOver ? [1920 / 2, 800] : [1920 / 2, 1000]}
+				position={
+					game.isGameOver ? [1920 / 2, 800] : [1920 - 100, 1030]
+				}
+				scale={game.isGameOver ? 1 : 0.5}
 				onClick={action(() => {
+					void requestFullScreen();
 					startNewGame(app);
 				})}
 			/>
