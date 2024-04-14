@@ -18,6 +18,7 @@ import {
 	ManaPointStart,
 	Mana2End,
 	WizardIdle,
+	InactiveSide,
 } from "./assets";
 import { BLEND_MODES, ColorMatrixFilter, Filter, filters } from "pixi.js";
 import { getFrame, getNtFrame } from "./Animation";
@@ -49,11 +50,10 @@ export const Game = ({ game }: { game: GameT }) => {
 					monsterTint={0xff4444}
 				/>
 			</Container>
-			<Rectangle
+			<Sprite
+				texture={InactiveSide}
 				x={1920 / 2}
 				y={0}
-				width={1920 / 2}
-				height={1080}
 				alpha={screenAlpha}
 			/>
 			<Container>

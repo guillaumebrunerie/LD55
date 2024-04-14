@@ -1,4 +1,4 @@
-/** Generated on Mon Apr 15 00:49:48 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Mon Apr 15 01:27:10 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -18,6 +18,7 @@ import Defense2_ from "../gfx/Defense2.png?texture";
 import Defense3_ from "../gfx/Defense3.png?texture";
 import Division_ from "../gfx/Division.png?texture";
 import Hero_ from "../gfx/Hero.png?texture";
+import InactiveSide_ from "../gfx/InactiveSide.png?texture";
 import Logo_ from "../gfx/Logo.png?texture";
 import Mana1_ from "../gfx/Mana1.png?texture";
 import Mana2_ from "../gfx/Mana2.png?texture";
@@ -66,6 +67,7 @@ export const [
 	Defense3,
 	Division,
 	Hero,
+	InactiveSide,
 	Logo,
 	Mana1,
 	Mana2,
@@ -109,6 +111,7 @@ export const [
 	Defense3_,
 	Division_,
 	Hero_,
+	InactiveSide_,
 	Logo_,
 	Mana1_,
 	Mana2_,
