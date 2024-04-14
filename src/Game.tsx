@@ -14,10 +14,13 @@ import {
 	ShieldHit,
 	CloudFight,
 	Mana2,
+	Spawn,
 } from "./assets";
 import { BLEND_MODES } from "pixi.js";
 import { Fragment } from "react/jsx-runtime";
 import { CustomText } from "./CustomText";
+import { useLocalTime } from "./useLocalTime";
+import { getFrame } from "./Animation";
 
 export const Game = ({ game }: { game: GameT }) => {
 	return (
@@ -52,12 +55,14 @@ const Player = ({
 };
 
 const ManaPoints = ({ items }: { items: Item[] }) => {
+	const lt = useLocalTime();
 	return items.map((item, i) => {
 		return (
 			<Sprite
 				key={i}
 				anchor={0.5}
 				scale={item.scale}
+				rotation={lt * 3 + item.offset}
 				blendMode={BLEND_MODES.NORMAL}
 				texture={ManaPoint}
 				position={item.position}
@@ -66,51 +71,91 @@ const ManaPoints = ({ items }: { items: Item[] }) => {
 	});
 };
 
+const MonsterItems = ({ items, tint }: { items: Item[]; tint: number }) => {
+	return items.map((item, i) => (
+		<MonsterItem key={i} item={item} tint={tint} />
+	));
+};
+
 const MonsterTexture = {
 	1: Monster1,
 	2: Monster2,
 	3: Monster3,
 } as const;
 
-const MonsterItems = ({ items, tint }: { items: Item[]; tint: number }) => {
-	return items.map((item, i) => {
-		switch (item.state) {
-			case "visible":
-				return (
-					<Fragment key={i}>
-						<Sprite
-							anchor={0.5}
-							tint={tint}
-							blendMode={BLEND_MODES.NORMAL}
-							// blendMode={BLEND_MODES.NORMAL}
-							texture={MonsterTexture[item.strength]}
-							position={item.tmpPosition || item.position}
-						/>
-						{/* <CustomText */}
-						{/* 	text={String(item.hp)} */}
-						{/* 	position={item.tmpPosition || item.position} */}
-						{/* /> */}
-					</Fragment>
-				);
-			case "fighting": {
-				const j = Math.floor(
-					(item.nt || 0) *
-						(Monster3Dies.animations.Monster3Dies.length - 1),
-				);
-				return (
-					<Sprite
-						key={i}
-						anchor={0.5}
-						tint={0xffffff}
-						blendMode={BLEND_MODES.ADD}
-						texture={Monster3Dies.animations.Monster3Dies[j]}
-						position={item.tmpPosition || item.position}
-					/>
-				);
-			}
+const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
+	const lt = useLocalTime();
+	const visible = (
+		<Sprite
+			anchor={0.5}
+			tint={tint}
+			rotation={0}
+			scale={1}
+			blendMode={BLEND_MODES.NORMAL}
+			texture={MonsterTexture[item.strength]}
+			position={item.tmpPosition || item.position}
+		/>
+	);
+	switch (item.state) {
+		case "visible":
+			return (
+				<Fragment>
+					{visible}
+					{/* <CustomText */}
+					{/* 	text={String(item.hp)} */}
+					{/* 	position={item.tmpPosition || item.position} */}
+					{/* /> */}
+				</Fragment>
+			);
+		case "fighting": {
+			const j = Math.floor(
+				(item.nt || 0) *
+					(Monster3Dies.animations.Monster3Dies.length - 1),
+			);
+			return (
+				<Sprite
+					anchor={0.5}
+					tint={0xffffff}
+					rotation={0}
+					scale={1}
+					blendMode={BLEND_MODES.ADD}
+					texture={Monster3Dies.animations.Monster3Dies[j]}
+					position={item.tmpPosition || item.position}
+				/>
+			);
 		}
-		return null;
-	});
+		case "preSpawning":
+			return (
+				<Sprite
+					anchor={0.5}
+					scale={item.manaPoint.scale}
+					rotation={lt * 3 + item.manaPoint.offset}
+					blendMode={BLEND_MODES.NORMAL}
+					texture={ManaPoint}
+					position={item.tmpPosition}
+				/>
+			);
+		case "spawning":
+			return (
+				<>
+					{visible}
+					<Sprite
+						anchor={0.5}
+						scale={0.5}
+						blendMode={BLEND_MODES.ADD}
+						texture={getFrame(Spawn.animations.Spawn, 30, item.lt)}
+						position={item.position}
+					/>
+				</>
+			);
+	}
+	return null;
+};
+
+const ManaItems = ({ items }: { items: Item[] }) => {
+	return items
+		.toSorted((a, b) => a.position.y - b.position.y)
+		.map((item, i) => <ManaItem key={i} item={item} />);
 };
 
 const ManaTexture = {
@@ -118,17 +163,47 @@ const ManaTexture = {
 	2: Mana2,
 } as const;
 
-const ManaItems = ({ items }: { items: Item[] }) => {
-	return items
-		.toSorted((a, b) => a.position.y - b.position.y)
-		.map((item, i) => (
-			<Sprite
-				key={i}
-				texture={ManaTexture[item.strength]}
-				anchor={0.5}
-				position={item.position}
-			/>
-		));
+const ManaItem = ({ item }: { item: Item }) => {
+	const lt = useLocalTime();
+	const visible = (
+		<Sprite
+			texture={ManaTexture[item.strength]}
+			rotation={0}
+			blendMode={BLEND_MODES.NORMAL}
+			scale={1}
+			anchor={0.5}
+			position={item.position}
+		/>
+	);
+	switch (item.state) {
+		case "visible":
+			return visible;
+		case "preSpawning":
+			return (
+				<Sprite
+					anchor={0.5}
+					scale={item.manaPoint.scale}
+					rotation={lt * 3 + item.manaPoint.offset}
+					blendMode={BLEND_MODES.NORMAL}
+					texture={ManaPoint}
+					position={item.tmpPosition}
+				/>
+			);
+		case "spawning":
+			return (
+				<>
+					{visible}
+					<Sprite
+						anchor={0.5}
+						scale={0.5}
+						blendMode={BLEND_MODES.ADD}
+						texture={getFrame(Spawn.animations.Spawn, 30, item.lt)}
+						position={item.position}
+					/>
+				</>
+			);
+	}
+	return null;
 };
 
 const DefenseItems = ({ items }: { items: Item[] }) => {

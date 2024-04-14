@@ -17,7 +17,7 @@ export const startApp = (app: App) => {
 	sound.init();
 	void Music.play();
 	const tick = action((delta: number) => {
-		tickApp(app, delta);
+		tickApp(app, delta / 60);
 	});
 	Ticker.shared.add(tick);
 	return () => {

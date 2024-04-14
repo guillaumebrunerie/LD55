@@ -11,6 +11,9 @@ import {
 	// BtnBar,
 	BtnDefense,
 	BtnMana,
+	Cloud1,
+	Cloud2,
+	Cloud3,
 	Logo,
 	SoundOff,
 	SoundOn,
@@ -26,6 +29,7 @@ import {
 } from "./gameLogic";
 import { Game } from "./Game";
 import { CustomText } from "./CustomText";
+import { useLocalTime } from "./useLocalTime";
 
 const StartButton = ({
 	onClick,
@@ -148,6 +152,8 @@ export const App = () => {
 	useEffect(() => startApp(app), [app]);
 	const toTxt = (score: number) => score.toFixed(1);
 
+	const lt = useLocalTime();
+
 	return (
 		<Container>
 			<Sprite
@@ -160,6 +166,17 @@ export const App = () => {
 					console.log(`${Math.round(x)}, ${Math.round(y)}`);
 				}}
 			/>
+			<Sprite
+				texture={Cloud3}
+				x={(((lt + 250) * 70) % 2800) - 800}
+				y={50}
+			/>
+			<Sprite
+				texture={Cloud2}
+				x={2800 + (((lt + 50) * -55) % 2800) - 800}
+				y={200}
+			/>
+			<Sprite texture={Cloud1} x={((lt * 40) % 2800) - 800} y={500} />
 			{/* <CustomText text={"SCORE: " + toTxt(game.score)} x={10} y={40} /> */}
 			{game.isGameOver && (
 				<Sprite texture={Logo} x={1920 / 2} y={400} anchor={0.5} />

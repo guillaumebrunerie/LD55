@@ -1,4 +1,4 @@
-/** Generated on Sun Apr 14 16:51:00 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sun Apr 14 17:54:03 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -37,6 +37,7 @@ import Font_ from "../gfx/Font.png?spritesheet";
 import Monster3Dies_ from "../gfx/Monster3Dies.png?spritesheet";
 import Runes_ from "../gfx/Runes.png?spritesheet";
 import ShieldHit_ from "../gfx/ShieldHit.png?spritesheet";
+import Spawn_ from "../gfx/Spawn.png?spritesheet";
 
 /** Sounds */
 import Click_ from "../audio/Click.mp3?sound";
@@ -76,6 +77,7 @@ export const [
 	Monster3Dies,
 	Runes,
 	ShieldHit,
+	Spawn,
 	Click,
 	Music,
 	Pop,
@@ -112,6 +114,7 @@ export const [
 	Monster3Dies_,
 	Runes_,
 	ShieldHit_,
+	Spawn_,
 	Click_,
 	Music_,
 	Pop_,

@@ -11,13 +11,13 @@ export const getFrame = (
 ) => {
 	switch (time) {
 		case "loop":
-			return animation[Math.floor((t * fps) / 1000) % animation.length];
+			return animation[Math.floor(t * fps) % animation.length];
 		case "hold":
 			return animation[
-				Math.min(Math.floor((t * fps) / 1000), animation.length - 1)
+				Math.min(Math.floor(t * fps), animation.length - 1)
 			];
 		case "remove": {
-			const i = Math.floor((t * fps) / 1000);
+			const i = Math.floor(t * fps);
 			if (i >= animation.length) {
 				return Texture.EMPTY;
 			} else {
