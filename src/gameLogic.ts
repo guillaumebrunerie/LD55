@@ -256,12 +256,10 @@ const pickAttackPair = (game: GameT) => {
 	) {
 		game.timer = -1;
 		game.phase = "defenseFight";
-		console.log("NOT fighting");
 		return;
 	}
 	game.timer = fightDuration + attackApproachDuration;
 	game.phase = "attackFight";
-	console.log("Fighting");
 	const playerAttacker = pickFighter(game.player.items.attack);
 	const opponentAttacker = pickFighter(game.opponent.items.attack);
 	game.attackers = [playerAttacker, opponentAttacker];
@@ -279,7 +277,6 @@ const pickDefensePair = (game: GameT) => {
 	) {
 		game.timer = -1;
 		game.phase = "finish";
-		console.log("NOT defending");
 		return;
 	}
 
@@ -290,13 +287,11 @@ const pickDefensePair = (game: GameT) => {
 	if (defender.items.defense.length == 0) {
 		game.timer = -1;
 		game.phase = "finish";
-		console.log("Game over");
 		return;
 	}
 
 	game.timer = fightDuration + attackApproachDuration;
 	game.phase = "defenseFight";
-	console.log("Fighting");
 	const fighter = pickFighter(attacker.items.attack);
 	const shield = defender.items.defense[defender.items.defense.length - 1];
 	game.attackers = [fighter, shield];

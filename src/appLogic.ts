@@ -14,7 +14,6 @@ export const newApp = () => ({
 type App = ReturnType<typeof newApp>;
 
 export const startApp = (app: App) => {
-	console.log("MUSIC start");
 	sound.init();
 	void Music.play();
 	const tick = action((delta: number) => {
@@ -24,7 +23,6 @@ export const startApp = (app: App) => {
 	return () => {
 		Ticker.shared.remove(tick);
 		sound.close();
-		console.log("MUSIC stoxpe ");
 	};
 };
 
