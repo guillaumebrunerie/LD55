@@ -234,7 +234,7 @@ export const App = () => {
 			/>
 			<Sprite
 				texture={Cloud2}
-				x={mod(-16 * lt + (2800 * 2) / 3, 2800) - 800}
+				x={mod(16 * lt + (2800 * 2) / 3, 2800) - 800}
 				y={200}
 			/>
 			<Sprite texture={Cloud1} x={mod(21 * lt, 2800) - 800} y={500} />

@@ -513,9 +513,9 @@ const pickDefensePair = (game: GameT) => {
 	let hasFought = false;
 	while (fighter.hp > 0 && lastShield(defender)) {
 		const shield = lastShield(defender)!;
-		shield.state = "fighting";
-		shield.lt = 0;
-		shield.nt = 0;
+		// shield.state = "fighting";
+		// shield.lt = 0;
+		// shield.nt = 0;
 		game.attackers = [fighter, shield];
 		const i = defender.items.defense.length;
 		const superShield = i == 2 || i == 17;

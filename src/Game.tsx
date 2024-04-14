@@ -19,7 +19,7 @@ import {
 	Mana2End,
 	WizardIdle,
 } from "./assets";
-import { BLEND_MODES } from "pixi.js";
+import { BLEND_MODES, ColorMatrixFilter, Filter, filters } from "pixi.js";
 import { getFrame, getNtFrame } from "./Animation";
 import { Rectangle } from "./Rectangle";
 import { wave } from "./ease";
@@ -67,6 +67,9 @@ export const Game = ({ game }: { game: GameT }) => {
 	);
 };
 
+const filter = new ColorMatrixFilter();
+filter.hue(70, false);
+
 const Player = ({
 	game,
 	player,
@@ -87,6 +90,7 @@ const Player = ({
 				)}
 				x={-15}
 				y={230}
+				filters={player == game.opponent ? [filter] : []}
 			/>
 			<DefenseItems items={player.items.defense} />
 			<ManaItems items={player.items.mana} />
@@ -305,9 +309,6 @@ const DefenseItems = ({ items }: { items: Item[] }) => {
 };
 
 const DefenseItem = ({ item, i }: { item: Item; i: number }) => {
-	// if (item.state == "fighting") {
-	// 	debugger;
-	// }
 	const visible = (
 		<>
 			{i > 0 && (
@@ -328,14 +329,10 @@ const DefenseItem = ({ item, i }: { item: Item; i: number }) => {
 			)}
 			{item.state == "fighting" && i > 0 && (
 				<Sprite
-					texture={
-						ShieldHit.animations.ShieldHit[
-							Math.floor(
-								item.nt *
-									(ShieldHit.animations.ShieldHit.length - 1),
-							)
-						]
-					}
+					texture={getNtFrame(
+						ShieldHit.animations.ShieldHit,
+						item.nt,
+					)}
 					blendMode={BLEND_MODES.ADD}
 					position={[18, -70]}
 					anchor={0}
@@ -355,6 +352,7 @@ const DefenseItem = ({ item, i }: { item: Item; i: number }) => {
 
 	switch (item.state) {
 		case "visible":
+		case "fighting":
 			return visible;
 		case "preSpawning": {
 			const dx = item.manaPoint.position.x - item.position.x;
