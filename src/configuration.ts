@@ -2,7 +2,7 @@ import { Polygon } from "pixi.js";
 
 export const initialMana = 5;
 export const initialManaItems = [];
-export const initialDefenseItems = Array(16)
+export const initialDefenseItems = Array(8)
 	.fill(null)
 	.map(() => 2);
 export const initialAttackItems = Array(0)
@@ -40,4 +40,8 @@ export const attackBounds: Bounds = {
 	polygon: new Polygon([
 		850, 211, 723, 174, 496, 294, 353, 310, 348, 593, 850, 850,
 	]),
+};
+
+export const playerBounds: Bounds = {
+	polygon: new Polygon([193, 625, 251, 626, 254, 439, 217, 436]),
 };

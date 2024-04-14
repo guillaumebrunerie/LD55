@@ -12,6 +12,7 @@ import {
 	Runes,
 	ShieldLoop,
 	ShieldHit,
+	CloudFight,
 } from "./assets";
 import { BLEND_MODES } from "pixi.js";
 import { Fragment } from "react/jsx-runtime";
@@ -40,10 +41,10 @@ const Player = ({
 	return (
 		<Container>
 			<ManaPoints items={player.mana} />
+			<Sprite texture={Hero} x={180} y={290} />
 			<DefenseItems items={player.items.defense} />
 			<ManaItems items={player.items.mana} />
 			<MonsterItems items={player.items.attack} tint={monsterTint} />
-			<Sprite texture={Hero} x={180} y={290} />
 		</Container>
 	);
 };
@@ -115,13 +116,15 @@ const DefenseItems = ({ items }: { items: Item[] }) => {
 	return items.map((item, i) => {
 		return (
 			<Fragment key={i}>
-				<Sprite
-					key={i}
-					texture={Runes.animations.Rune[i]}
-					anchor={0}
-					position={[-14, 613]}
-				/>
-				{i == 0 && (
+				{i > 0 && (
+					<Sprite
+						key={i}
+						texture={Runes.animations.Rune[i - 1]}
+						anchor={0}
+						position={[-14, 613]}
+					/>
+				)}
+				{i == 1 && (
 					<Sprite
 						texture={ShieldLoop}
 						blendMode={BLEND_MODES.ADD}
@@ -130,7 +133,7 @@ const DefenseItems = ({ items }: { items: Item[] }) => {
 						scale={2}
 					/>
 				)}
-				{item.state == "fighting" && (
+				{item.state == "fighting" && i > 0 && (
 					<Sprite
 						texture={
 							ShieldHit.animations.ShieldHit[
@@ -145,6 +148,14 @@ const DefenseItems = ({ items }: { items: Item[] }) => {
 						position={[18, -70]}
 						anchor={0}
 						scale={2}
+					/>
+				)}
+				{item.state == "fighting" && i == 0 && (
+					<Sprite
+						texture={CloudFight}
+						blendMode={BLEND_MODES.NORMAL}
+						position={item.position}
+						anchor={0.5}
 					/>
 				)}
 			</Fragment>

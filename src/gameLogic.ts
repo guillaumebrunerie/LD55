@@ -11,6 +11,7 @@ import {
 	fightDuration,
 	attackApproachDuration,
 	type Bounds,
+	playerBounds,
 } from "./configuration";
 
 export type Point = {
@@ -101,6 +102,7 @@ const newPlayer = (): Player => {
 	for (const manaItem of initialManaItems) {
 		addItem(player.items.mana, manaBounds, manaItem);
 	}
+	addItem(player.items.defense, playerBounds, 1);
 	for (const defenseItem of initialDefenseItems) {
 		addItem(player.items.defense, defenseBounds, defenseItem);
 	}
@@ -296,7 +298,7 @@ const pickDefensePair = (game: GameT) => {
 	game.phase = "defenseFight";
 	console.log("Fighting");
 	const fighter = pickFighter(attacker.items.attack);
-	const shield = defender.items.defense[0];
+	const shield = defender.items.defense[defender.items.defense.length - 1];
 	game.attackers = [fighter, shield];
 	fighter.hp = 0;
 	shield.hp = 0;
@@ -411,7 +413,7 @@ export const buyAttackItem = (game: GameT, player: Player) => {
 };
 
 export const buyDefenseItem = (game: GameT, player: Player) => {
-	if (!canBuy(game, player) || player.items.defense.length == 16) {
+	if (!canBuy(game, player) || player.items.defense.length == 17) {
 		return;
 	}
 	player.mana.pop();
