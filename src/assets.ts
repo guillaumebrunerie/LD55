@@ -1,4 +1,4 @@
-/** Generated on Sun Apr 14 21:31:17 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Mon Apr 15 00:49:48 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -43,6 +43,7 @@ import Monster3Dies_ from "../gfx/Monster3Dies.png?spritesheet";
 import Runes_ from "../gfx/Runes.png?spritesheet";
 import ShieldHit_ from "../gfx/ShieldHit.png?spritesheet";
 import Spawn_ from "../gfx/Spawn.png?spritesheet";
+import WizardIdle_ from "../gfx/WizardIdle.png?spritesheet";
 
 /** Sounds */
 import Click_ from "../audio/Click.mp3?sound";
@@ -88,6 +89,7 @@ export const [
 	Runes,
 	ShieldHit,
 	Spawn,
+	WizardIdle,
 	Click,
 	Music,
 	Pop,
@@ -130,6 +132,7 @@ export const [
 	Runes_,
 	ShieldHit_,
 	Spawn_,
+	WizardIdle_,
 	Click_,
 	Music_,
 	Pop_,

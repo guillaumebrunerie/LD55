@@ -92,14 +92,17 @@ const UIButton = ({
 	onClick,
 	texture,
 	x,
-	player,
+	game,
 }: {
 	onClick: () => void;
 	texture: Texture;
 	x: number;
-	player: Player;
+	game: GameT;
 }) => {
-	const tint = player.mana.length == 0 ? 0x333333 : 0xffffff;
+	const tint =
+		game.player.mana.length == 0 || game.phase != "buildUp" ?
+			0x333333
+		:	0xffffff;
 	// const proportion = (player.mana / itemCost(player)) * 100;
 	// const i = Math.min(Math.round(proportion), 99);
 	return (
@@ -124,19 +127,19 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				texture={BtnDefense}
 				x={600}
 				onClick={action(() => buyDefenseItem(game, game.player))}
-				player={game.player}
+				game={game}
 			/>
 			<UIButton
 				texture={BtnMana}
 				x={960}
 				onClick={action(() => buyManaItem(game, game.player))}
-				player={game.player}
+				game={game}
 			/>
 			<UIButton
 				texture={BtnAttack}
 				x={1320}
 				onClick={action(() => buyAttackItem(game, game.player))}
-				player={game.player}
+				game={game}
 			/>
 		</>
 	);
@@ -209,6 +212,8 @@ export const App = () => {
 		};
 	}, [app]);
 
+	const startButtonInCenter = game.isGameOver || game.phase == "gameover";
+
 	return (
 		<Container>
 			<Sprite
@@ -238,9 +243,9 @@ export const App = () => {
 			{!game.isGameOver && <UIButtons game={game} />}
 			<StartButton
 				position={
-					game.isGameOver ? [1920 / 2, 800] : [1920 - 100, 1030]
+					startButtonInCenter ? [1920 / 2, 800] : [1920 - 100, 1030]
 				}
-				scale={game.isGameOver ? 1 : 0.5}
+				scale={startButtonInCenter ? 1 : 0.5}
 				onClick={action(() => {
 					void requestFullScreen();
 					startNewGame(app);

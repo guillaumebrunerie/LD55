@@ -1,10 +1,9 @@
 import { Container, Sprite } from "@pixi/react";
-import type { GameT as GameT, Item } from "./gameLogic";
+import type { GameT as GameT, Item, Player } from "./gameLogic";
 import {
 	Monster1,
 	Monster2,
 	Monster3,
-	Hero,
 	Mana1,
 	Monster3Dies,
 	ManaPoint,
@@ -18,10 +17,9 @@ import {
 	ManaPointBlurred,
 	ManaPointStart,
 	Mana2End,
+	WizardIdle,
 } from "./assets";
 import { BLEND_MODES } from "pixi.js";
-import { Fragment } from "react/jsx-runtime";
-import { useLocalTime } from "./useLocalTime";
 import { getFrame, getNtFrame } from "./Animation";
 import { Rectangle } from "./Rectangle";
 import { wave } from "./ease";
@@ -38,11 +36,18 @@ export const Game = ({ game }: { game: GameT }) => {
 		case "rebuild":
 			screenAlpha = 1; // wave(game.nt);
 			break;
+		case "gameover":
+			screenAlpha = 0;
+			break;
 	}
 	return (
 		<Container>
 			<Container scale={[-1, 1]} x={1920}>
-				<Player player={game.opponent} monsterTint={0xff4444} />
+				<Player
+					game={game}
+					player={game.opponent}
+					monsterTint={0xff4444}
+				/>
 			</Container>
 			<Rectangle
 				x={1920 / 2}
@@ -52,23 +57,37 @@ export const Game = ({ game }: { game: GameT }) => {
 				alpha={screenAlpha}
 			/>
 			<Container>
-				<Player player={game.player} monsterTint={0xffffff} />
+				<Player
+					game={game}
+					player={game.player}
+					monsterTint={0xffffff}
+				/>
 			</Container>
 		</Container>
 	);
 };
 
 const Player = ({
+	game,
 	player,
 	monsterTint,
 }: {
-	player: GameT["player"];
+	game: GameT;
+	player: Player;
 	monsterTint: number;
 }) => {
 	return (
 		<Container>
 			<ManaPoints items={player.mana} />
-			<Sprite texture={Hero} x={180} y={290} />
+			<Sprite
+				texture={getFrame(
+					WizardIdle.animations.WizardIdle,
+					10,
+					game.gt,
+				)}
+				x={-15}
+				y={230}
+			/>
 			<DefenseItems items={player.items.defense} />
 			<ManaItems items={player.items.mana} />
 			<MonsterItems items={player.items.attack} tint={monsterTint} />
@@ -86,7 +105,7 @@ const manaEndAnimations = {
 } as const;
 
 const ManaPointC = ({ item }: { item: Item }) => {
-	const lt = useLocalTime();
+	const lt = item.lt;
 	switch (item.state) {
 		case "visible":
 			return (
@@ -161,7 +180,6 @@ const MonsterTexture = {
 } as const;
 
 const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
-	const lt = useLocalTime();
 	const visible = (
 		<Sprite
 			anchor={0.5}
@@ -170,20 +188,12 @@ const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
 			scale={1}
 			blendMode={BLEND_MODES.NORMAL}
 			texture={MonsterTexture[item.strength]}
-			position={item.tmpPosition || item.position}
+			position={item.tmpPosition || { ...item.position }}
 		/>
 	);
 	switch (item.state) {
 		case "visible":
-			return (
-				<Fragment>
-					{visible}
-					{/* <CustomText */}
-					{/* 	text={String(item.hp)} */}
-					{/* 	position={item.tmpPosition || item.position} */}
-					{/* /> */}
-				</Fragment>
-			);
+			return visible;
 		case "fighting": {
 			const j = Math.floor(
 				(item.nt || 0) *
@@ -245,7 +255,6 @@ const ManaTexture = {
 } as const;
 
 const ManaItem = ({ item }: { item: Item }) => {
-	const lt = useLocalTime();
 	const visible = (
 		<Sprite
 			texture={ManaTexture[item.strength]}
@@ -296,6 +305,9 @@ const DefenseItems = ({ items }: { items: Item[] }) => {
 };
 
 const DefenseItem = ({ item, i }: { item: Item; i: number }) => {
+	// if (item.state == "fighting") {
+	// 	debugger;
+	// }
 	const visible = (
 		<>
 			{i > 0 && (

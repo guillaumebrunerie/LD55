@@ -9,7 +9,6 @@ export const initialAttackItems = Array(0)
 	.fill(null)
 	.map(() => [2, 3, 4][Math.floor(Math.random() * 3)]);
 
-export const initialTimer = 10;
 export const attackSpeed = 150;
 
 const factor = 1;
