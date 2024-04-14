@@ -2,7 +2,7 @@ import { useState, useEffect, useReducer } from "react";
 import { Polygon, Rectangle, Texture } from "pixi.js";
 import { Container, Sprite } from "@pixi/react";
 import { useButton } from "./useButton";
-import { newApp, startApp, startNewGame } from "./appLogic";
+import { newApp, startApp, startNewGame, type AppT } from "./appLogic";
 import { observable, action } from "mobx";
 import { sound } from "@pixi/sound";
 import {
@@ -15,6 +15,7 @@ import {
 	Cloud2,
 	Cloud3,
 	Logo,
+	Moon,
 	SoundOff,
 	SoundOn,
 	StartButtonDefault,
@@ -146,11 +147,44 @@ const requestFullScreen = async () => {
 	// await screen.orientation.lock("landscape");
 };
 
+const LogoMoon = ({ app }: { app: AppT }) => {
+	switch (app.state) {
+		case "game":
+			return (
+				<Sprite
+					texture={Moon}
+					anchor={[0.5, 0.5]}
+					x={1920 / 2}
+					y={-100}
+				/>
+			);
+		case "transition":
+			return (
+				<>
+					<Sprite
+						texture={Moon}
+						anchor={[0.5, 0.5]}
+						x={1920 / 2}
+						y={400 - app.nt * 500}
+					/>
+					<Sprite
+						texture={Logo}
+						anchor={[0.5, 0.5]}
+						x={1920 / 2}
+						y={400 - app.nt * 500}
+						alpha={1 - app.nt}
+					/>
+				</>
+			);
+		case "intro":
+			return <Sprite texture={Logo} x={1920 / 2} y={400} anchor={0.5} />;
+	}
+};
+
 export const App = () => {
 	const [app] = useState(() => observable(newApp()));
-	const { highScore, game } = app;
+	const { game } = app;
 	useEffect(() => startApp(app), [app]);
-	const toTxt = (score: number) => score.toFixed(1);
 
 	const lt = useLocalTime();
 
@@ -166,6 +200,7 @@ export const App = () => {
 					console.log(`${Math.round(x)}, ${Math.round(y)}`);
 				}}
 			/>
+			<LogoMoon app={app} />
 			<Sprite
 				texture={Cloud3}
 				x={(((lt + 250) * 70) % 2800) - 800}
@@ -177,16 +212,6 @@ export const App = () => {
 				y={200}
 			/>
 			<Sprite texture={Cloud1} x={((lt * 40) % 2800) - 800} y={500} />
-			{/* <CustomText text={"SCORE: " + toTxt(game.score)} x={10} y={40} /> */}
-			{game.isGameOver && (
-				<Sprite texture={Logo} x={1920 / 2} y={400} anchor={0.5} />
-			)}
-			{game.isGameOver && app.highScore > 0 && (
-				<CustomText
-					position={{ x: 10, y: 90 }}
-					text={`HIGHSCORE: ${toTxt(highScore)}`}
-				/>
-			)}
 			{!game.isGameOver && <Game game={game} />}
 			{!game.isGameOver && <UIButtons game={game} />}
 			<StartButton

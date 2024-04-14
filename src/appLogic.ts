@@ -3,17 +3,23 @@ import { fadeVolume, musicVolume } from "./sounds";
 import { Ticker } from "pixi.js";
 import { sound } from "@pixi/sound";
 import { Music, StartButton } from "./assets";
-import { newGame, startGame, tickGame } from "./gameLogic";
+import { newGame, startGame, tickGame, type GameT } from "./gameLogic";
 
-export const newApp = () => ({
-	highScore: 0,
+export type AppT = {
+	state: "intro" | "transition" | "game";
+	lt: number;
+	nt: number;
+	game: GameT;
+};
+
+export const newApp = (): AppT => ({
+	state: "intro",
+	lt: 0,
+	nt: 0,
 	game: newGame(true),
-	previousGame: newGame(true),
 });
 
-type App = ReturnType<typeof newApp>;
-
-export const startApp = (app: App) => {
+export const startApp = (app: AppT) => {
 	sound.init();
 	void Music.play();
 	const tick = action((delta: number) => {
@@ -26,18 +32,33 @@ export const startApp = (app: App) => {
 	};
 };
 
-export const startNewGame = (app: App) => {
-	fadeVolume(Music, musicVolume.high, musicVolume.low, 500);
-	void StartButton.play();
+export const startNewGame = (app: AppT) => {
+	app.state = "transition";
+	app.lt = 0;
+	// fadeVolume(Music, musicVolume.high, musicVolume.low, 500);
+	// void StartButton.play();
 	app.game = newGame();
 	startGame(app.game);
 };
 
-const tickApp = (app: App, delta: number) => {
+const transitionDuration = 0.5;
+
+const wave = (nt: number) => (1 - Math.cos(nt * Math.PI)) / 2;
+
+const tickApp = (app: AppT, delta: number) => {
+	app.lt += delta;
+	switch (app.state) {
+		case "transition":
+			app.nt = wave(app.lt / transitionDuration);
+			if (app.lt >= transitionDuration) {
+				app.lt = app.nt = 0;
+				app.state = "game";
+			}
+	}
 	tickGame(app.game, () => gameOver(app), delta);
 };
 
-const gameOver = (app: App) => {
+const gameOver = (app: AppT) => {
 	if (!app.game.isGameOver) {
 		app.game.isGameOver = true;
 		fadeVolume(Music, musicVolume.low, musicVolume.high, 500);

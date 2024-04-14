@@ -204,14 +204,7 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 	if (game.isGameOver) {
 		return;
 	}
-	// game.player.mana += deltaS * manaRate(game.player);
-	// game.opponent.mana += deltaS * manaRate(game.opponent);
-	for (const item of game.player.items.attack) {
-		tickItem(item, delta);
-	}
-	for (const item of game.player.items.mana) {
-		tickItem(item, delta);
-	}
+	tickItems(game.player, delta);
 	switch (game.phase) {
 		case "buildUp":
 			// if (game.timer <= 0) {
@@ -223,9 +216,7 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 			// opponentMove(game, game.opponent, 0.6);
 			if (
 				game.player.mana.length == 0 &&
-				game.player.items.attack.every(
-					(item) => item.state == "visible",
-				)
+				areAllItemsVisible(game.player)
 			) {
 				opponentMove(game, game.opponent, smartStrategy);
 				pickAttackPair(game);
@@ -257,6 +248,26 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 			// moveBackAttack(game, deltaS);
 			break;
 	}
+};
+
+const tickItems = (player: Player, delta: number) => {
+	for (const item of player.items.attack) {
+		tickItem(item, delta);
+	}
+	for (const item of player.items.mana) {
+		tickItem(item, delta);
+	}
+	for (const item of player.items.defense) {
+		tickItem(item, delta);
+	}
+};
+
+const areAllItemsVisible = (player: Player) => {
+	return (
+		player.items.attack.every((item) => item.state == "visible") &&
+		player.items.defense.every((item) => item.state == "visible") &&
+		player.items.mana.every((item) => item.state == "visible")
+	);
 };
 
 const preSpawnDuration = 0.2;
@@ -306,6 +317,16 @@ const cleanUp = (game: GameT) => {
 			playerAttacker.tmpPosition || playerAttacker.position;
 		opponentAttacker.position =
 			opponentAttacker.tmpPosition || opponentAttacker.position;
+	}
+	for (const item of game.player.items.defense) {
+		if (item.state == "fighting") {
+			item.state = "visible";
+		}
+	}
+	for (const item of game.opponent.items.defense) {
+		if (item.state == "fighting") {
+			item.state = "visible";
+		}
 	}
 
 	game.player.items.attack = game.player.items.attack.filter(
@@ -547,9 +568,16 @@ export const buyDefenseItem = (game: GameT, player: Player) => {
 		return;
 	}
 	player.boughtThisRound.defense++;
-	player.mana.pop();
+	const manaPoint = player.mana.pop();
 	player.items.hasBoughtDefense = true;
-	addItem(player.items.defense, defenseBounds, 4);
+	const add = () => {
+		if (player == game.player) {
+			spawnItem(player.items.defense, defenseBounds, 4, manaPoint);
+		} else {
+			addItem(player.items.defense, defenseBounds, 4);
+		}
+	};
+	add();
 	if (player.items.attack.length > 0 && player.items.mana.length > 0) {
 		return;
 	}
@@ -558,9 +586,11 @@ export const buyDefenseItem = (game: GameT, player: Player) => {
 		player.items.defense.length < 17 &&
 		Math.random() < 0.5
 	) {
-		addItem(player.items.defense, defenseBounds, 4);
+		add();
+		// addItem(player.items.defense, defenseBounds, 4);
 		if (player.items.defense.length < 17 && Math.random() < 0.5) {
-			addItem(player.items.defense, defenseBounds, 4);
+			add();
+			// addItem(player.items.defense, defenseBounds, 4);
 			// if (player.items.defense.length < 17 && Math.random() < 0.4) {
 			// 	addItem(player.items.defense, defenseBounds, 4);
 			// }

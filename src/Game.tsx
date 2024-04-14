@@ -25,7 +25,6 @@ import { getFrame } from "./Animation";
 export const Game = ({ game }: { game: GameT }) => {
 	return (
 		<Container>
-			<Sprite texture={Moon} anchor={[0.5, 0.5]} x={1920 / 2} y={-100} />
 			<Container>
 				<Player player={game.player} monsterTint={0xffffff} />
 			</Container>
@@ -207,52 +206,83 @@ const ManaItem = ({ item }: { item: Item }) => {
 };
 
 const DefenseItems = ({ items }: { items: Item[] }) => {
-	return items.map((item, i) => {
-		return (
-			<Fragment key={i}>
-				{i > 0 && (
+	return items.map((item, i) => <DefenseItem key={i} item={item} i={i} />);
+};
+
+const DefenseItem = ({ item, i }: { item: Item; i: number }) => {
+	const visible = (
+		<>
+			{i > 0 && (
+				<Sprite
+					texture={Runes.animations.Rune[i - 1]}
+					anchor={0}
+					position={[-14, 613]}
+				/>
+			)}
+			{i == 1 && (
+				<Sprite
+					texture={ShieldLoop}
+					blendMode={BLEND_MODES.ADD}
+					position={[18, -70]}
+					anchor={0}
+					scale={2}
+				/>
+			)}
+			{item.state == "fighting" && i > 0 && (
+				<Sprite
+					texture={
+						ShieldHit.animations.ShieldHit[
+							Math.floor(
+								item.nt *
+									(ShieldHit.animations.ShieldHit.length - 1),
+							)
+						]
+					}
+					blendMode={BLEND_MODES.ADD}
+					position={[18, -70]}
+					anchor={0}
+					scale={2}
+				/>
+			)}
+			{item.state == "fighting" && i == 0 && (
+				<Sprite
+					texture={CloudFight}
+					blendMode={BLEND_MODES.NORMAL}
+					position={item.position}
+					anchor={0.5}
+				/>
+			)}
+		</>
+	);
+
+	const lt = useLocalTime();
+	switch (item.state) {
+		case "visible":
+			return visible;
+		case "preSpawning":
+			return (
+				<Sprite
+					anchor={0.5}
+					scale={item.manaPoint.scale}
+					rotation={lt * 3 + item.manaPoint.offset}
+					blendMode={BLEND_MODES.NORMAL}
+					texture={ManaPoint}
+					position={item.tmpPosition}
+				/>
+			);
+		case "spawning":
+			return (
+				<>
+					{visible}
 					<Sprite
-						key={i}
-						texture={Runes.animations.Rune[i - 1]}
-						anchor={0}
-						position={[-14, 613]}
-					/>
-				)}
-				{i == 1 && (
-					<Sprite
-						texture={ShieldLoop}
-						blendMode={BLEND_MODES.ADD}
-						position={[18, -70]}
-						anchor={0}
-						scale={2}
-					/>
-				)}
-				{item.state == "fighting" && i > 0 && (
-					<Sprite
-						texture={
-							ShieldHit.animations.ShieldHit[
-								Math.floor(
-									item.nt *
-										(ShieldHit.animations.ShieldHit.length -
-											1),
-								)
-							]
-						}
-						blendMode={BLEND_MODES.ADD}
-						position={[18, -70]}
-						anchor={0}
-						scale={2}
-					/>
-				)}
-				{item.state == "fighting" && i == 0 && (
-					<Sprite
-						texture={CloudFight}
-						blendMode={BLEND_MODES.NORMAL}
-						position={item.position}
 						anchor={0.5}
+						scale={0.5}
+						blendMode={BLEND_MODES.ADD}
+						texture={getFrame(Spawn.animations.Spawn, 30, item.lt)}
+						position={item.position}
 					/>
-				)}
-			</Fragment>
-		);
-	});
+				</>
+			);
+	}
+	return null;
 };
