@@ -29,6 +29,12 @@ export type Item = {
 	scale?: number;
 };
 
+type Buys = {
+	mana: number;
+	attack: number;
+	defense: number;
+};
+
 export type Player = {
 	mana: Item[];
 	items: {
@@ -37,6 +43,8 @@ export type Player = {
 		attack: Item[];
 		hasBoughtDefense: boolean;
 	};
+	boughtThisRound: Buys;
+	boughtPreviousRound: Buys;
 };
 
 const delta = 150;
@@ -97,6 +105,16 @@ const newPlayer = (): Player => {
 			attack: [],
 			hasBoughtDefense: false,
 		},
+		boughtThisRound: {
+			mana: 0,
+			attack: 0,
+			defense: 0,
+		},
+		boughtPreviousRound: {
+			mana: 0,
+			attack: 0,
+			defense: 0,
+		},
 	};
 	addManaPoints(player, initialMana);
 	for (const manaItem of initialManaItems) {
@@ -143,7 +161,10 @@ export const startGame = (game: GameT) => {
 
 const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 	while (opponent.mana.length > 0) {
-		const type = strategy(game, opponent, game.player);
+		const type = strategy(
+			game.opponent.boughtPreviousRound,
+			game.player.boughtPreviousRound,
+		);
 
 		switch (type) {
 			case "mana":
@@ -176,7 +197,7 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 			// opponentMove(game, game.player, 0.4);
 			// opponentMove(game, game.opponent, 0.6);
 			if (game.player.mana.length == 0) {
-				opponentMove(game, game.opponent, randomStrategy);
+				opponentMove(game, game.opponent, smartStrategy);
 				pickAttackPair(game);
 			}
 			break;
@@ -287,9 +308,8 @@ const pickDefensePair = (game: GameT) => {
 		const shield =
 			defender.items.defense[defender.items.defense.length - 1];
 		game.attackers = [fighter, shield];
-		const superShield =
-			defender.items.defense.length == 2 ||
-			defender.items.defense.length == 17;
+		const i = defender.items.defense.length;
+		const superShield = i == 2 || i == 17;
 		if (superShield) {
 			fighter.hp = 0;
 			if (!hasFought) {
@@ -334,6 +354,18 @@ const nextRound = (game: GameT) => {
 	game.opponent.items.mana = [];
 	game.player.items.hasBoughtDefense = false;
 	game.opponent.items.hasBoughtDefense = false;
+	game.player.boughtPreviousRound = game.player.boughtThisRound;
+	game.opponent.boughtPreviousRound = game.opponent.boughtThisRound;
+	game.player.boughtThisRound = {
+		mana: 0,
+		attack: 0,
+		defense: 0,
+	};
+	game.opponent.boughtThisRound = {
+		mana: 0,
+		attack: 0,
+		defense: 0,
+	};
 };
 
 const moveAttack = (game: GameT) => {
@@ -407,6 +439,7 @@ export const buyManaItem = (game: GameT, player: Player) => {
 	if (!canBuy(game, player) || player.mana.length == 0) {
 		return;
 	}
+	player.boughtThisRound.mana++;
 	player.mana.pop();
 	// player.mana.pop();
 	let strength = Math.random() < 0.6 ? 2 : 1;
@@ -423,6 +456,7 @@ export const buyAttackItem = (game: GameT, player: Player) => {
 	if (!canBuy(game, player)) {
 		return;
 	}
+	player.boughtThisRound.attack++;
 	player.mana.pop();
 	let strength;
 	if (Math.random() < 0.5) {
@@ -447,6 +481,7 @@ export const buyDefenseItem = (game: GameT, player: Player) => {
 	) {
 		return;
 	}
+	player.boughtThisRound.defense++;
 	player.mana.pop();
 	player.items.hasBoughtDefense = true;
 	addItem(player.items.defense, defenseBounds, 4);
@@ -469,9 +504,8 @@ export const buyDefenseItem = (game: GameT, player: Player) => {
 };
 
 type Strategy = { strategy: string } & ((
-	game: GameT,
-	player: Player,
-	opponent: Player,
+	buys: Buys,
+	opponentBuys: Buys,
 ) => "mana" | "attack" | "defense");
 
 const attackStrategy: Strategy = () => {
@@ -518,6 +552,38 @@ const randomStrategy: Strategy = () => {
 };
 randomStrategy.strategy = "Random ";
 
+const smartStrategy: Strategy = (buys, opponentBuys) => {
+	if (
+		opponentBuys.attack >= opponentBuys.mana + 2 &&
+		opponentBuys.attack >= opponentBuys.defense + 2
+	) {
+		return defenseStrategy(buys, opponentBuys);
+	}
+	if (
+		opponentBuys.mana >= opponentBuys.attack + 2 &&
+		opponentBuys.mana >= opponentBuys.defense + 2
+	) {
+		return attackStrategy(buys, opponentBuys);
+	}
+	return manaStrategy(buys, opponentBuys);
+};
+smartStrategy.strategy = "Smart  ";
+
+const naturalStrategy: Strategy = (buys, opponentBuys) => {
+	// console.log(JSON.stringify(buys));
+	if (buys.attack >= buys.mana + 1 && buys.attack >= buys.defense + 1) {
+		return attackStrategy(buys, opponentBuys);
+	}
+	if (buys.mana >= buys.attack + 1 && buys.mana >= buys.defense + 1) {
+		return manaStrategy(buys, opponentBuys);
+	}
+	if (buys.defense >= buys.attack + 1 && buys.defense >= buys.mana + 1) {
+		return defenseStrategy(buys, opponentBuys);
+	}
+	return randomStrategy(buys, opponentBuys);
+};
+naturalStrategy.strategy = "Natural";
+
 export const testStrategiesOnce = (
 	strategy1: Strategy,
 	strategy2: Strategy,
@@ -529,7 +595,10 @@ export const testStrategiesOnce = (
 		opponent: Player,
 	) => {
 		while (player.mana.length > 0) {
-			const type = strategy(game, player, opponent);
+			const type = strategy(
+				player.boughtPreviousRound,
+				opponent.boughtPreviousRound,
+			);
 			switch (type) {
 				case "mana":
 					buyManaItem(game, player);
@@ -612,5 +681,14 @@ testStrategies(manaStrategy, defenseStrategy);
 testStrategies(attackStrategy, randomStrategy);
 testStrategies(defenseStrategy, randomStrategy);
 testStrategies(manaStrategy, randomStrategy);
+testStrategies(smartStrategy, randomStrategy);
+testStrategies(smartStrategy, defenseStrategy);
+testStrategies(smartStrategy, attackStrategy);
+testStrategies(smartStrategy, manaStrategy);
+testStrategies(naturalStrategy, randomStrategy);
+testStrategies(naturalStrategy, defenseStrategy);
+testStrategies(naturalStrategy, attackStrategy);
+testStrategies(naturalStrategy, manaStrategy);
+testStrategies(naturalStrategy, smartStrategy);
 console.log("");
 // debugger;
