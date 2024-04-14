@@ -166,8 +166,7 @@ export const App = () => {
 			)}
 			{game.isGameOver && app.highScore > 0 && (
 				<CustomText
-					x={10}
-					y={90}
+					position={{ x: 10, y: 90 }}
 					text={`HIGHSCORE: ${toTxt(highScore)}`}
 				/>
 			)}

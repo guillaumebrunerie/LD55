@@ -1,20 +1,20 @@
 import { type ReactNode } from "react";
 import { Sprite } from "@pixi/react";
 import { Font } from "./assets";
+import type { Point } from "./gameLogic";
 
 export const CustomText = ({
 	text,
-	x,
-	y,
+	position,
 }: {
 	text: string;
-	x: number;
-	y: number;
+	position: Point;
 }) => {
 	const scale = 0.4;
 	const kerning = 10;
 	const space = 30;
 	const result: ReactNode[] = [];
+	let { x, y } = position;
 	text.split("").forEach((char, i) => {
 		if (char == ":") {
 			char = "collon";

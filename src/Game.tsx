@@ -16,6 +16,7 @@ import {
 } from "./assets";
 import { BLEND_MODES } from "pixi.js";
 import { Fragment } from "react/jsx-runtime";
+import { CustomText } from "./CustomText";
 
 export const Game = ({ game }: { game: GameT }) => {
 	return (
@@ -65,9 +66,9 @@ const ManaPoints = ({ items }: { items: Item[] }) => {
 };
 
 const MonsterTexture = {
-	2: Monster1,
-	3: Monster2,
-	4: Monster3,
+	1: Monster1,
+	2: Monster2,
+	3: Monster3,
 } as const;
 
 const MonsterItems = ({ items, tint }: { items: Item[]; tint: number }) => {
@@ -75,15 +76,20 @@ const MonsterItems = ({ items, tint }: { items: Item[]; tint: number }) => {
 		switch (item.state) {
 			case "visible":
 				return (
-					<Sprite
-						key={i}
-						anchor={0.5}
-						tint={tint}
-						blendMode={BLEND_MODES.NORMAL}
-						// blendMode={BLEND_MODES.NORMAL}
-						texture={MonsterTexture[item.strength]}
-						position={item.tmpPosition || item.position}
-					/>
+					<Fragment key={i}>
+						<Sprite
+							anchor={0.5}
+							tint={tint}
+							blendMode={BLEND_MODES.NORMAL}
+							// blendMode={BLEND_MODES.NORMAL}
+							texture={MonsterTexture[item.strength]}
+							position={item.tmpPosition || item.position}
+						/>
+						{/* <CustomText */}
+						{/* 	text={String(item.hp)} */}
+						{/* 	position={item.tmpPosition || item.position} */}
+						{/* /> */}
+					</Fragment>
 				);
 			case "fighting": {
 				const j = Math.floor(
