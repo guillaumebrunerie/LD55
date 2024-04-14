@@ -16,11 +16,13 @@ import {
 	Spawn,
 	Mana1End,
 	ManaPointBlurred,
+	ManaPointStart,
+	Mana2End,
 } from "./assets";
 import { BLEND_MODES } from "pixi.js";
 import { Fragment } from "react/jsx-runtime";
 import { useLocalTime } from "./useLocalTime";
-import { getFrame } from "./Animation";
+import { getFrame, getNtFrame } from "./Animation";
 import { Rectangle } from "./Rectangle";
 import { wave } from "./ease";
 
@@ -34,7 +36,7 @@ export const Game = ({ game }: { game: GameT }) => {
 			screenAlpha = wave(1 - game.nt);
 			break;
 		case "rebuild":
-			screenAlpha = wave(game.nt);
+			screenAlpha = 1; // wave(game.nt);
 			break;
 	}
 	return (
@@ -78,6 +80,11 @@ const ManaPoints = ({ items }: { items: Item[] }) => {
 	return items.map((item, i) => <ManaPointC key={i} item={item} />);
 };
 
+const manaEndAnimations = {
+	1: Mana1End.animations.Mana1End,
+	2: Mana2End.animations.Mana2End,
+} as const;
+
 const ManaPointC = ({ item }: { item: Item }) => {
 	const lt = useLocalTime();
 	switch (item.state) {
@@ -92,28 +99,52 @@ const ManaPointC = ({ item }: { item: Item }) => {
 					position={item.position}
 				/>
 			);
-		case "spawning":
-			return (
-				<Sprite
-					anchor={0.5}
-					scale={1}
-					rotation={0}
-					blendMode={BLEND_MODES.NORMAL}
-					texture={Mana1End.animations.Mana1End[0]}
-					position={item.manaPoint?.position || item.position}
-				/>
-			);
-		case "postSpawning":
-			return (
-				<Sprite
-					anchor={0.5}
-					scale={1}
-					rotation={0}
-					blendMode={BLEND_MODES.NORMAL}
-					texture={ManaPoint}
-					position={item.tmpPosition}
-				/>
-			);
+		case "spawning": {
+			if (item.manaPoint) {
+				return (
+					<>
+						<Sprite
+							anchor={0.5}
+							scale={1}
+							rotation={0}
+							blendMode={BLEND_MODES.NORMAL}
+							texture={getNtFrame(
+								manaEndAnimations[item.manaPoint.strength],
+								item.nt,
+							)}
+							position={item.manaPoint?.position}
+						/>
+						<Sprite
+							anchor={0.5}
+							scale={item.scale}
+							rotation={lt * 3 + item.offset}
+							blendMode={BLEND_MODES.NORMAL}
+							alpha={
+								item.nt < 0.2 ? 0 : Math.min(item.lt / 0.2, 1)
+							}
+							texture={ManaPoint}
+							position={item.tmpPosition || item.position}
+						/>
+					</>
+				);
+			} else {
+				return (
+					<>
+						<Sprite
+							anchor={0.5}
+							scale={item.scale}
+							rotation={lt * 3 + item.offset}
+							blendMode={BLEND_MODES.NORMAL}
+							texture={getNtFrame(
+								ManaPointStart.animations.ManaPointStart,
+								item.nt,
+							)}
+							position={item.position}
+						/>
+					</>
+				);
+			}
+		}
 	}
 };
 
@@ -310,7 +341,6 @@ const DefenseItem = ({ item, i }: { item: Item; i: number }) => {
 		</>
 	);
 
-	// const lt = useLocalTime();
 	switch (item.state) {
 		case "visible":
 			return visible;

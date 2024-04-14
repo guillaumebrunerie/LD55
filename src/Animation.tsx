@@ -27,6 +27,14 @@ export const getFrame = (
 	}
 };
 
+export const getNtFrame = (animation: Texture[], nt: number) => {
+	const i = Math.min(
+		Math.max(Math.floor(nt * animation.length), 0),
+		animation.length - 1,
+	);
+	return animation[i];
+};
+
 export const getFrameMultiple = (
 	spritesheet1: Spritesheet,
 	fps1: number,

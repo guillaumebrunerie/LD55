@@ -25,13 +25,7 @@ export type Item = {
 	tmpPosition?: Point;
 	strength: number;
 	hp: number;
-	state:
-		| "visible"
-		| "hidden"
-		| "fighting"
-		| "preSpawning"
-		| "spawning"
-		| "postSpawning";
+	state: "visible" | "hidden" | "fighting" | "preSpawning" | "spawning";
 	nt?: number;
 	scale?: number;
 	offset?: number;
@@ -57,6 +51,23 @@ export type Player = {
 const delta = 150;
 
 let ITERATION_COUNT = 100;
+
+const spawnManaPoint = (
+	array: Item[],
+	bounds: Bounds,
+	strength: number,
+	manaPoint: Item,
+	props?: Partial<Item>,
+) => {
+	addItem(array, bounds, strength, {
+		...props,
+		tmpPosition: manaPoint?.position,
+		manaPoint,
+		state: "spawning",
+		lt: 0,
+		nt: 0,
+	});
+};
 
 const spawnItem = (
 	array: Item[],
@@ -152,25 +163,16 @@ const newPlayer = (): Player => {
 	return player;
 };
 
-// const addManaPoints = (player: Player, points: number) => {
-// 	for (let i = 0; i < points; i++) {
-// 		addItem(player.mana, manaPointsBounds, 1, {
-// 			scale: 0.7 + Math.random() * 0.3,
-// 			offset: Math.random() * 2 * Math.PI,
-// 		});
-// 	}
-// };
-
-const spawnManaPoints = (player: Player) => {
-	for (let i = 0; i < initialMana; i++) {
-		spawnItem(player.mana, manaPointsBounds, 1, null, {
+const rebuildManaPoint = (player: Player) => {
+	if (player.mana.length < initialMana) {
+		spawnManaPoint(player.mana, manaPointsBounds, 1, null, {
 			scale: 0.7 + Math.random() * 0.3,
 			offset: Math.random() * 2 * Math.PI,
 		});
-	}
-	for (const item of player.items.mana) {
+	} else if (player.items.mana.length > 0) {
+		const item = player.items.mana.pop() as Item;
 		for (let i = 0; i < item.strength; i++) {
-			spawnItem(player.mana, manaPointsBounds, 1, item, {
+			spawnManaPoint(player.mana, manaPointsBounds, 1, item, {
 				scale: 0.7 + Math.random() * 0.3,
 				offset: Math.random() * 2 * Math.PI,
 			});
@@ -235,7 +237,7 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 };
 
 const toAttackDuration = 0.5;
-const rebuildDuration = 0.5;
+const rebuildDuration = 0.2;
 
 export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 	if (game.isGameOver) {
@@ -289,8 +291,13 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 		case "rebuild":
 			game.nt = game.lt / rebuildDuration;
 			if (game.lt >= rebuildDuration) {
-				game.timer = initialTimer;
-				game.phase = "buildUp";
+				if (hasManaToSpawn(game.player)) {
+					rebuildManaPoint(game.player);
+					game.lt = 0;
+				} else {
+					game.timer = initialTimer;
+					game.phase = "buildUp";
+				}
 				break;
 			}
 			break;
@@ -367,29 +374,19 @@ const tickItem = (item: Item, delta: number) => {
 	}
 };
 
+const manaSpawnDuration = 0.5;
 const tickManaItem = (item: Item, delta: number) => {
 	item.lt += delta;
 	switch (item.state) {
-		case "preSpawning":
-			item.lt = 0;
-			item.state = "spawning";
-			break;
 		case "spawning": {
-			if (item.lt >= spawnDuration) {
-				item.state = "postSpawning";
-				item.lt = 0;
-				break;
-			}
-			break;
-		}
-		case "postSpawning": {
-			if (item.lt >= spawnDuration) {
+			item.nt = item.lt / manaSpawnDuration;
+			if (item.lt >= manaSpawnDuration) {
 				item.state = "visible";
 				item.lt = 0;
 				item.tmpPosition = undefined;
 				break;
 			}
-			const nt = item.lt / spawnDuration;
+			const nt = Math.max((item.lt - 0.2) / (manaSpawnDuration - 0.2), 0);
 			if (!item.manaPoint) {
 				item.tmpPosition = item.position;
 			} else {
@@ -521,14 +518,11 @@ const pickDefensePair = (game: GameT) => {
 	}
 };
 
-const nextRound = (game: GameT) => {
-	// game.player.mana = [];
-	// game.opponent.mana = [];
-	spawnManaPoints(game.player);
-	spawnManaPoints(game.opponent);
-	game.player.items.mana = [];
-	game.opponent.items.mana = [];
+const hasManaToSpawn = (player: Player) => {
+	return player.mana.length < initialMana || player.items.mana.length > 0;
+};
 
+const nextRound = (game: GameT) => {
 	game.player.boughtPreviousRound = game.player.boughtThisRound;
 	game.opponent.boughtPreviousRound = game.opponent.boughtThisRound;
 	game.player.boughtThisRound = {

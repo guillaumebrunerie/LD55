@@ -189,17 +189,25 @@ export const App = () => {
 	const { game } = app;
 	useEffect(() => startApp(app), [app]);
 
-	const lt = useLocalTime();
-	// useEffect(() => {
-	// 	const callback = action((event: React.KeyboardEvent) => {
+	const lt = app.lt;
 
-	// 		app.speed *= 2;
-	// 	});
-	// 	window.addEventListener("keydown", callback);
-	// 	return () => {
-	// 		window.removeEventListener("keydown", callback);
-	// 	}
-	// })
+	useEffect(() => {
+		const callback = action((event: KeyboardEvent) => {
+			if (event.key == "ArrowUp") {
+				app.speed *= 2;
+			} else if (event.key == "ArrowDown") {
+				app.speed *= 1 / 2;
+			} else if (event.key == "ArrowLeft") {
+				app.speed = 0;
+			} else if (event.key == "ArrowRight") {
+				app.speed = 1;
+			}
+		});
+		window.addEventListener("keydown", callback);
+		return () => {
+			window.removeEventListener("keydown", callback);
+		};
+	}, [app]);
 
 	return (
 		<Container>
@@ -216,15 +224,15 @@ export const App = () => {
 			<LogoMoon app={app} />
 			<Sprite
 				texture={Cloud3}
-				x={mod(10 * lt + 2800 / 3, 2800) - 800}
+				x={mod(13 * lt + 2800 / 3, 2800) - 800}
 				y={50}
 			/>
 			<Sprite
 				texture={Cloud2}
-				x={mod(-15 * lt + (2800 * 2) / 3, 2800) - 800}
+				x={mod(-16 * lt + (2800 * 2) / 3, 2800) - 800}
 				y={200}
 			/>
-			<Sprite texture={Cloud1} x={mod(20 * lt, 2800) - 800} y={500} />
+			<Sprite texture={Cloud1} x={mod(21 * lt, 2800) - 800} y={500} />
 			<Sprite texture={BgFront} x={0} y={0} />
 			{!game.isGameOver && <Game game={game} />}
 			{!game.isGameOver && <UIButtons game={game} />}

@@ -23,10 +23,11 @@ export const newApp = (): AppT => ({
 });
 
 export const startApp = (app: AppT) => {
+	window.app = app;
 	sound.init();
 	void Music.play();
 	const tick = action((delta: number) => {
-		tickApp(app, delta / 60 / app.speed);
+		tickApp(app, (delta / 60) * app.speed);
 	});
 	Ticker.shared.add(tick);
 	return () => {
