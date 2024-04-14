@@ -1,0 +1,95 @@
+{"frames": {
+
+"ManaPointStart_000.png":
+{
+	"frame": {"x":1,"y":1,"w":3,"h":3},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":3,"h":3},
+	"sourceSize": {"w":140,"h":139}
+},
+"ManaPointStart_001.png":
+{
+	"frame": {"x":6,"y":1,"w":76,"h":75},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":32,"y":32,"w":76,"h":75},
+	"sourceSize": {"w":140,"h":139}
+},
+"ManaPointStart_002.png":
+{
+	"frame": {"x":1,"y":703,"w":100,"h":99},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":20,"y":20,"w":100,"h":99},
+	"sourceSize": {"w":140,"h":139}
+},
+"ManaPointStart_003.png":
+{
+	"frame": {"x":1,"y":605,"w":97,"h":96},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":22,"y":22,"w":97,"h":96},
+	"sourceSize": {"w":140,"h":139}
+},
+"ManaPointStart_004.png":
+{
+	"frame": {"x":1,"y":515,"w":88,"h":88},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":26,"y":26,"w":88,"h":88},
+	"sourceSize": {"w":140,"h":139}
+},
+"ManaPointStart_005.png":
+{
+	"frame": {"x":1,"y":78,"w":85,"h":84},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":27,"y":28,"w":85,"h":84},
+	"sourceSize": {"w":140,"h":139}
+},
+"ManaPointStart_006.png":
+{
+	"frame": {"x":1,"y":164,"w":85,"h":84},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":27,"y":27,"w":85,"h":84},
+	"sourceSize": {"w":140,"h":139}
+},
+"ManaPointStart_007.png":
+{
+	"frame": {"x":1,"y":250,"w":86,"h":85},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":27,"y":27,"w":86,"h":85},
+	"sourceSize": {"w":140,"h":139}
+},
+"ManaPointStart_008.png":
+{
+	"frame": {"x":1,"y":337,"w":88,"h":87},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":26,"y":26,"w":88,"h":87},
+	"sourceSize": {"w":140,"h":139}
+},
+"ManaPointStart_009.png":
+{
+	"frame": {"x":1,"y":426,"w":88,"h":87},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":26,"y":26,"w":88,"h":87},
+	"sourceSize": {"w":140,"h":139}
+}},
+"animations": {
+	"ManaPointStart": ["ManaPointStart_000.png","ManaPointStart_001.png","ManaPointStart_002.png","ManaPointStart_003.png","ManaPointStart_004.png","ManaPointStart_005.png","ManaPointStart_006.png","ManaPointStart_007.png","ManaPointStart_008.png","ManaPointStart_009.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "ManaPointStart.png",
+	"format": "RGBA8888",
+	"size": {"w":102,"h":803},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:66150bfd333a43a8152567710304a99f:6fc3c8c155cfdf3003d3c3335ccd0530:535fd4c9212aa34387eba5b284164e44$"
+}
+}
