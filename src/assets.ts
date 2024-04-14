@@ -1,4 +1,4 @@
-/** Generated on Sun Apr 14 01:10:52 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sun Apr 14 16:51:00 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -8,6 +8,9 @@ import Bg_ from "../gfx/Bg.jpg?texture";
 import BtnAttack_ from "../gfx/BtnAttack.png?texture";
 import BtnDefense_ from "../gfx/BtnDefense.png?texture";
 import BtnMana_ from "../gfx/BtnMana.png?texture";
+import Cloud1_ from "../gfx/Cloud1.png?texture";
+import Cloud2_ from "../gfx/Cloud2.png?texture";
+import Cloud3_ from "../gfx/Cloud3.png?texture";
 import CloudFight_ from "../gfx/CloudFight.png?texture";
 import Defense1_ from "../gfx/Defense1.png?texture";
 import Defense2_ from "../gfx/Defense2.png?texture";
@@ -16,6 +19,7 @@ import Division_ from "../gfx/Division.png?texture";
 import Hero_ from "../gfx/Hero.png?texture";
 import Logo_ from "../gfx/Logo.png?texture";
 import Mana1_ from "../gfx/Mana1.png?texture";
+import Mana2_ from "../gfx/Mana2.png?texture";
 import ManaPoint_ from "../gfx/ManaPoint.png?texture";
 import Monster1_ from "../gfx/Monster1.png?texture";
 import Monster2_ from "../gfx/Monster2.png?texture";
@@ -45,6 +49,9 @@ export const [
 	BtnAttack,
 	BtnDefense,
 	BtnMana,
+	Cloud1,
+	Cloud2,
+	Cloud3,
 	CloudFight,
 	Defense1,
 	Defense2,
@@ -53,6 +60,7 @@ export const [
 	Hero,
 	Logo,
 	Mana1,
+	Mana2,
 	ManaPoint,
 	Monster1,
 	Monster2,
@@ -77,6 +85,9 @@ export const [
 	BtnAttack_,
 	BtnDefense_,
 	BtnMana_,
+	Cloud1_,
+	Cloud2_,
+	Cloud3_,
 	CloudFight_,
 	Defense1_,
 	Defense2_,
@@ -85,6 +96,7 @@ export const [
 	Hero_,
 	Logo_,
 	Mana1_,
+	Mana2_,
 	ManaPoint_,
 	Monster1_,
 	Monster2_,

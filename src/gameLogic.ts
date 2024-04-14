@@ -164,6 +164,7 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 		const type = strategy(
 			game.opponent.boughtPreviousRound,
 			game.player.boughtPreviousRound,
+			game.opponent.items,
 		);
 
 		switch (type) {
@@ -506,6 +507,11 @@ export const buyDefenseItem = (game: GameT, player: Player) => {
 type Strategy = { strategy: string } & ((
 	buys: Buys,
 	opponentBuys: Buys,
+	items: {
+		mana: Item[];
+		attack: Item[];
+		defense: Item[];
+	},
 ) => "mana" | "attack" | "defense");
 
 const attackStrategy: Strategy = () => {
@@ -552,35 +558,44 @@ const randomStrategy: Strategy = () => {
 };
 randomStrategy.strategy = "Random ";
 
-const smartStrategy: Strategy = (buys, opponentBuys) => {
+const smartStrategy: Strategy = (buys, opponentBuys, items) => {
 	if (
-		opponentBuys.attack >= opponentBuys.mana + 2 &&
-		opponentBuys.attack >= opponentBuys.defense + 2
+		opponentBuys.attack >= opponentBuys.mana + 1 &&
+		opponentBuys.attack >= opponentBuys.defense + 1
 	) {
-		return defenseStrategy(buys, opponentBuys);
+		return defenseStrategy(buys, opponentBuys, items);
 	}
 	if (
-		opponentBuys.mana >= opponentBuys.attack + 2 &&
-		opponentBuys.mana >= opponentBuys.defense + 2
+		opponentBuys.mana >= opponentBuys.attack + 1 &&
+		opponentBuys.mana >= opponentBuys.defense + 1
 	) {
-		return attackStrategy(buys, opponentBuys);
+		return attackStrategy(buys, opponentBuys, items);
 	}
-	return manaStrategy(buys, opponentBuys);
+	return manaStrategy(buys, opponentBuys, items);
 };
 smartStrategy.strategy = "Smart  ";
 
-const naturalStrategy: Strategy = (buys, opponentBuys) => {
+const smart2Strategy: Strategy = (buys, opponentBuys, items) => {
+	if (items.defense.length < 4) {
+		return defenseStrategy(buys, opponentBuys, items);
+	} else {
+		return smartStrategy(buys, opponentBuys, items);
+	}
+};
+smart2Strategy.strategy = "Smart2 ";
+
+const naturalStrategy: Strategy = (buys, opponentBuys, items) => {
 	// console.log(JSON.stringify(buys));
 	if (buys.attack >= buys.mana + 1 && buys.attack >= buys.defense + 1) {
-		return attackStrategy(buys, opponentBuys);
+		return attackStrategy(buys, opponentBuys, items);
 	}
 	if (buys.mana >= buys.attack + 1 && buys.mana >= buys.defense + 1) {
-		return manaStrategy(buys, opponentBuys);
+		return manaStrategy(buys, opponentBuys, items);
 	}
 	if (buys.defense >= buys.attack + 1 && buys.defense >= buys.mana + 1) {
-		return defenseStrategy(buys, opponentBuys);
+		return defenseStrategy(buys, opponentBuys, items);
 	}
-	return randomStrategy(buys, opponentBuys);
+	return randomStrategy(buys, opponentBuys, items);
 };
 naturalStrategy.strategy = "Natural";
 
@@ -598,6 +613,7 @@ export const testStrategiesOnce = (
 			const type = strategy(
 				player.boughtPreviousRound,
 				opponent.boughtPreviousRound,
+				player.items,
 			);
 			switch (type) {
 				case "mana":
@@ -674,21 +690,21 @@ const testStrategies = (strategy1: Strategy, strategy2: Strategy) => {
 	);
 };
 
-console.log("");
-testStrategies(defenseStrategy, attackStrategy);
-testStrategies(attackStrategy, manaStrategy);
-testStrategies(manaStrategy, defenseStrategy);
-testStrategies(attackStrategy, randomStrategy);
-testStrategies(defenseStrategy, randomStrategy);
-testStrategies(manaStrategy, randomStrategy);
-testStrategies(smartStrategy, randomStrategy);
-testStrategies(smartStrategy, defenseStrategy);
-testStrategies(smartStrategy, attackStrategy);
-testStrategies(smartStrategy, manaStrategy);
-testStrategies(naturalStrategy, randomStrategy);
-testStrategies(naturalStrategy, defenseStrategy);
-testStrategies(naturalStrategy, attackStrategy);
-testStrategies(naturalStrategy, manaStrategy);
-testStrategies(naturalStrategy, smartStrategy);
-console.log("");
-// debugger;
+// console.log("");
+// testStrategies(defenseStrategy, attackStrategy);
+// testStrategies(attackStrategy, manaStrategy);
+// testStrategies(manaStrategy, defenseStrategy);
+// testStrategies(attackStrategy, randomStrategy);
+// testStrategies(defenseStrategy, randomStrategy);
+// testStrategies(manaStrategy, randomStrategy);
+// testStrategies(smartStrategy, randomStrategy);
+// testStrategies(smartStrategy, defenseStrategy);
+// testStrategies(smartStrategy, attackStrategy);
+// testStrategies(smartStrategy, manaStrategy);
+// testStrategies(smart2Strategy, randomStrategy);
+// testStrategies(smart2Strategy, defenseStrategy);
+// testStrategies(smart2Strategy, attackStrategy);
+// testStrategies(smart2Strategy, manaStrategy);
+// testStrategies(smart2Strategy, smartStrategy);
+// console.log("");
+// // debugger;

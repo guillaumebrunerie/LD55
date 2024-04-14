@@ -13,6 +13,7 @@ import {
 	ShieldLoop,
 	ShieldHit,
 	CloudFight,
+	Mana2,
 } from "./assets";
 import { BLEND_MODES } from "pixi.js";
 import { Fragment } from "react/jsx-runtime";
@@ -112,10 +113,22 @@ const MonsterItems = ({ items, tint }: { items: Item[]; tint: number }) => {
 	});
 };
 
+const ManaTexture = {
+	1: Mana1,
+	2: Mana2,
+} as const;
+
 const ManaItems = ({ items }: { items: Item[] }) => {
-	return items.map((item, i) => (
-		<Sprite key={i} texture={Mana1} anchor={0.5} position={item.position} />
-	));
+	return items
+		.toSorted((a, b) => a.position.y - b.position.y)
+		.map((item, i) => (
+			<Sprite
+				key={i}
+				texture={ManaTexture[item.strength]}
+				anchor={0.5}
+				position={item.position}
+			/>
+		));
 };
 
 const DefenseItems = ({ items }: { items: Item[] }) => {
