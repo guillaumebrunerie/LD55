@@ -1,0 +1,87 @@
+{"frames": {
+
+"Spawn_000.png":
+{
+	"frame": {"x":907,"y":255,"w":189,"h":198},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":58,"y":60,"w":189,"h":198},
+	"sourceSize": {"w":300,"h":300}
+},
+"Spawn_001.png":
+{
+	"frame": {"x":692,"y":270,"w":213,"h":222},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":44,"y":46,"w":213,"h":222},
+	"sourceSize": {"w":300,"h":300}
+},
+"Spawn_002.png":
+{
+	"frame": {"x":797,"y":1,"w":243,"h":252},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":24,"y":32,"w":243,"h":252},
+	"sourceSize": {"w":300,"h":300}
+},
+"Spawn_003.png":
+{
+	"frame": {"x":1,"y":1,"w":267,"h":281},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":8,"y":14,"w":267,"h":281},
+	"sourceSize": {"w":300,"h":300}
+},
+"Spawn_004.png":
+{
+	"frame": {"x":270,"y":1,"w":270,"h":275},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":13,"y":16,"w":270,"h":275},
+	"sourceSize": {"w":300,"h":300}
+},
+"Spawn_005.png":
+{
+	"frame": {"x":542,"y":1,"w":253,"h":267},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":16,"y":20,"w":253,"h":267},
+	"sourceSize": {"w":300,"h":300}
+},
+"Spawn_006.png":
+{
+	"frame": {"x":1,"y":284,"w":227,"h":227},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":19,"y":22,"w":227,"h":227},
+	"sourceSize": {"w":300,"h":300}
+},
+"Spawn_007.png":
+{
+	"frame": {"x":230,"y":284,"w":221,"h":227},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":35,"y":24,"w":221,"h":227},
+	"sourceSize": {"w":300,"h":300}
+},
+"Spawn_008.png":
+{
+	"frame": {"x":453,"y":278,"w":228,"h":237},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":47,"y":20,"w":228,"h":237},
+	"sourceSize": {"w":300,"h":300}
+}},
+"animations": {
+	"Spawn": ["Spawn_000.png","Spawn_001.png","Spawn_002.png","Spawn_003.png","Spawn_004.png","Spawn_005.png","Spawn_006.png","Spawn_007.png","Spawn_008.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "Spawn.png",
+	"format": "RGBA8888",
+	"size": {"w":1097,"h":512},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:9a42ea4150812b56201b5dc8f5b10d26:54baf1aef7ace18cc2528a320b48d715:31b99a0454cd035dec4b9662569f0148$"
+}
+}
