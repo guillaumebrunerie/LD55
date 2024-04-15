@@ -37,24 +37,40 @@ import {
 } from "./gameLogic";
 import { Game } from "./Game";
 import { wave } from "./ease";
+import type { ButtonT } from "./button";
 
 const StartButton = ({
+	button,
 	onClick,
 	position,
 	scale,
 }: {
+	button: ButtonT;
 	onClick: () => void;
 	position: [number, number];
 	scale: number;
 }) => {
 	const { isActive, props } = useButton({ onClick });
 
+	let alpha = 0;
+	switch (button.state) {
+		case "idle":
+			alpha = 1;
+			break;
+		case "appearing":
+			alpha = button.nt;
+			break;
+		case "disappearing":
+			alpha = 1 - button.nt;
+			break;
+	}
 	return (
 		<Sprite
 			texture={isActive ? StartButtonPressed : StartButtonDefault}
 			anchor={0.5}
 			position={position}
 			scale={scale}
+			alpha={alpha}
 			hitArea={new Rectangle(-200, -100, 400, 200)}
 			{...props}
 		/>
@@ -256,7 +272,7 @@ export const App = () => {
 		}
 	}, [app]);
 
-	const startButtonInCenter = game.isGameOver || game.state == "gameover";
+	const startButtonInCenter = true; //game.isGameOver || game.state == "gameover";
 
 	let screenAlpha = 0;
 	switch (game.curtain.state) {
@@ -351,6 +367,7 @@ export const App = () => {
 			<LogoMoon app={app} filters={filters} alpha={screenAlpha} />
 			{!game.isGameOver && <UIButtons game={game} />}
 			<StartButton
+				button={game.startButton}
 				position={
 					startButtonInCenter ? [1920 / 2, 800] : [1920 - 100, 1030]
 				}

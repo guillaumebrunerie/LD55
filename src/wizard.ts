@@ -12,7 +12,7 @@ export type WizardT = Entity<
 	| "disappearing"
 >;
 
-export const newWizard = (): WizardT => newEntity("idle");
+export const newWizard = (): WizardT => newEntity("hidden");
 
 export const tickWizard = tick<WizardT["state"], WizardT>(() => ({}));
 
@@ -36,9 +36,9 @@ export const actWizardWhenBuying = (game: GameT, player: Player) => {
 	if (player == game.opponent) {
 		return;
 	}
-	if (game.wizard.state == "idle") {
-		magicStartWizard(game.wizard);
+	if (player.wizard.state == "idle") {
+		magicStartWizard(player.wizard);
 	} else if (player.mana.length == 1) {
-		magicEndWizard(game.wizard);
+		magicEndWizard(player.wizard);
 	}
 };

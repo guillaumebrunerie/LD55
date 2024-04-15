@@ -96,6 +96,28 @@ const Wizard = ({
 					filters={player == game.opponent ? [filter] : []}
 				/>
 			);
+		case "appearing":
+			return (
+				<Sprite
+					texture={getFrame(WizardIdle, 30, wizard.lt)}
+					x={-15}
+					y={230}
+					alpha={wizard.nt}
+					filters={player == game.opponent ? [filter] : []}
+				/>
+			);
+		case "disappearing":
+			return (
+				<Sprite
+					texture={getFrame(WizardIdle, 30, wizard.lt)}
+					x={-15}
+					y={230}
+					alpha={1 - wizard.nt}
+					filters={player == game.opponent ? [filter] : []}
+				/>
+			);
+		case "hidden":
+			break;
 		default:
 			console.error("Unhandled state: ", wizard.state);
 	}
@@ -113,7 +135,7 @@ const Player = ({
 	return (
 		<Container>
 			<ManaPoints items={player.mana} />
-			<Wizard game={game} player={player} wizard={game.wizard} />
+			<Wizard game={game} player={player} wizard={player.wizard} />
 			<DefenseItems items={player.items.defense} />
 			<ManaItems items={player.items.mana} />
 			<MonsterItems items={player.items.attack} tint={monsterTint} />

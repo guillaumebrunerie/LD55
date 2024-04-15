@@ -1,3 +1,9 @@
+export type Transition<State extends string> = {
+	duration: number;
+	callback?: (v: unknown) => void;
+	state?: State;
+};
+
 export type Entity<State extends string> = {
 	state: State;
 	lt: number;
@@ -13,11 +19,6 @@ export const newEntity = <State extends string>(
 	nt: 0,
 	transition: null,
 });
-
-export type Transition<State extends string> = {
-	duration: number;
-	state: State;
-};
 
 export const changeState = <State extends string>(
 	entity: Entity<State>,
@@ -37,7 +38,6 @@ export const tick =
 			delta: number,
 		) => {
 			[S in State]?: (
-				initialCall: boolean,
 				setTransition: (transition: Transition<State>) => void,
 			) => void;
 		},
@@ -45,15 +45,28 @@ export const tick =
 	(entity: T, delta: number) => {
 		const stateCallbacks = callback(entity, delta);
 		entity.lt += delta;
-		let initialCall = false;
 		if (entity.transition !== null) {
 			entity.nt = entity.lt / entity.transition.duration;
 			if (entity.nt >= 1) {
-				changeState(entity, entity.transition.state, null);
-				initialCall = true;
+				if (entity.transition.callback) {
+					entity.transition.callback(entity);
+				} else if (entity.transition.state) {
+					changeState(entity, entity.transition.state, null);
+				}
 			}
 		}
-		stateCallbacks[entity.state]?.(initialCall, (transition) => {
+		stateCallbacks[entity.state]?.((transition) => {
 			entity.transition = transition;
 		});
 	};
+
+export const schedule = <State extends string, T extends Entity<State>>(
+	callback: (v: T) => void,
+	entity: T,
+	delay: number,
+) => {
+	entity.transition = {
+		duration: entity.lt + delay,
+		callback,
+	};
+};

@@ -1,3 +1,4 @@
+import { disappearButton, newButton, tickButton, type ButtonT } from "./button";
 import {
 	attackBounds,
 	shieldImpactBounds,
@@ -21,10 +22,11 @@ import {
 	type Curtain,
 } from "./curtain";
 import { wave } from "./ease";
-import { newEntity, type Entity } from "./entities";
+import { newEntity, schedule, type Entity } from "./entities";
 import { smartStrategy, type Strategy } from "./strategies";
 import {
 	actWizardWhenBuying,
+	appearWizard,
 	newWizard,
 	tickWizard,
 	type WizardT,
@@ -239,8 +241,11 @@ export type GameT = Entity<GameState> & {
 	player: Player;
 	opponent: Player;
 	attackers?: [Item, Item];
-	wizard: WizardT;
 	curtain: Curtain;
+	startButton: ButtonT;
+	manaButton: ButtonT;
+	attackButton: ButtonT;
+	defenseButton: ButtonT;
 };
 
 export const newGame = (isGameOver = false): GameT => ({
@@ -248,13 +253,22 @@ export const newGame = (isGameOver = false): GameT => ({
 	isGameOver,
 	player: newPlayer(),
 	opponent: newPlayer(),
-	wizard: newWizard(),
 	curtain: newCurtain(),
+	startButton: newButton("idle"),
+	manaButton: newButton("hidden"),
+	attackButton: newButton("hidden"),
+	defenseButton: newButton("hidden"),
 });
 
 export const startGame = (game: GameT) => {
 	game.isGameOver = false;
+	disappearButton(game.startButton);
 	showCurtain(game.curtain);
+
+	appearWizard(game.opponent.wizard);
+	schedule(appearWizard, game.player.wizard, 0.5);
+
+	// appearWizard(game.player.wizard);
 };
 
 const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
@@ -311,8 +325,13 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 	}
 	game.lt += delta;
 	tickItems(game, game.player, delta);
-	tickWizard(game.wizard, delta);
+	tickWizard(game.player.wizard, delta);
+	tickWizard(game.opponent.wizard, delta);
 	tickCurtain(game.curtain, delta);
+	tickButton(game.startButton, delta);
+	tickButton(game.manaButton, delta);
+	tickButton(game.attackButton, delta);
+	tickButton(game.defenseButton, delta);
 	switch (game.state) {
 		case "buildUp":
 			if (
