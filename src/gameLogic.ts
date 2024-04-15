@@ -87,41 +87,35 @@ const tickPlayer = tick<"", Player>(() => ({}));
 
 const delta = 150;
 
-const ITERATION_COUNT = 100;
-
-const spawnManaPoint = (
-	array: Item[],
-	bounds: Bounds,
-	strength: number,
-	previousItem: Item | undefined,
-	props?: Partial<Item>,
-) => {
-	addItem(array, bounds, strength, {
-		...props,
-		tmpPosition: previousItem?.position,
-		previousItem,
-		state: "spawning",
-		lt: 0,
-		nt: 0,
-	});
-};
-
 const spawnItem = (
 	array: Item[],
 	bounds: Bounds,
 	strength: number,
 	manaPoint: Item | undefined,
 	hidden: boolean,
-	props?: Partial<Item>,
 ) => {
-	addItem(array, bounds, strength, {
-		...props,
+	const position = pickPosition(array, bounds, delta);
+	array.push({
+		...newEntity("preSpawning", [
+			{
+				duration: preSpawnDuration,
+				state: "spawning",
+			},
+			{
+				duration: spawnDuration,
+				state: "visible",
+			},
+		]),
+		position,
+		strength,
+		hp: strength,
 		tmpPosition: manaPoint?.position,
 		previousItem: manaPoint,
 		hidden,
-		state: "preSpawning",
 	});
 };
+
+const ITERATION_COUNT = 100;
 
 const pickPosition = (array: Item[], bounds: Bounds, delta: number) => {
 	const { left, top, width, height, polygon } = bounds;
@@ -171,7 +165,7 @@ const addItem = (
 		strength,
 		hp: strength,
 		state: "visible",
-		transition: null,
+		transitions: [],
 		...props,
 	});
 };
@@ -211,17 +205,19 @@ const newPlayer = (): Player => {
 	return player;
 };
 
-const initialSpawnManaPoint = (
+const spawnManaPoint = (
 	player: Player,
 	previousItem: Item | undefined = undefined,
 ) => {
 	const position = pickPosition(player.mana, manaPointsBounds, delta);
 
 	player.mana.push({
-		...newEntity("spawning", {
-			duration: manaSpawnDuration,
-			state: "visible",
-		}),
+		...newEntity("spawning", [
+			{
+				duration: manaSpawnDuration,
+				state: "visible",
+			},
+		]),
 		scale: 0.7 + Math.random() * 0.3,
 		offset: Math.random() * 2 * Math.PI,
 		previousItem,
@@ -233,7 +229,7 @@ const initialSpawnManaPoint = (
 
 const rebuildManaPoint = (player: Player) => {
 	if (player.mana.length < initialMana) {
-		initialSpawnManaPoint(player);
+		spawnManaPoint(player);
 		// spawnManaPoint(player.mana, manaPointsBounds, 1, undefined, {
 		// 	scale: 0.7 + Math.random() * 0.3,
 		// 	offset: Math.random() * 2 * Math.PI,
@@ -241,7 +237,7 @@ const rebuildManaPoint = (player: Player) => {
 	} else if (player.items.mana.length > 0) {
 		const item = player.items.mana.pop() as Item;
 		for (let i = 0; i < item.strength; i++) {
-			initialSpawnManaPoint(player, item);
+			spawnManaPoint(player, item);
 			// spawnManaPoint(player.mana, manaPointsBounds, 1, item, {
 			// 	scale: 0.7 + Math.random() * 0.3,
 			// 	offset: Math.random() * 2 * Math.PI,
@@ -310,92 +306,10 @@ export const startGame = (game: GameT) => {
 	schedule(appearButton, game.attackButton, 1.2);
 	schedule(appearButton, game.defenseButton, 1.2);
 
-	// let scheduledFunction = () => {};
-	// for (let i = 0; i < 5; i++) {
-	// 	scheduledFunction = () =>
-	// 		schedule(
-	// 			(p) => {
-	// 				initialSpawnManaPoint(p);
-	// 				scheduledFunction();
-	// 			},
-	// 			game.player,
-	// 			0.2,
-	// 		);
-	// }
-	// scheduledFunction();
-
-	// :D
-	schedule(
-		(p) => {
-			initialSpawnManaPoint(p);
-			schedule(
-				(p) => {
-					initialSpawnManaPoint(p);
-					schedule(
-						(p) => {
-							initialSpawnManaPoint(p);
-							schedule(
-								(p) => {
-									initialSpawnManaPoint(p);
-									schedule(
-										(p) => {
-											initialSpawnManaPoint(p);
-										},
-										game.player,
-										0.2,
-									);
-								},
-								game.player,
-								0.2,
-							);
-						},
-						game.player,
-						0.2,
-					);
-				},
-				game.player,
-				0.2,
-			);
-		},
-		game.player,
-		1.2,
-	);
-
-	schedule(
-		(p) => {
-			initialSpawnManaPoint(p);
-			schedule(
-				(p) => {
-					initialSpawnManaPoint(p);
-					schedule(
-						(p) => {
-							initialSpawnManaPoint(p);
-							schedule(
-								(p) => {
-									initialSpawnManaPoint(p);
-									schedule(
-										(p) => {
-											initialSpawnManaPoint(p);
-										},
-										game.opponent,
-										0.2,
-									);
-								},
-								game.opponent,
-								0.2,
-							);
-						},
-						game.opponent,
-						0.2,
-					);
-				},
-				game.opponent,
-				0.2,
-			);
-		},
-		game.opponent,
-		1.2,
-	);
+	for (let i = 0; i < 5; i++) {
+		schedule(spawnManaPoint, game.player, i == 0 ? 1.2 : 0.2);
+		schedule(spawnManaPoint, game.opponent, i == 0 ? 1.2 : 0.2);
+	}
 };
 
 const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
@@ -471,7 +385,7 @@ export const tickGame = (game: GameT, delta: number) => {
 					game.defenseButton,
 				)
 			) {
-				changeState(game, "buildUp", null);
+				changeState(game, "buildUp");
 			}
 			break;
 		case "buildUp":
@@ -565,43 +479,62 @@ const areAllItemsVisible = (player: Player) => {
 const preSpawnDuration = 0.2;
 const spawnDuration = 0.3;
 
-const tickItem = (item: Item, delta: number) => {
-	item.lt += delta;
-	switch (item.state) {
-		case "fighting":
-			item.nt = item.lt / (fightDuration + attackApproachDuration);
-			break;
-		case "preSpawning": {
-			if (item.lt >= preSpawnDuration) {
-				item.state = "spawning";
-				item.lt = 0;
-				item.tmpPosition = undefined;
-				break;
-			}
-			const nt = item.lt / preSpawnDuration;
+const tickItem = tick<ItemState, Item>((item) => {
+	return {
+		preSpawning: () => {
 			if (!item.previousItem) {
 				item.tmpPosition = item.position;
 			} else {
+				const prevPos = item.previousItem.position;
 				item.tmpPosition = {
-					x:
-						item.previousItem.position.x +
-						(item.position.x - item.previousItem.position.x) * nt,
-					y:
-						item.previousItem.position.y +
-						(item.position.y - item.previousItem.position.y) * nt,
+					x: prevPos.x + (item.position.x - prevPos.x) * item.nt,
+					y: prevPos.y + (item.position.y - prevPos.y) * item.nt,
 				};
 			}
-			break;
-		}
-		case "spawning": {
-			if (item.lt >= spawnDuration) {
-				item.state = "visible";
-				item.lt = 0;
-				break;
-			}
-		}
-	}
-};
+		},
+		spawning: () => {
+			item.tmpPosition = undefined;
+		},
+	};
+});
+
+// const tickItem = (item: Item, delta: number) => {
+// 	item.lt += delta;
+// 	switch (item.state) {
+// 		case "fighting":
+// 			item.nt = item.lt / (fightDuration + attackApproachDuration);
+// 			break;
+// 		case "preSpawning": {
+// 			if (item.lt >= preSpawnDuration) {
+// 				item.state = "spawning";
+// 				item.lt = 0;
+// 				item.tmpPosition = undefined;
+// 				break;
+// 			}
+// 			const nt = item.lt / preSpawnDuration;
+// 			if (!item.previousItem) {
+// 				item.tmpPosition = item.position;
+// 			} else {
+// 				item.tmpPosition = {
+// 					x:
+// 						item.previousItem.position.x +
+// 						(item.position.x - item.previousItem.position.x) * nt,
+// 					y:
+// 						item.previousItem.position.y +
+// 						(item.position.y - item.previousItem.position.y) * nt,
+// 				};
+// 			}
+// 			break;
+// 		}
+// 		case "spawning": {
+// 			if (item.lt >= spawnDuration) {
+// 				item.state = "visible";
+// 				item.lt = 0;
+// 				break;
+// 			}
+// 		}
+// 	}
+// };
 
 const manaSpawnDuration = 0.5;
 
@@ -744,6 +677,8 @@ const pickDefensePair = (game: GameT) => {
 	if (defender.items.defense.length == 0) {
 		dieWizard(defender.wizard);
 		winWizard(attacker.wizard);
+		appearButton(game.startButton);
+		runeTombola(attacker);
 		game.state = "gameover";
 		game.lt = 0;
 		game.nt = 0;
@@ -780,6 +715,16 @@ const pickDefensePair = (game: GameT) => {
 		}
 		hasFought = true;
 	}
+};
+
+const runeTombola = (player: Player) => {
+	player.items.defense = [];
+	for (let i = 0; i < 16; i++) {
+		addItem(player.items.defense, feetBounds, 4, {
+			invisible: i == 1 ? false : Math.random() < 0.5,
+		});
+	}
+	schedule(runeTombola, player, 0.2);
 };
 
 const hasManaToSpawn = (player: Player) => {

@@ -19,25 +19,29 @@ export const newWizard = (): WizardT => newEntity("hidden");
 export const tickWizard = tick<WizardT["state"], WizardT>(() => ({}));
 
 export const appearWizard = (wizard: WizardT) => {
-	changeState(wizard, "appearing", {
-		duration: getDuration(WizardAppear, 20),
-		state: "idle",
-	});
+	changeState(wizard, "appearing", [
+		{
+			duration: getDuration(WizardAppear, 20),
+			state: "idle",
+		},
+	]);
 };
 
 export const magicStartWizard = (wizard: WizardT) => {
-	changeState(wizard, "magicStart", { duration: 0.5, state: "magicLoop" });
+	changeState(wizard, "magicStart", [{ duration: 0.5, state: "magicLoop" }]);
 };
 
 export const magicEndWizard = (wizard: WizardT) => {
-	changeState(wizard, "magicEnd", { duration: 0.5, state: "idle" });
+	changeState(wizard, "magicEnd", [{ duration: 0.5, state: "idle" }]);
 };
 
 export const dieWizard = (wizard: WizardT) => {
-	changeState(wizard, "die", {
-		duration: getDuration(WizardDie, 20),
-		state: "hidden",
-	});
+	changeState(wizard, "die", [
+		{
+			duration: getDuration(WizardDie, 20),
+			state: "hidden",
+		},
+	]);
 };
 
 export const winWizard = (wizard: WizardT) => {

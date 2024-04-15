@@ -383,6 +383,10 @@ const DefenseItems = ({ items }: { items: Item[] }) => {
 };
 
 const DefenseItem = ({ item, i }: { item: Item; i: number }) => {
+	if (item.invisible) {
+		return null;
+	}
+
 	const visible = (
 		<>
 			{i > 0 && (
