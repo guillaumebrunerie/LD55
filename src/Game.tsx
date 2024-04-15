@@ -20,27 +20,10 @@ import {
 	WizardIdle,
 	InactiveSide,
 } from "./assets";
-import { BLEND_MODES, ColorMatrixFilter, Filter, filters } from "pixi.js";
+import { BLEND_MODES, ColorMatrixFilter } from "pixi.js";
 import { getFrame, getNtFrame } from "./Animation";
-import { Rectangle } from "./Rectangle";
-import { wave } from "./ease";
 
 export const Game = ({ game }: { game: GameT }) => {
-	let screenAlpha = 0;
-	switch (game.phase) {
-		case "buildUp":
-			screenAlpha = 1;
-			break;
-		case "toAttack":
-			screenAlpha = wave(1 - game.nt);
-			break;
-		case "rebuild":
-			screenAlpha = 1; // wave(game.nt);
-			break;
-		case "gameover":
-			screenAlpha = 0;
-			break;
-	}
 	return (
 		<Container>
 			<Container scale={[-1, 1]} x={1920}>
@@ -50,13 +33,6 @@ export const Game = ({ game }: { game: GameT }) => {
 					monsterTint={0xff4444}
 				/>
 			</Container>
-			<Sprite
-				texture={InactiveSide}
-				anchor={[1, 0]}
-				x={1920}
-				y={0}
-				alpha={screenAlpha}
-			/>
 			<Container>
 				<Player
 					game={game}

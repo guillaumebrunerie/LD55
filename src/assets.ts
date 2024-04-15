@@ -1,4 +1,4 @@
-/** Generated on Mon Apr 15 01:27:10 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Mon Apr 15 02:17:40 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -19,6 +19,8 @@ import Defense3_ from "../gfx/Defense3.png?texture";
 import Division_ from "../gfx/Division.png?texture";
 import Hero_ from "../gfx/Hero.png?texture";
 import InactiveSide_ from "../gfx/InactiveSide.png?texture";
+import InactiveSideBlack_ from "../gfx/InactiveSideBlack.png?texture";
+import InactiveSideWhite_ from "../gfx/InactiveSideWhite.png?texture";
 import Logo_ from "../gfx/Logo.png?texture";
 import Mana1_ from "../gfx/Mana1.png?texture";
 import Mana2_ from "../gfx/Mana2.png?texture";
@@ -45,6 +47,9 @@ import Runes_ from "../gfx/Runes.png?spritesheet";
 import ShieldHit_ from "../gfx/ShieldHit.png?spritesheet";
 import Spawn_ from "../gfx/Spawn.png?spritesheet";
 import WizardIdle_ from "../gfx/WizardIdle.png?spritesheet";
+import WizardMagicEnd_ from "../gfx/WizardMagicEnd.png?spritesheet";
+import WizardMagicLoop_ from "../gfx/WizardMagicLoop.png?spritesheet";
+import WizardMagicStart_ from "../gfx/WizardMagicStart.png?spritesheet";
 
 /** Sounds */
 import Click_ from "../audio/Click.mp3?sound";
@@ -68,6 +73,8 @@ export const [
 	Division,
 	Hero,
 	InactiveSide,
+	InactiveSideBlack,
+	InactiveSideWhite,
 	Logo,
 	Mana1,
 	Mana2,
@@ -92,6 +99,9 @@ export const [
 	ShieldHit,
 	Spawn,
 	WizardIdle,
+	WizardMagicEnd,
+	WizardMagicLoop,
+	WizardMagicStart,
 	Click,
 	Music,
 	Pop,
@@ -112,6 +122,8 @@ export const [
 	Division_,
 	Hero_,
 	InactiveSide_,
+	InactiveSideBlack_,
+	InactiveSideWhite_,
 	Logo_,
 	Mana1_,
 	Mana2_,
@@ -136,6 +148,9 @@ export const [
 	ShieldHit_,
 	Spawn_,
 	WizardIdle_,
+	WizardMagicEnd_,
+	WizardMagicLoop_,
+	WizardMagicStart_,
 	Click_,
 	Music_,
 	Pop_,

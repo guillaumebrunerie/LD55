@@ -9,6 +9,7 @@ import { wave } from "./ease";
 export type AppT = {
 	speed: number;
 	state: "intro" | "transition" | "game";
+	gt: number;
 	lt: number;
 	nt: number;
 	game: GameT;
@@ -17,6 +18,7 @@ export type AppT = {
 export const newApp = (): AppT => ({
 	speed: 1,
 	state: "intro",
+	gt: 0,
 	lt: 0,
 	nt: 0,
 	game: newGame(true),
@@ -48,6 +50,7 @@ export const startNewGame = (app: AppT) => {
 const transitionDuration = 0.5;
 
 const tickApp = (app: AppT, delta: number) => {
+	app.gt += delta;
 	app.lt += delta;
 	switch (app.state) {
 		case "transition":

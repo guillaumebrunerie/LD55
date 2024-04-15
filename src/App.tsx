@@ -1,5 +1,11 @@
-import { useState, useEffect, useReducer } from "react";
-import { Polygon, Rectangle, Texture } from "pixi.js";
+import { useState, useEffect, useReducer, useRef } from "react";
+import {
+	ColorMatrixFilter,
+	Filter,
+	Rectangle,
+	SpriteMaskFilter,
+	Texture,
+} from "pixi.js";
 import { Container, Sprite } from "@pixi/react";
 import { useButton } from "./useButton";
 import { newApp, startApp, startNewGame, type AppT } from "./appLogic";
@@ -15,6 +21,9 @@ import {
 	Cloud1,
 	Cloud2,
 	Cloud3,
+	InactiveSide,
+	InactiveSideBlack,
+	InactiveSideWhite,
 	Logo,
 	Moon,
 	SoundOff,
@@ -32,6 +41,7 @@ import {
 import { Game } from "./Game";
 import { CustomText } from "./CustomText";
 import { useLocalTime } from "./useLocalTime";
+import { wave } from "./ease";
 
 const StartButton = ({
 	onClick,
@@ -151,7 +161,15 @@ const requestFullScreen = async () => {
 	// await screen.orientation.lock("landscape");
 };
 
-const LogoMoon = ({ app }: { app: AppT }) => {
+const LogoMoon = ({
+	app,
+	filters = [],
+	alpha = 1,
+}: {
+	app: AppT;
+	filters?: Filter[];
+	alpha?: number;
+}) => {
 	switch (app.state) {
 		case "game":
 			return (
@@ -160,6 +178,8 @@ const LogoMoon = ({ app }: { app: AppT }) => {
 					anchor={[0.5, 0.5]}
 					x={1920 / 2}
 					y={-100}
+					filters={filters}
+					alpha={alpha}
 				/>
 			);
 		case "transition":
@@ -170,6 +190,8 @@ const LogoMoon = ({ app }: { app: AppT }) => {
 						anchor={[0.5, 0.5]}
 						x={1920 / 2}
 						y={400 - app.nt * 500}
+						filters={filters}
+						alpha={alpha}
 					/>
 					<Sprite
 						texture={Logo}
@@ -187,12 +209,37 @@ const LogoMoon = ({ app }: { app: AppT }) => {
 
 const mod = (a: number, b: number) => (b + (a % b)) % b;
 
+const filter2 = new ColorMatrixFilter();
+filter2.brightness(1000, true);
+filter2.matrix = [
+	0,
+	0,
+	0,
+	0,
+	0x41 / 256,
+	0,
+	0,
+	0,
+	0,
+	0x29 / 256,
+	0,
+	0,
+	0,
+	0,
+	0x56 / 256,
+	0,
+	0,
+	0,
+	1,
+	0,
+];
+
 export const App = () => {
 	const [app] = useState(() => observable(newApp()));
 	const { game } = app;
 	useEffect(() => startApp(app), [app]);
 
-	const lt = app.lt;
+	const lt = app.gt;
 
 	useEffect(() => {
 		const callback = action((event: KeyboardEvent) => {
@@ -214,6 +261,43 @@ export const App = () => {
 
 	const startButtonInCenter = game.isGameOver || game.phase == "gameover";
 
+	let screenAlpha = 0;
+	switch (game.phase) {
+		case "buildUp":
+			screenAlpha = 1;
+			break;
+		case "toAttack":
+			screenAlpha = wave(1 - game.nt);
+			break;
+		case "rebuild":
+			screenAlpha = wave(game.nt);
+			break;
+		case "gameover":
+			screenAlpha = 0;
+			break;
+	}
+	if (game.isGameOver) {
+		screenAlpha = 0;
+	}
+
+	const cloud1 = {
+		x: mod(21 * lt, 2800) - 800,
+		y: 500,
+	};
+
+	const cloud2 = {
+		x: mod(16 * lt + (2800 * 2) / 3, 2800) - 800,
+		y: 200,
+	};
+
+	const cloud3 = {
+		x: mod(13 * lt + 2800 / 3, 2800) - 800,
+		y: 50,
+	};
+
+	const [filter, setFilter] = useState<Filter>();
+	const filters = filter ? [filter, filter2] : [];
+
 	return (
 		<Container>
 			<Sprite
@@ -227,19 +311,50 @@ export const App = () => {
 				}}
 			/>
 			<LogoMoon app={app} />
+			<Sprite texture={Cloud3} position={cloud3} />
+			<Sprite texture={Cloud2} position={cloud2} />
+			<Sprite texture={Cloud1} position={cloud1} />
+			<Sprite texture={BgFront} x={0} y={0} />
+			{!game.isGameOver && <Game game={game} />}
+			<Sprite
+				texture={InactiveSideWhite}
+				anchor={[1, 0]}
+				x={1920}
+				y={0}
+				alpha={1}
+				ref={(sprite) => {
+					if (sprite && !filter) {
+						const f = new SpriteMaskFilter(sprite);
+						setFilter(f);
+					}
+				}}
+			/>
+			<Sprite
+				texture={InactiveSide}
+				anchor={[1, 0]}
+				x={1920}
+				y={0}
+				alpha={screenAlpha}
+			/>
 			<Sprite
 				texture={Cloud3}
-				x={mod(13 * lt + 2800 / 3, 2800) - 800}
-				y={50}
+				position={cloud3}
+				filters={filters}
+				alpha={screenAlpha}
 			/>
 			<Sprite
 				texture={Cloud2}
-				x={mod(16 * lt + (2800 * 2) / 3, 2800) - 800}
-				y={200}
+				position={cloud2}
+				filters={filters}
+				alpha={screenAlpha}
 			/>
-			<Sprite texture={Cloud1} x={mod(21 * lt, 2800) - 800} y={500} />
-			<Sprite texture={BgFront} x={0} y={0} />
-			{!game.isGameOver && <Game game={game} />}
+			<Sprite
+				texture={Cloud1}
+				position={cloud1}
+				filters={filters}
+				alpha={screenAlpha}
+			/>
+			<LogoMoon app={app} filters={filters} alpha={screenAlpha} />
 			{!game.isGameOver && <UIButtons game={game} />}
 			<StartButton
 				position={
