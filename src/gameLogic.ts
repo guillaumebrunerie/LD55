@@ -272,7 +272,8 @@ type GameState =
 	| "attack"
 	| "defense"
 	| "rebuild"
-	| "gameover";
+	| "gameover"
+	| "restart";
 
 export type GameT = Entity<GameState> & {
 	player: Player;
@@ -285,8 +286,8 @@ export type GameT = Entity<GameState> & {
 	defenseButton: ButtonT;
 };
 
-export const newGame = (): GameT => ({
-	...newEntity("intro"),
+export const newGame = (state: "intro" | "restart"): GameT => ({
+	...newEntity(state),
 	player: newPlayer(),
 	opponent: newPlayer(),
 	curtain: newCurtain(),
@@ -297,10 +298,35 @@ export const newGame = (): GameT => ({
 });
 
 export const startGame = (game: GameT) => {
+	if (game.state == "gameover") {
+		restartGame(game);
+		return;
+	}
 	changeState(game, "transition");
 	disappearButton(game.startButton);
 	appearWizard(game.opponent.wizard);
 	appearWizard(game.player.wizard);
+	schedule(showCurtain, game.curtain, 0.7);
+	schedule(appearButton, game.manaButton, 1.2);
+	schedule(appearButton, game.attackButton, 1.2);
+	schedule(appearButton, game.defenseButton, 1.2);
+
+	for (let i = 0; i < 5; i++) {
+		schedule(spawnManaPoint, game.player, i == 0 ? 1.2 : 0.2);
+		schedule(spawnManaPoint, game.opponent, i == 0 ? 1.2 : 0.2);
+	}
+};
+
+const restartGame = (game: GameT) => {
+	changeState(game, "restart");
+	disappearButton(game.startButton);
+	for (const player of [game.player, game.opponent]) {
+		if (player.wizard.state == "die") {
+			appearWizard(player.wizard);
+		} else {
+			changeState(player.wizard, "idle");
+		}
+	}
 	schedule(showCurtain, game.curtain, 0.7);
 	schedule(appearButton, game.manaButton, 1.2);
 	schedule(appearButton, game.attackButton, 1.2);
@@ -374,6 +400,7 @@ export const tickGame = (game: GameT, delta: number) => {
 	tickPlayer(game.opponent, delta);
 	switch (game.state) {
 		case "transition":
+		case "restart":
 			if (
 				areIdle(
 					game.player.wizard,
@@ -719,7 +746,7 @@ const pickDefensePair = (game: GameT) => {
 
 const runeTombola = (player: Player) => {
 	player.items.defense = [];
-	for (let i = 0; i < 16; i++) {
+	for (let i = 0; i < 17; i++) {
 		addItem(player.items.defense, feetBounds, 4, {
 			invisible: i == 1 ? false : Math.random() < 0.5,
 		});

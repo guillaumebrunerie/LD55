@@ -21,7 +21,7 @@ export const newApp = (): AppT => ({
 	gt: 0,
 	lt: 0,
 	nt: 0,
-	game: newGame(),
+	game: newGame("intro"),
 });
 
 export const startApp = (app: AppT) => {
@@ -39,11 +39,13 @@ export const startApp = (app: AppT) => {
 };
 
 export const startNewGame = (app: AppT) => {
-	app.state = "transition";
+	if (app.state == "intro") {
+		app.state = "transition";
+	}
 	app.lt = 0;
 	// fadeVolume(Music, musicVolume.high, musicVolume.low, 500);
 	// void StartButton.play();
-	app.game = newGame();
+	app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
 	startGame(app.game);
 };
 
