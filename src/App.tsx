@@ -38,6 +38,7 @@ import {
 import { Game } from "./Game";
 import { wave } from "./ease";
 import type { ButtonT } from "./button";
+import { GlobalTimeContext } from "./useGlobalTime";
 
 const StartButton = ({
 	button,
@@ -284,8 +285,6 @@ export const App = () => {
 	const { game } = app;
 	useEffect(() => startApp(app), [app]);
 
-	const lt = app.gt;
-
 	useEffect(() => {
 		const callback = action((event: KeyboardEvent) => {
 			if (event.key == "ArrowUp") {
@@ -325,17 +324,17 @@ export const App = () => {
 	}
 
 	const cloud1 = {
-		x: mod(21 * lt, 2800) - 800,
+		x: mod(21 * app.gt, 2800) - 800,
 		y: 500,
 	};
 
 	const cloud2 = {
-		x: mod(16 * lt + (2800 * 2) / 3, 2800) - 800,
+		x: mod(16 * app.gt + (2800 * 2) / 3, 2800) - 800,
 		y: 200,
 	};
 
 	const cloud3 = {
-		x: mod(13 * lt + 2800 / 3, 2800) - 800,
+		x: mod(13 * app.gt + 2800 / 3, 2800) - 800,
 		y: 50,
 	};
 
@@ -343,76 +342,80 @@ export const App = () => {
 	const filters = filter ? [filter, filter2] : [];
 
 	return (
-		<Container>
-			<Sprite
-				texture={Bg}
-				x={0}
-				y={0}
-				eventMode="static"
-				pointerdown={(e) => {
-					const { x, y } = e.global;
-					console.log(`${Math.round(x)}, ${Math.round(y)}`);
-				}}
-			/>
-			<LogoMoon app={app} />
-			<Sprite texture={Cloud3} position={cloud3} />
-			<Sprite texture={Cloud2} position={cloud2} />
-			<Sprite texture={Cloud1} position={cloud1} />
-			<Sprite texture={BgFront} x={0} y={0} />
-			<Game game={game} />
-			<Sprite
-				texture={InactiveSideWhite}
-				anchor={[1, 0]}
-				x={1920}
-				y={0}
-				alpha={1}
-				ref={(sprite) => {
-					if (sprite && !filter) {
-						const f = new SpriteMaskFilter(sprite);
-						setFilter(f);
+		<GlobalTimeContext.Provider value={app.gt}>
+			<Container>
+				<Sprite
+					texture={Bg}
+					x={0}
+					y={0}
+					eventMode="static"
+					pointerdown={(e) => {
+						const { x, y } = e.global;
+						console.log(`${Math.round(x)}, ${Math.round(y)}`);
+					}}
+				/>
+				<LogoMoon app={app} />
+				<Sprite texture={Cloud3} position={cloud3} />
+				<Sprite texture={Cloud2} position={cloud2} />
+				<Sprite texture={Cloud1} position={cloud1} />
+				<Sprite texture={BgFront} x={0} y={0} />
+				<Game game={game} />
+				<Sprite
+					texture={InactiveSideWhite}
+					anchor={[1, 0]}
+					x={1920}
+					y={0}
+					alpha={1}
+					ref={(sprite) => {
+						if (sprite && !filter) {
+							const f = new SpriteMaskFilter(sprite);
+							setFilter(f);
+						}
+					}}
+				/>
+				<Sprite
+					texture={InactiveSide}
+					anchor={[1, 0]}
+					x={1920}
+					y={0}
+					alpha={screenAlpha}
+				/>
+				<Sprite
+					texture={Cloud3}
+					position={cloud3}
+					filters={filters}
+					alpha={screenAlpha}
+				/>
+				<Sprite
+					texture={Cloud2}
+					position={cloud2}
+					filters={filters}
+					alpha={screenAlpha}
+				/>
+				<Sprite
+					texture={Cloud1}
+					position={cloud1}
+					filters={filters}
+					alpha={screenAlpha}
+				/>
+				<LogoMoon app={app} filters={filters} alpha={screenAlpha} />
+				<UIButtons game={game} />
+				<StartButton
+					button={game.startButton}
+					position={
+						startButtonInCenter ?
+							[1920 / 2, 800]
+						:	[1920 - 100, 1030]
 					}
-				}}
-			/>
-			<Sprite
-				texture={InactiveSide}
-				anchor={[1, 0]}
-				x={1920}
-				y={0}
-				alpha={screenAlpha}
-			/>
-			<Sprite
-				texture={Cloud3}
-				position={cloud3}
-				filters={filters}
-				alpha={screenAlpha}
-			/>
-			<Sprite
-				texture={Cloud2}
-				position={cloud2}
-				filters={filters}
-				alpha={screenAlpha}
-			/>
-			<Sprite
-				texture={Cloud1}
-				position={cloud1}
-				filters={filters}
-				alpha={screenAlpha}
-			/>
-			<LogoMoon app={app} filters={filters} alpha={screenAlpha} />
-			<UIButtons game={game} />
-			<StartButton
-				button={game.startButton}
-				position={
-					startButtonInCenter ? [1920 / 2, 800] : [1920 - 100, 1030]
-				}
-				scale={startButtonInCenter ? 1 : 0.5}
-				onClick={action(() => {
-					void requestFullScreen();
-					startNewGame(app);
-				})}
-			/>
-			<SoundButton />
-			{/* <PolygonShape polygon={manaBounds.polygon} alpha={0.4} /> */}
-		</Container>
+					scale={startButtonInCenter ? 1 : 0.5}
+					onClick={action(() => {
+						void requestFullScreen();
+						startNewGame(app);
+					})}
+				/>
+				<SoundButton />
+				{/* <PolygonShape polygon={manaBounds.polygon} alpha={0.4} /> */}
+			</Container>
+		</GlobalTimeContext.Provider>
 	);
 };

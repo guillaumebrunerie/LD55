@@ -23,10 +23,17 @@ import {
 	WizardMagicStart,
 	WizardDie,
 	WizardAppear,
+	Monster1Idle,
+	Monster2Idle,
+	Monster3Idle,
+	Monster1Die,
+	Monster2Die,
+	Monster3Die,
 } from "./assets";
 import { BLEND_MODES, ColorMatrixFilter } from "pixi.js";
 import { getFrame, getNtFrame } from "./Animation";
 import type { WizardT } from "./wizard";
+import { useGlobalTime } from "./useGlobalTime";
 
 export const Game = ({ game }: { game: GameT }) => {
 	return (
@@ -219,13 +226,20 @@ const MonsterItems = ({ items, tint }: { items: Item[]; tint: number }) => {
 	));
 };
 
-const MonsterTexture = {
-	1: Monster1,
-	2: Monster2,
-	3: Monster3,
+const MonsterIdle = {
+	1: Monster2Idle,
+	2: Monster2Idle,
+	3: Monster3Idle,
+} as const;
+
+const MonsterDie = {
+	1: Monster1Die,
+	2: Monster2Die,
+	3: Monster3Die,
 } as const;
 
 const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
+	const gt = useGlobalTime();
 	const visible = (
 		<Sprite
 			anchor={0.5}
@@ -233,7 +247,7 @@ const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
 			rotation={0}
 			scale={1}
 			blendMode={BLEND_MODES.NORMAL}
-			texture={MonsterTexture[item.strength]}
+			texture={getFrame(MonsterIdle[item.strength], 20, gt)}
 			position={item.tmpPosition || { ...item.position }}
 		/>
 	);
@@ -241,15 +255,17 @@ const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
 		case "visible":
 			return visible;
 		case "fighting": {
-			const j = Math.floor((item.nt || 0) * (Monster3Dies.length - 1));
 			return (
 				<Sprite
 					anchor={0.5}
-					tint={0xffffff}
+					tint={tint}
 					rotation={0}
 					scale={1}
 					blendMode={BLEND_MODES.ADD}
-					texture={Monster3Dies[j]}
+					texture={getNtFrame(
+						MonsterDie[item.strength],
+						item.nt || 0,
+					)}
 					position={item.tmpPosition || item.position}
 				/>
 			);

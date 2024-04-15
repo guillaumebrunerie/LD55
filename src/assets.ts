@@ -1,4 +1,4 @@
-/** Generated on Mon Apr 15 22:57:40 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Mon Apr 15 23:31:42 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -42,7 +42,13 @@ import Font_ from "../gfx/Font.png?spritesheet";
 import Mana1End_ from "../gfx/Mana1End.png?spritesheet";
 import Mana2End_ from "../gfx/Mana2End.png?spritesheet";
 import ManaPointStart_ from "../gfx/ManaPointStart.png?spritesheet";
+import Monster1Die_ from "../gfx/Monster1Die.png?spritesheet";
+import Monster1Idle_ from "../gfx/Monster1Idle.png?spritesheet";
+import Monster2Die_ from "../gfx/Monster2Die.png?spritesheet";
+import Monster2Idle_ from "../gfx/Monster2Idle.png?spritesheet";
+import Monster3Die_ from "../gfx/Monster3Die.png?spritesheet";
 import Monster3Dies_ from "../gfx/Monster3Dies.png?spritesheet";
+import Monster3Idle_ from "../gfx/Monster3Idle.png?spritesheet";
 import Runes_ from "../gfx/Runes.png?spritesheet";
 import ShieldHit_ from "../gfx/ShieldHit.png?spritesheet";
 import Spawn_ from "../gfx/Spawn.png?spritesheet";
@@ -102,8 +108,20 @@ export const [
 	{ animations: { Mana2End } },
 	ManaPointStartSheet,
 	{ animations: { ManaPointStart } },
+	Monster1DieSheet,
+	{ animations: { Monster1Die } },
+	Monster1IdleSheet,
+	{ animations: { Monster1Idle } },
+	Monster2DieSheet,
+	{ animations: { Monster2Die } },
+	Monster2IdleSheet,
+	{ animations: { Monster2Idle } },
+	Monster3DieSheet,
+	{ animations: { Monster3Die } },
 	Monster3DiesSheet,
 	{ animations: { Monster3Dies } },
+	Monster3IdleSheet,
+	{ animations: { Monster3Idle } },
 	RunesSheet,
 	{ animations: { Runes } },
 	ShieldHitSheet,
@@ -170,8 +188,20 @@ export const [
 	Mana2End_,
 	ManaPointStart_,
 	ManaPointStart_,
+	Monster1Die_,
+	Monster1Die_,
+	Monster1Idle_,
+	Monster1Idle_,
+	Monster2Die_,
+	Monster2Die_,
+	Monster2Idle_,
+	Monster2Idle_,
+	Monster3Die_,
+	Monster3Die_,
 	Monster3Dies_,
 	Monster3Dies_,
+	Monster3Idle_,
+	Monster3Idle_,
 	Runes_,
 	Runes_,
 	ShieldHit_,
