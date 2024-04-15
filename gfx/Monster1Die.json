@@ -1,0 +1,71 @@
+{"frames": {
+
+"Monster1Die_022.png":
+{
+	"frame": {"x":1,"y":107,"w":123,"h":111},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":89,"y":89,"w":123,"h":111},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Die_023.png":
+{
+	"frame": {"x":126,"y":107,"w":123,"h":115},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":89,"y":88,"w":123,"h":115},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Die_024.png":
+{
+	"frame": {"x":1,"y":224,"w":158,"h":149},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":67,"y":65,"w":158,"h":149},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Die_025.png":
+{
+	"frame": {"x":65,"y":1,"w":104,"h":144},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":48,"y":60,"w":104,"h":144},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Die_026.png":
+{
+	"frame": {"x":18,"y":1,"w":19,"h":22},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":133,"y":60,"w":19,"h":22},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Die_027.png":
+{
+	"frame": {"x":42,"y":1,"w":19,"h":21},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":133,"y":61,"w":19,"h":21},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Die_028.png":
+{
+	"frame": {"x":1,"y":1,"w":14,"h":15},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":138,"y":67,"w":14,"h":15},
+	"sourceSize": {"w":300,"h":300}
+}},
+"animations": {
+	"Monster1Die": ["Monster1Die_022.png","Monster1Die_023.png","Monster1Die_024.png","Monster1Die_025.png","Monster1Die_026.png","Monster1Die_027.png","Monster1Die_028.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "Monster1Die.png",
+	"format": "RGBA8888",
+	"size": {"w":250,"h":374},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:3798d786de37f6ec1fae9466d81c7710:6fb68ae8bcb0cfc4ab7001487f7d1d73:04d70fcdf3fdffccea347d9b78c98b0d$"
+}
+}
