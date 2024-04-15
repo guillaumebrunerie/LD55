@@ -20,6 +20,7 @@ import {
 	WizardMagicLoop,
 	WizardMagicEnd,
 	RunesSheet,
+	WizardMagicStart,
 } from "./assets";
 import { BLEND_MODES, ColorMatrixFilter } from "pixi.js";
 import { getFrame, getNtFrame } from "./Animation";
@@ -71,7 +72,7 @@ const Wizard = ({
 		case "magicStart":
 			return (
 				<Sprite
-					texture={getNtFrame(WizardMagicEnd, 1 - wizard.nt)}
+					texture={getNtFrame(WizardMagicStart, wizard.nt)}
 					x={-15}
 					y={230}
 					filters={player == game.opponent ? [filter] : []}
@@ -144,7 +145,7 @@ const ManaPointC = ({ item }: { item: Item }) => {
 				/>
 			);
 		case "spawning": {
-			if (item.manaPoint) {
+			if (item.previousItem) {
 				return (
 					<>
 						<Sprite
@@ -153,10 +154,10 @@ const ManaPointC = ({ item }: { item: Item }) => {
 							rotation={0}
 							blendMode={BLEND_MODES.NORMAL}
 							texture={getNtFrame(
-								manaEndAnimations[item.manaPoint.strength],
+								manaEndAnimations[item.previousItem.strength],
 								item.nt,
 							)}
-							position={item.manaPoint?.position}
+							position={item.previousItem.position}
 						/>
 						<Sprite
 							anchor={0.5}
@@ -231,13 +232,17 @@ const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
 			);
 		}
 		case "preSpawning": {
-			const dx = item.manaPoint.position.x - item.position.x;
-			const dy = item.manaPoint.position.y - item.position.y;
+			if (!item.previousItem) {
+				console.log("No previous item");
+				break;
+			}
+			const dx = item.previousItem.position.x - item.position.x;
+			const dy = item.previousItem.position.y - item.position.y;
 			const angle = Math.atan2(dy, dx);
 			return (
 				<Sprite
 					anchor={0.5}
-					scale={item.manaPoint.scale}
+					scale={item.previousItem.scale}
 					rotation={angle + Math.PI / 2}
 					blendMode={BLEND_MODES.NORMAL}
 					texture={ManaPointBlurred}
@@ -276,7 +281,7 @@ const ManaTexture = {
 const ManaItem = ({ item }: { item: Item }) => {
 	const visible = (
 		<Sprite
-			texture={ManaTexture[item.strength]}
+			texture={ManaTexture[item.strength as 1 | 2]}
 			rotation={0}
 			blendMode={BLEND_MODES.NORMAL}
 			scale={1}
@@ -288,13 +293,17 @@ const ManaItem = ({ item }: { item: Item }) => {
 		case "visible":
 			return visible;
 		case "preSpawning": {
-			const dx = item.manaPoint.position.x - item.position.x;
-			const dy = item.manaPoint.position.y - item.position.y;
+			if (!item.previousItem) {
+				console.error("No previous item");
+				break;
+			}
+			const dx = item.previousItem.position.x - item.position.x;
+			const dy = item.previousItem.position.y - item.position.y;
 			const angle = Math.atan2(dy, dx);
 			return (
 				<Sprite
 					anchor={0.5}
-					scale={item.manaPoint.scale}
+					scale={item.previousItem.scale}
 					rotation={angle + Math.PI / 2}
 					blendMode={BLEND_MODES.NORMAL}
 					texture={ManaPointBlurred}
@@ -370,13 +379,17 @@ const DefenseItem = ({ item, i }: { item: Item; i: number }) => {
 			if (item.hidden) {
 				return null;
 			}
-			const dx = item.manaPoint.position.x - item.position.x;
-			const dy = item.manaPoint.position.y - item.position.y;
+			if (!item.previousItem) {
+				console.error("No previous item");
+				break;
+			}
+			const dx = item.previousItem.position.x - item.position.x;
+			const dy = item.previousItem.position.y - item.position.y;
 			const angle = Math.atan2(dy, dx);
 			return (
 				<Sprite
 					anchor={0.5}
-					scale={item.manaPoint.scale}
+					scale={item.previousItem.scale}
 					rotation={angle + Math.PI / 2}
 					blendMode={BLEND_MODES.NORMAL}
 					texture={ManaPointBlurred}

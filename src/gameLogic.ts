@@ -21,7 +21,8 @@ import {
 	type Curtain,
 } from "./curtain";
 import { wave } from "./ease";
-import { changeState, newEntity, tick, type Entity } from "./entities";
+import { newEntity, type Entity } from "./entities";
+import { smartStrategy, type Strategy } from "./strategies";
 import {
 	actWizardWhenBuying,
 	newWizard,
@@ -41,18 +42,21 @@ export type Item = {
 	strength: number;
 	hp: number;
 	state: "visible" | "hidden" | "fighting" | "preSpawning" | "spawning";
-	nt?: number;
+	nt: number;
 	scale?: number;
 	offset?: number;
+	previousItem?: Item;
+	hidden?: boolean;
 };
 
-type Buys = {
+export type Buys = {
 	mana: number;
 	attack: number;
 	defense: number;
 };
 
 export type Player = {
+	wizard: WizardT;
 	mana: Item[];
 	items: {
 		mana: Item[];
@@ -65,19 +69,19 @@ export type Player = {
 
 const delta = 150;
 
-let ITERATION_COUNT = 100;
+const ITERATION_COUNT = 100;
 
 const spawnManaPoint = (
 	array: Item[],
 	bounds: Bounds,
 	strength: number,
-	manaPoint: Item,
+	previousItem: Item | undefined,
 	props?: Partial<Item>,
 ) => {
 	addItem(array, bounds, strength, {
 		...props,
-		tmpPosition: manaPoint?.position,
-		manaPoint,
+		tmpPosition: previousItem?.position,
+		previousItem,
 		state: "spawning",
 		lt: 0,
 		nt: 0,
@@ -88,22 +92,16 @@ const spawnItem = (
 	array: Item[],
 	bounds: Bounds,
 	strength: number,
-	manaPoint: Item,
+	manaPoint: Item | undefined,
 	hidden: boolean,
 	props?: Partial<Item>,
 ) => {
 	addItem(array, bounds, strength, {
 		...props,
 		tmpPosition: manaPoint?.position,
-		manaPoint,
+		previousItem: manaPoint,
 		hidden,
 		state: "preSpawning",
-	});
-};
-
-const addManaItem = (array: Item[], bounds: Bounds, strength: number) => {
-	addItem(array, bounds, strength, {
-		state: "visible",
 	});
 };
 
@@ -150,6 +148,7 @@ const addItem = (
 	const position = pickPosition(array, bounds, delta);
 	array.push({
 		lt: 0,
+		nt: 0,
 		position,
 		strength,
 		hp: strength,
@@ -160,6 +159,7 @@ const addItem = (
 
 const newPlayer = (): Player => {
 	const player: Player = {
+		wizard: newWizard(),
 		mana: [],
 		items: {
 			mana: [],
@@ -193,7 +193,7 @@ const newPlayer = (): Player => {
 
 const rebuildManaPoint = (player: Player) => {
 	if (player.mana.length < initialMana) {
-		spawnManaPoint(player.mana, manaPointsBounds, 1, null, {
+		spawnManaPoint(player.mana, manaPointsBounds, 1, undefined, {
 			scale: 0.7 + Math.random() * 0.3,
 			offset: Math.random() * 2 * Math.PI,
 		});
@@ -321,7 +321,7 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 			) {
 				game.lt = 0;
 				game.nt = 0;
-				opponentMove(game, game.opponent, attackStrategy);
+				opponentMove(game, game.opponent, smartStrategy);
 				game.state = "toAttack";
 				hideCurtain(game.curtain);
 			}
@@ -413,16 +413,16 @@ const tickItem = (item: Item, delta: number) => {
 				break;
 			}
 			const nt = item.lt / preSpawnDuration;
-			if (!item.manaPoint) {
+			if (!item.previousItem) {
 				item.tmpPosition = item.position;
 			} else {
 				item.tmpPosition = {
 					x:
-						item.manaPoint.position.x +
-						(item.position.x - item.manaPoint.position.x) * nt,
+						item.previousItem.position.x +
+						(item.position.x - item.previousItem.position.x) * nt,
 					y:
-						item.manaPoint.position.y +
-						(item.position.y - item.manaPoint.position.y) * nt,
+						item.previousItem.position.y +
+						(item.position.y - item.previousItem.position.y) * nt,
 				};
 			}
 			break;
@@ -450,16 +450,16 @@ const tickManaItem = (item: Item, delta: number) => {
 				break;
 			}
 			const nt = Math.max((item.lt - 0.2) / (manaSpawnDuration - 0.2), 0);
-			if (!item.manaPoint) {
+			if (!item.previousItem) {
 				item.tmpPosition = item.position;
 			} else {
 				item.tmpPosition = {
 					x:
-						item.manaPoint.position.x +
-						(item.position.x - item.manaPoint.position.x) * nt,
+						item.previousItem.position.x +
+						(item.position.x - item.previousItem.position.x) * nt,
 					y:
-						item.manaPoint.position.y +
-						(item.position.y - item.manaPoint.position.y) * nt,
+						item.previousItem.position.y +
+						(item.position.y - item.previousItem.position.y) * nt,
 				};
 			}
 			break;
@@ -481,16 +481,6 @@ const cleanUp = (game: GameT) => {
 		opponentAttacker.position =
 			opponentAttacker.tmpPosition || opponentAttacker.position;
 	}
-	// for (const item of game.player.items.defense) {
-	// 	if (item.state == "fighting") {
-	// 		item.state = "visible";
-	// 	}
-	// }
-	// for (const item of game.opponent.items.defense) {
-	// 	if (item.state == "fighting") {
-	// 		item.state = "visible";
-	// 	}
-	// }
 
 	game.player.items.attack = game.player.items.attack.filter(
 		(item) => item.hp > 0,
@@ -563,11 +553,11 @@ const pickDefensePair = (game: GameT) => {
 	game.nt = 0;
 	const fighter = pickFighter(attacker.items.attack);
 	let hasFought = false;
-	while (fighter.hp > 0 && lastShield(defender)) {
-		const shield = lastShield(defender)!;
-		// shield.state = "fighting";
-		// shield.lt = 0;
-		// shield.nt = 0;
+	while (fighter.hp > 0) {
+		const shield = lastShield(defender);
+		if (!shield) {
+			break;
+		}
 		game.attackers = [fighter, shield];
 		shield.position = pickPosition(
 			defender.items.defense,
@@ -609,8 +599,6 @@ const nextRound = (game: GameT) => {
 		defense: 0,
 	};
 };
-
-const quad = (t: number) => t * t;
 
 const moveAttack = (game: GameT) => {
 	if (!game.attackers) {
@@ -758,208 +746,3 @@ export const buyDefenseItem = (game: GameT, player: Player) => {
 		}
 	}
 };
-
-type Strategy = { strategy: string } & ((
-	buys: Buys,
-	opponentBuys: Buys,
-	items: {
-		mana: Item[];
-		attack: Item[];
-		defense: Item[];
-	},
-) => "mana" | "attack" | "defense");
-
-const attackStrategy: Strategy = () => {
-	if (Math.random() < 0.8) {
-		return "attack";
-	} else if (Math.random() < 0.5) {
-		return "mana";
-	} else {
-		return "defense";
-	}
-};
-attackStrategy.strategy = "Attack ";
-
-const manaStrategy: Strategy = () => {
-	if (Math.random() < 0.8) {
-		return "mana";
-	} else if (Math.random() < 0.5) {
-		return "attack";
-	} else {
-		return "defense";
-	}
-};
-manaStrategy.strategy = "Mana   ";
-
-const defenseStrategy: Strategy = () => {
-	if (Math.random() < 0.8) {
-		return "defense";
-	} else if (Math.random() < 0.5) {
-		return "attack";
-	} else {
-		return "mana";
-	}
-};
-defenseStrategy.strategy = "Defense";
-
-const randomStrategy: Strategy = () => {
-	if (Math.random() < 1 / 3) {
-		return "defense";
-	} else if (Math.random() < 0.5) {
-		return "attack";
-	} else {
-		return "mana";
-	}
-};
-randomStrategy.strategy = "Random ";
-
-const smartStrategy: Strategy = (buys, opponentBuys, items) => {
-	if (
-		opponentBuys.attack >= opponentBuys.mana + 1 &&
-		opponentBuys.attack >= opponentBuys.defense + 1
-	) {
-		return defenseStrategy(buys, opponentBuys, items);
-	}
-	if (
-		opponentBuys.mana >= opponentBuys.attack + 1 &&
-		opponentBuys.mana >= opponentBuys.defense + 1
-	) {
-		return attackStrategy(buys, opponentBuys, items);
-	}
-	return manaStrategy(buys, opponentBuys, items);
-};
-smartStrategy.strategy = "Smart  ";
-
-const smart2Strategy: Strategy = (buys, opponentBuys, items) => {
-	if (items.defense.length < 4) {
-		return defenseStrategy(buys, opponentBuys, items);
-	} else {
-		return smartStrategy(buys, opponentBuys, items);
-	}
-};
-smart2Strategy.strategy = "Smart2 ";
-
-const naturalStrategy: Strategy = (buys, opponentBuys, items) => {
-	// console.log(JSON.stringify(buys));
-	if (buys.attack >= buys.mana + 1 && buys.attack >= buys.defense + 1) {
-		return attackStrategy(buys, opponentBuys, items);
-	}
-	if (buys.mana >= buys.attack + 1 && buys.mana >= buys.defense + 1) {
-		return manaStrategy(buys, opponentBuys, items);
-	}
-	if (buys.defense >= buys.attack + 1 && buys.defense >= buys.mana + 1) {
-		return defenseStrategy(buys, opponentBuys, items);
-	}
-	return randomStrategy(buys, opponentBuys, items);
-};
-naturalStrategy.strategy = "Natural";
-
-export const testStrategiesOnce = (
-	strategy1: Strategy,
-	strategy2: Strategy,
-) => {
-	const playStrategy = (
-		strategy: Strategy,
-		game: GameT,
-		player: Player,
-		opponent: Player,
-	) => {
-		while (player.mana.length > 0) {
-			const type = strategy(
-				player.boughtPreviousRound,
-				opponent.boughtPreviousRound,
-				player.items,
-			);
-			switch (type) {
-				case "mana":
-					buyManaItem(game, player);
-					break;
-				case "attack":
-					buyAttackItem(game, player);
-					break;
-				case "defense":
-					buyDefenseItem(game, player);
-					break;
-			}
-		}
-	};
-	const playRound = (game: GameT) => {
-		do {
-			pickAttackPair(game);
-		} while (game.state === "attack");
-		do {
-			pickDefensePair(game);
-		} while (game.state === "defense");
-	};
-	const printPlayer = (player: Player, label: string) => {
-		console.log(label, "flowers", player.items.mana.length);
-		console.log(label, "runes", player.items.defense.length);
-		console.log(label, "ghosts", player.items.attack.length);
-	};
-
-	const game = newGame();
-	let round = 1;
-	do {
-		// console.log();
-		// console.log("Round", round);
-		round++;
-		playStrategy(strategy1, game, game.player, game.opponent);
-		playStrategy(strategy2, game, game.opponent, game.player);
-		// printPlayer(game.player, "Player");
-		// printPlayer(game.opponent, "Opponent");
-		playRound(game);
-		// printPlayer(game.player, "> Player");
-		// printPlayer(game.opponent, "> Opponent");
-		nextRound(game);
-		// debugger;
-	} while (
-		game.player.items.attack.length == 0 &&
-		game.opponent.items.attack.length == 0
-	);
-	if (game.player.items.attack.length > 0) {
-		// console.log("Player wins");
-		return { rounds: round, winner: "player" };
-	} else {
-		// console.log("Opponent wins");
-		return { rounds: round, winner: "opponent" };
-	}
-};
-
-const testStrategies = (strategy1: Strategy, strategy2: Strategy) => {
-	let playerWins = 0;
-	let opponentWins = 0;
-	let totalRounds = 0;
-	ITERATION_COUNT = 0;
-	for (let i = 0; i < 1000; i++) {
-		const { rounds, winner } = testStrategiesOnce(strategy1, strategy2);
-		if (winner === "player") {
-			playerWins++;
-		} else {
-			opponentWins++;
-		}
-		totalRounds += rounds;
-	}
-	ITERATION_COUNT = 100;
-	console.log(
-		`${strategy1.strategy} wins: ${playerWins}, \t${strategy2.strategy} wins: ${opponentWins}, \tRounds: ${totalRounds / 1000}`,
-	);
-};
-
-// console.log("");
-// testStrategies(defenseStrategy, attackStrategy);
-// testStrategies(attackStrategy, manaStrategy);
-// testStrategies(manaStrategy, defenseStrategy);
-// testStrategies(attackStrategy, randomStrategy);
-// testStrategies(defenseStrategy, randomStrategy);
-// testStrategies(manaStrategy, randomStrategy);
-// testStrategies(smartStrategy, randomStrategy);
-// testStrategies(smartStrategy, defenseStrategy);
-// testStrategies(smartStrategy, attackStrategy);
-// testStrategies(smartStrategy, manaStrategy);
-// testStrategies(smart2Strategy, randomStrategy);
-// testStrategies(smart2Strategy, defenseStrategy);
-// testStrategies(smart2Strategy, attackStrategy);
-// testStrategies(smart2Strategy, manaStrategy);
-// testStrategies(smart2Strategy, smartStrategy);
-// console.log("");
-// // debugger;

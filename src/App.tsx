@@ -248,10 +248,12 @@ export const App = () => {
 				app.speed = 1;
 			}
 		});
-		window.addEventListener("keydown", callback);
-		return () => {
-			window.removeEventListener("keydown", callback);
-		};
+		if (import.meta.env.DEV) {
+			window.addEventListener("keydown", callback);
+			return () => {
+				window.removeEventListener("keydown", callback);
+			};
+		}
 	}, [app]);
 
 	const startButtonInCenter = game.isGameOver || game.state == "gameover";
