@@ -22,6 +22,7 @@ import {
 	RunesSheet,
 	WizardMagicStart,
 	WizardDie,
+	WizardAppear,
 } from "./assets";
 import { BLEND_MODES, ColorMatrixFilter } from "pixi.js";
 import { getFrame, getNtFrame } from "./Animation";
@@ -100,10 +101,9 @@ const Wizard = ({
 		case "appearing":
 			return (
 				<Sprite
-					texture={getFrame(WizardIdle, 30, wizard.lt)}
+					texture={getNtFrame(WizardAppear, wizard.nt)}
 					x={-15}
 					y={230}
-					alpha={wizard.nt}
 					filters={player == game.opponent ? [filter] : []}
 				/>
 			);

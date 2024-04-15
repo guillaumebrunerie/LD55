@@ -1,5 +1,5 @@
 import { getDuration } from "./Animation";
-import { WizardDie } from "./assets";
+import { WizardAppear, WizardDie } from "./assets";
 import { changeState, newEntity, tick, type Entity } from "./entities";
 import type { GameT, Player } from "./gameLogic";
 
@@ -19,7 +19,10 @@ export const newWizard = (): WizardT => newEntity("hidden");
 export const tickWizard = tick<WizardT["state"], WizardT>(() => ({}));
 
 export const appearWizard = (wizard: WizardT) => {
-	changeState(wizard, "appearing", { duration: 1, state: "idle" });
+	changeState(wizard, "appearing", {
+		duration: getDuration(WizardAppear, 20),
+		state: "idle",
+	});
 };
 
 export const magicStartWizard = (wizard: WizardT) => {

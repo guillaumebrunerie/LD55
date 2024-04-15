@@ -1,4 +1,4 @@
-/** Generated on Mon Apr 15 21:11:06 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Mon Apr 15 22:57:40 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -46,6 +46,7 @@ import Monster3Dies_ from "../gfx/Monster3Dies.png?spritesheet";
 import Runes_ from "../gfx/Runes.png?spritesheet";
 import ShieldHit_ from "../gfx/ShieldHit.png?spritesheet";
 import Spawn_ from "../gfx/Spawn.png?spritesheet";
+import WizardAppear_ from "../gfx/WizardAppear.png?spritesheet";
 import WizardDie_ from "../gfx/WizardDie.png?spritesheet";
 import WizardIdle_ from "../gfx/WizardIdle.png?spritesheet";
 import WizardMagicEnd_ from "../gfx/WizardMagicEnd.png?spritesheet";
@@ -109,6 +110,8 @@ export const [
 	{ animations: { ShieldHit } },
 	SpawnSheet,
 	{ animations: { Spawn } },
+	WizardAppearSheet,
+	{ animations: { WizardAppear } },
 	WizardDieSheet,
 	{ animations: { WizardDie } },
 	WizardIdleSheet,
@@ -175,6 +178,8 @@ export const [
 	ShieldHit_,
 	Spawn_,
 	Spawn_,
+	WizardAppear_,
+	WizardAppear_,
 	WizardDie_,
 	WizardDie_,
 	WizardIdle_,
