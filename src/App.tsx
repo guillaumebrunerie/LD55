@@ -50,7 +50,14 @@ const StartButton = ({
 	position: [number, number];
 	scale: number;
 }) => {
-	const { isActive, props } = useButton({ onClick });
+	const { isActive, props } = useButton({
+		onClick,
+		enabled: button.state == "idle",
+	});
+
+	if (button.state == "hidden") {
+		return null;
+	}
 
 	let alpha = 0;
 	switch (button.state) {
@@ -71,7 +78,11 @@ const StartButton = ({
 			position={position}
 			scale={scale}
 			alpha={alpha}
-			hitArea={new Rectangle(-200, -100, 400, 200)}
+			hitArea={
+				button.state == "idle" ?
+					new Rectangle(-200, -100, 400, 200)
+				:	null
+			}
 			{...props}
 		/>
 	);

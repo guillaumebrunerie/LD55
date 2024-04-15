@@ -46,6 +46,10 @@ export const shieldImpactBounds = makeBounds(
 	new Polygon([411, 404, 411, 641, 386, 640, 386, 422]),
 );
 
+export const chestBounds = makeBounds(
+	new Polygon([251, 467, 256, 532, 206, 527, 217, 470]),
+);
+
 export const feetBounds = makeBounds(
 	new Polygon([191, 629, 189, 656, 261, 668, 258, 637]),
 );

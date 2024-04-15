@@ -13,6 +13,7 @@ import {
 	type Bounds,
 	playerBounds,
 	feetBounds,
+	chestBounds,
 } from "./configuration";
 import {
 	hideCurtain,
@@ -351,15 +352,20 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 				pickAttackPair(game);
 			}
 			break;
-		case "attack":
-			if (game.lt >= fightDuration + attackApproachDuration) {
+		case "attack": {
+			if (game.lt >= attackApproachDuration + fightDuration) {
 				pickAttackPair(game);
 				break;
 			}
 			moveAttack(game);
 			break;
+		}
 		case "defense":
-			if (game.lt >= fightDuration + attackApproachDuration) {
+			const duration =
+				isFinalHitGame(game) ?
+					attackApproachDuration
+				:	fightDuration + attackApproachDuration;
+			if (game.lt >= duration) {
 				pickDefensePair(game);
 				break;
 			}
@@ -541,6 +547,16 @@ const lastShield = (player: Player) => {
 	return player.items.defense.findLast((item) => item.hp > 0);
 };
 
+const isFinalHit = (player: Player) => {
+	return player.items.defense.filter((item) => item.hp > 0).length <= 1;
+};
+
+const isFinalHitGame = (game: GameT) => {
+	const defender =
+		game.player.items.attack.length > 0 ? game.opponent : game.player;
+	return defender.items.defense.filter((item) => item.hp > 0).length == 0;
+};
+
 const pickDefensePair = (game: GameT) => {
 	cleanUp(game);
 	if (
@@ -579,10 +595,10 @@ const pickDefensePair = (game: GameT) => {
 		game.attackers = [fighter, shield];
 		shield.position = pickPosition(
 			defender.items.defense,
-			shieldImpactBounds,
+			isFinalHit(defender) ? chestBounds : shieldImpactBounds,
 			0,
 		);
-		const i = defender.items.defense.length;
+		const i = defender.items.defense.filter((i) => i.hp > 0).length;
 		const superShield = i == 2 || i == 17;
 		if (superShield) {
 			fighter.hp = 0;

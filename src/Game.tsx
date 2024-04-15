@@ -111,8 +111,8 @@ const Wizard = ({
 			return (
 				<Sprite
 					texture={getNtFrame(WizardDie, wizard.nt)}
-					x={-15}
-					y={230}
+					x={-80}
+					y={170}
 					alpha={1 - wizard.nt}
 					filters={player == game.opponent ? [filter] : []}
 				/>

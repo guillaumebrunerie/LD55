@@ -1,7 +1,13 @@
 import type { EventMode } from "pixi.js";
 import { useCallback, useState } from "react";
 
-export const useButton = ({ onClick }: { onClick: () => void }) => {
+export const useButton = ({
+	onClick,
+	enabled,
+}: {
+	onClick: () => void;
+	enabled: boolean;
+}) => {
 	const [isPressed, setIsPressed] = useState(false);
 	const [isHovered, setIsHovered] = useState(false);
 
@@ -20,14 +26,17 @@ export const useButton = ({ onClick }: { onClick: () => void }) => {
 		isPressed,
 		isPending: isHovered || isPressed,
 		isActive: isHovered && isPressed,
-		props: {
-			eventMode,
-			cursor: "pointer",
-			mouseover,
-			mouseout,
-			pointerdown,
-			pointerup,
-			pointerupoutside,
-		},
+		props:
+			enabled ?
+				{
+					eventMode,
+					cursor: "pointer",
+					mouseover,
+					mouseout,
+					pointerdown,
+					pointerup,
+					pointerupoutside,
+				}
+			:	{},
 	};
 };
