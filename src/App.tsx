@@ -135,7 +135,12 @@ const UIButton = ({
 	game: GameT;
 }) => {
 	const tint =
-		game.player.mana.length == 0 || game.state != "buildUp" ?
+		(
+			game.player.mana.length == 0 ||
+			game.state != "buildUp" ||
+			(button == game.defenseButton &&
+				game.player.items.defense.length >= 17)
+		) ?
 			0x333333
 		:	0xffffff;
 	// const proportion = (player.mana / itemCost(player)) * 100;
