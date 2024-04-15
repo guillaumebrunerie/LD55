@@ -227,7 +227,7 @@ const MonsterItems = ({ items, tint }: { items: Item[]; tint: number }) => {
 };
 
 const MonsterIdle = {
-	1: Monster2Idle,
+	1: Monster1Idle,
 	2: Monster2Idle,
 	3: Monster3Idle,
 } as const;
