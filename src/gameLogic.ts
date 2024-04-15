@@ -1,6 +1,6 @@
 import {
 	attackBounds,
-	defenseBounds,
+	shieldImpactBounds,
 	initialAttackItems,
 	initialDefenseItems,
 	initialMana,
@@ -11,7 +11,23 @@ import {
 	attackApproachDuration,
 	type Bounds,
 	playerBounds,
+	feetBounds,
 } from "./configuration";
+import {
+	hideCurtain,
+	showCurtain,
+	newCurtain,
+	tickCurtain,
+	type Curtain,
+} from "./curtain";
+import { wave } from "./ease";
+import { changeState, newEntity, tick, type Entity } from "./entities";
+import {
+	actWizardWhenBuying,
+	newWizard,
+	tickWizard,
+	type WizardT,
+} from "./wizard";
 
 export type Point = {
 	x: number;
@@ -73,12 +89,14 @@ const spawnItem = (
 	bounds: Bounds,
 	strength: number,
 	manaPoint: Item,
+	hidden: boolean,
 	props?: Partial<Item>,
 ) => {
 	addItem(array, bounds, strength, {
 		...props,
 		tmpPosition: manaPoint?.position,
 		manaPoint,
+		hidden,
 		state: "preSpawning",
 	});
 };
@@ -89,12 +107,7 @@ const addManaItem = (array: Item[], bounds: Bounds, strength: number) => {
 	});
 };
 
-const addItem = (
-	array: Item[],
-	bounds: Bounds,
-	strength: number,
-	props?: Partial<Item>,
-) => {
+const pickPosition = (array: Item[], bounds: Bounds, delta: number) => {
 	const { left, top, width, height, polygon } = bounds;
 	let bestPosition = {
 		x: left + Math.random() * width,
@@ -125,9 +138,19 @@ const addItem = (
 			bestDistance = distance;
 		}
 	}
+	return bestPosition;
+};
+
+const addItem = (
+	array: Item[],
+	bounds: Bounds,
+	strength: number,
+	props?: Partial<Item>,
+) => {
+	const position = pickPosition(array, bounds, delta);
 	array.push({
 		lt: 0,
-		position: bestPosition,
+		position,
 		strength,
 		hp: strength,
 		state: "visible",
@@ -160,7 +183,7 @@ const newPlayer = (): Player => {
 	}
 	addItem(player.items.defense, playerBounds, 1);
 	for (const defenseItem of initialDefenseItems) {
-		addItem(player.items.defense, defenseBounds, defenseItem);
+		addItem(player.items.defense, feetBounds, defenseItem);
 	}
 	for (const attackItem of initialAttackItems) {
 		addItem(player.items.attack, attackBounds, attackItem);
@@ -203,35 +226,35 @@ const addManaPoints = (player: Player) => {
 	}
 };
 
-export type GameT = {
+type GameState =
+	| "buildUp"
+	| "toAttack"
+	| "attack"
+	| "defense"
+	| "rebuild"
+	| "gameover";
+
+export type GameT = Entity<GameState> & {
 	isGameOver: boolean;
-	phase:
-		| "buildUp"
-		| "toAttack"
-		| "attack"
-		| "defense"
-		| "rebuild"
-		| "gameover";
-	nt: number;
-	lt: number;
-	gt: number;
 	player: Player;
 	opponent: Player;
 	attackers?: [Item, Item];
+	wizard: WizardT;
+	curtain: Curtain;
 };
 
 export const newGame = (isGameOver = false): GameT => ({
+	...newEntity("buildUp"),
 	isGameOver,
-	phase: "buildUp",
-	nt: 0,
-	lt: 0,
-	gt: 0,
 	player: newPlayer(),
 	opponent: newPlayer(),
+	wizard: newWizard(),
+	curtain: newCurtain(),
 });
 
 export const startGame = (game: GameT) => {
 	game.isGameOver = false;
+	showCurtain(game.curtain);
 };
 
 const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
@@ -256,6 +279,29 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 	}
 };
 
+// const startAttack = (game: GameT) => {};
+
+// export const tickGame = tick<GameState, GameT>((game: GameT, delta) => {
+// 	tickItems(game, game.player, delta);
+// 	tickWizard(game.wizard, delta);
+// 	tickCurtain(game.curtain, delta);
+// 	return {
+// 		buildUp: () => {
+// 			if (
+// 				game.player.mana.length == 0 &&
+// 				areAllItemsVisible(game.player)
+// 			) {
+// 				opponentMove(game, game.opponent, attackStrategy);
+// 				changeState(game, "toAttack", {
+// 					duration: toAttackDuration,
+// 					state: "attack",
+// 				});
+// 				hideCurtain(game.curtain);
+// 			}
+// 		},
+// 	};
+// });
+
 const toAttackDuration = 0.5;
 const rebuildDuration = 0.2;
 
@@ -264,9 +310,10 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 		return;
 	}
 	game.lt += delta;
-	game.gt += delta;
 	tickItems(game, game.player, delta);
-	switch (game.phase) {
+	tickWizard(game.wizard, delta);
+	tickCurtain(game.curtain, delta);
+	switch (game.state) {
 		case "buildUp":
 			if (
 				game.player.mana.length == 0 &&
@@ -275,7 +322,8 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 				game.lt = 0;
 				game.nt = 0;
 				opponentMove(game, game.opponent, attackStrategy);
-				game.phase = "toAttack";
+				game.state = "toAttack";
+				hideCurtain(game.curtain);
 			}
 			break;
 		case "toAttack":
@@ -308,7 +356,8 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 					game.lt = 0;
 				} else {
 					game.lt = 0;
-					game.phase = "buildUp";
+					game.state = "buildUp";
+					nextRound(game);
 				}
 				break;
 			}
@@ -318,12 +367,12 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 
 const tickItems = (game: GameT, player: Player, delta: number) => {
 	for (const item of game.opponent.items.attack) {
-		if (game.phase == "attack" || game.phase == "defense") {
+		if (game.state == "attack" || game.state == "defense") {
 			item.position.x += delta * 25;
 		}
 	}
 	for (const item of player.items.attack) {
-		if (game.phase == "attack" || game.phase == "defense") {
+		if (game.state == "attack" || game.state == "defense") {
 			item.position.x += delta * 25;
 		}
 		tickItem(item, delta);
@@ -463,11 +512,12 @@ const pickAttackPair = (game: GameT) => {
 		game.player.items.attack.length == 0 ||
 		game.opponent.items.attack.length == 0
 	) {
-		game.phase = "defense";
+		game.state = "defense";
 		game.lt = 0;
+		pickDefensePair(game);
 		return;
 	}
-	game.phase = "attack";
+	game.state = "attack";
 	game.lt = 0;
 	const playerAttacker = pickFighter(game.player.items.attack);
 	const opponentAttacker = pickFighter(game.opponent.items.attack);
@@ -476,6 +526,8 @@ const pickAttackPair = (game: GameT) => {
 
 	playerAttacker.hp -= fightStrength;
 	opponentAttacker.hp -= fightStrength;
+
+	return;
 };
 
 const lastShield = (player: Player) => {
@@ -490,8 +542,8 @@ const pickDefensePair = (game: GameT) => {
 	) {
 		game.lt = 0;
 		game.nt = 0;
-		game.phase = "rebuild";
-		nextRound(game);
+		game.state = "rebuild";
+		showCurtain(game.curtain);
 		return;
 	}
 
@@ -500,13 +552,13 @@ const pickDefensePair = (game: GameT) => {
 	const defender =
 		game.player.items.attack.length > 0 ? game.opponent : game.player;
 	if (defender.items.defense.length == 0) {
-		game.phase = "gameover";
+		game.state = "gameover";
 		game.lt = 0;
 		game.nt = 0;
 		return;
 	}
 
-	game.phase = "defense";
+	game.state = "defense";
 	game.lt = 0;
 	game.nt = 0;
 	const fighter = pickFighter(attacker.items.attack);
@@ -517,6 +569,11 @@ const pickDefensePair = (game: GameT) => {
 		// shield.lt = 0;
 		// shield.nt = 0;
 		game.attackers = [fighter, shield];
+		shield.position = pickPosition(
+			defender.items.defense,
+			shieldImpactBounds,
+			0,
+		);
 		const i = defender.items.defense.length;
 		const superShield = i == 2 || i == 17;
 		if (superShield) {
@@ -553,6 +610,8 @@ const nextRound = (game: GameT) => {
 	};
 };
 
+const quad = (t: number) => t * t;
+
 const moveAttack = (game: GameT) => {
 	if (!game.attackers) {
 		return;
@@ -566,7 +625,7 @@ const moveAttack = (game: GameT) => {
 	if (game.lt <= attackApproachDuration) {
 		playerAttacker.state = "visible";
 		opponentAttacker.state = "visible";
-		t = Math.pow(game.lt / attackApproachDuration, 2);
+		t = wave(game.lt / attackApproachDuration);
 	} else {
 		playerAttacker.nt = opponentAttacker.nt =
 			(game.lt - attackApproachDuration) / fightDuration;
@@ -611,18 +670,19 @@ const moveDefense = (game: GameT) => {
 };
 
 const canBuy = (game: GameT, player: Player) => {
-	return player.mana.length > 0 && game.phase === "buildUp";
+	return player.mana.length > 0 && game.state === "buildUp";
 };
 
 export const buyManaItem = (game: GameT, player: Player) => {
 	if (!canBuy(game, player) || player.mana.length == 0) {
 		return;
 	}
+	actWizardWhenBuying(game, player);
 	player.boughtThisRound.mana++;
 	const manaPoint = player.mana.pop();
 	const strength = Math.random() < 0.6 ? 2 : 1;
 	if (player == game.player) {
-		spawnItem(player.items.mana, manaBounds, strength, manaPoint);
+		spawnItem(player.items.mana, manaBounds, strength, manaPoint, false);
 	} else {
 		addItem(player.items.mana, manaBounds, strength);
 	}
@@ -632,6 +692,7 @@ export const buyAttackItem = (game: GameT, player: Player) => {
 	if (!canBuy(game, player)) {
 		return;
 	}
+	actWizardWhenBuying(game, player);
 	player.boughtThisRound.attack++;
 	const manaPoint = player.mana.pop();
 	let strength;
@@ -647,7 +708,13 @@ export const buyAttackItem = (game: GameT, player: Player) => {
 		strength = 3;
 	}
 	if (player == game.player) {
-		spawnItem(player.items.attack, attackBounds, strength, manaPoint);
+		spawnItem(
+			player.items.attack,
+			attackBounds,
+			strength,
+			manaPoint,
+			false,
+		);
 	} else {
 		addItem(player.items.attack, attackBounds, strength);
 	}
@@ -661,16 +728,17 @@ export const buyDefenseItem = (game: GameT, player: Player) => {
 	) {
 		return;
 	}
+	actWizardWhenBuying(game, player);
 	player.boughtThisRound.defense++;
 	const manaPoint = player.mana.pop();
-	const add = () => {
+	const add = (hidden: boolean) => {
 		if (player == game.player) {
-			spawnItem(player.items.defense, defenseBounds, 4, manaPoint);
+			spawnItem(player.items.defense, feetBounds, 4, manaPoint, hidden);
 		} else {
-			addItem(player.items.defense, defenseBounds, 4);
+			addItem(player.items.defense, feetBounds, 4);
 		}
 	};
-	add();
+	add(false);
 	if (player.items.attack.length > 0 && player.items.mana.length > 0) {
 		return;
 	}
@@ -679,10 +747,10 @@ export const buyDefenseItem = (game: GameT, player: Player) => {
 		player.items.defense.length < 17 &&
 		Math.random() < 0.5
 	) {
-		add();
+		add(true);
 		// addItem(player.items.defense, defenseBounds, 4);
 		if (player.items.defense.length < 17 && Math.random() < 0.5) {
-			add();
+			add(true);
 			// addItem(player.items.defense, defenseBounds, 4);
 			// if (player.items.defense.length < 17 && Math.random() < 0.4) {
 			// 	addItem(player.items.defense, defenseBounds, 4);
@@ -818,10 +886,10 @@ export const testStrategiesOnce = (
 	const playRound = (game: GameT) => {
 		do {
 			pickAttackPair(game);
-		} while (game.phase === "attack");
+		} while (game.state === "attack");
 		do {
 			pickDefensePair(game);
-		} while (game.phase === "defense");
+		} while (game.state === "defense");
 	};
 	const printPlayer = (player: Player, label: string) => {
 		console.log(label, "flowers", player.items.mana.length);
