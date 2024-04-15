@@ -2,7 +2,7 @@
 
 "WizardWin_000.png":
 {
-	"frame": {"x":1,"y":817,"w":199,"h":418},
+	"frame": {"x":1,"y":889,"w":199,"h":418},
 	"rotated": true,
 	"trimmed": true,
 	"spriteSourceSize": {"x":162,"y":32,"w":199,"h":418},
@@ -10,7 +10,7 @@
 },
 "WizardWin_001.png":
 {
-	"frame": {"x":421,"y":873,"w":199,"h":418},
+	"frame": {"x":421,"y":1085,"w":199,"h":418},
 	"rotated": true,
 	"trimmed": true,
 	"spriteSourceSize": {"x":162,"y":32,"w":199,"h":418},
@@ -18,7 +18,7 @@
 },
 "WizardWin_002.png":
 {
-	"frame": {"x":1,"y":1018,"w":198,"h":418},
+	"frame": {"x":1,"y":1090,"w":198,"h":418},
 	"rotated": true,
 	"trimmed": true,
 	"spriteSourceSize": {"x":162,"y":32,"w":198,"h":418},
@@ -26,7 +26,7 @@
 },
 "WizardWin_003.png":
 {
-	"frame": {"x":420,"y":1263,"w":196,"h":417},
+	"frame": {"x":421,"y":1286,"w":196,"h":417},
 	"rotated": true,
 	"trimmed": true,
 	"spriteSourceSize": {"x":162,"y":33,"w":196,"h":417},
@@ -34,7 +34,7 @@
 },
 "WizardWin_004.png":
 {
-	"frame": {"x":419,"y":1461,"w":195,"h":416},
+	"frame": {"x":1,"y":1290,"w":195,"h":416},
 	"rotated": true,
 	"trimmed": true,
 	"spriteSourceSize": {"x":162,"y":34,"w":195,"h":416},
@@ -42,63 +42,63 @@
 },
 "WizardWin_005.png":
 {
-	"frame": {"x":408,"y":1658,"w":189,"h":416},
+	"frame": {"x":427,"y":435,"w":205,"h":416},
 	"rotated": true,
 	"trimmed": true,
-	"spriteSourceSize": {"x":162,"y":34,"w":189,"h":416},
+	"spriteSourceSize": {"x":162,"y":34,"w":205,"h":416},
 	"sourceSize": {"w":500,"h":500}
 },
 "WizardWin_006.png":
 {
-	"frame": {"x":421,"y":1074,"w":187,"h":418},
+	"frame": {"x":425,"y":865,"w":218,"h":418},
 	"rotated": true,
 	"trimmed": true,
-	"spriteSourceSize": {"x":162,"y":32,"w":187,"h":418},
+	"spriteSourceSize": {"x":162,"y":32,"w":218,"h":418},
 	"sourceSize": {"w":500,"h":500}
 },
 "WizardWin_007.png":
 {
-	"frame": {"x":1,"y":622,"w":193,"h":422},
+	"frame": {"x":1,"y":670,"w":217,"h":422},
 	"rotated": true,
 	"trimmed": true,
-	"spriteSourceSize": {"x":162,"y":28,"w":193,"h":422},
+	"spriteSourceSize": {"x":162,"y":28,"w":217,"h":422},
 	"sourceSize": {"w":500,"h":500}
 },
 "WizardWin_008.png":
 {
-	"frame": {"x":1,"y":208,"w":199,"h":424},
+	"frame": {"x":1,"y":225,"w":216,"h":424},
 	"rotated": true,
 	"trimmed": true,
-	"spriteSourceSize": {"x":162,"y":26,"w":199,"h":424},
+	"spriteSourceSize": {"x":162,"y":26,"w":216,"h":424},
 	"sourceSize": {"w":500,"h":500}
 },
 "WizardWin_009.png":
 {
-	"frame": {"x":1,"y":1,"w":205,"h":425},
+	"frame": {"x":1,"y":1,"w":222,"h":425},
 	"rotated": true,
 	"trimmed": true,
-	"spriteSourceSize": {"x":162,"y":25,"w":205,"h":425},
+	"spriteSourceSize": {"x":162,"y":25,"w":222,"h":425},
 	"sourceSize": {"w":500,"h":500}
 },
 "WizardWin_010.png":
 {
-	"frame": {"x":1,"y":409,"w":211,"h":423},
+	"frame": {"x":1,"y":443,"w":225,"h":423},
 	"rotated": true,
 	"trimmed": true,
-	"spriteSourceSize": {"x":162,"y":27,"w":211,"h":423},
+	"spriteSourceSize": {"x":162,"y":27,"w":225,"h":423},
 	"sourceSize": {"w":500,"h":500}
 },
 "WizardWin_011.png":
 {
-	"frame": {"x":1,"y":1218,"w":218,"h":417},
+	"frame": {"x":426,"y":642,"w":221,"h":417},
 	"rotated": true,
 	"trimmed": true,
-	"spriteSourceSize": {"x":162,"y":33,"w":218,"h":417},
+	"spriteSourceSize": {"x":162,"y":33,"w":221,"h":417},
 	"sourceSize": {"w":500,"h":500}
 },
 "WizardWin_012.png":
 {
-	"frame": {"x":427,"y":212,"w":224,"h":412},
+	"frame": {"x":428,"y":1,"w":224,"h":412},
 	"rotated": true,
 	"trimmed": true,
 	"spriteSourceSize": {"x":162,"y":38,"w":224,"h":412},
@@ -106,7 +106,7 @@
 },
 "WizardWin_013.png":
 {
-	"frame": {"x":425,"y":652,"w":219,"h":406},
+	"frame": {"x":1,"y":1701,"w":219,"h":406},
 	"rotated": true,
 	"trimmed": true,
 	"spriteSourceSize": {"x":162,"y":44,"w":219,"h":406},
@@ -114,7 +114,7 @@
 },
 "WizardWin_014.png":
 {
-	"frame": {"x":1,"y":1646,"w":216,"h":405},
+	"frame": {"x":409,"y":1701,"w":216,"h":405},
 	"rotated": true,
 	"trimmed": true,
 	"spriteSourceSize": {"x":162,"y":45,"w":216,"h":405},
@@ -122,7 +122,7 @@
 },
 "WizardWin_015.png":
 {
-	"frame": {"x":426,"y":438,"w":212,"h":407},
+	"frame": {"x":1,"y":1487,"w":212,"h":407},
 	"rotated": true,
 	"trimmed": true,
 	"spriteSourceSize": {"x":162,"y":43,"w":212,"h":407},
@@ -130,7 +130,7 @@
 },
 "WizardWin_016.png":
 {
-	"frame": {"x":428,"y":1,"w":209,"h":411},
+	"frame": {"x":419,"y":1484,"w":209,"h":411},
 	"rotated": true,
 	"trimmed": true,
 	"spriteSourceSize": {"x":162,"y":39,"w":209,"h":411},
@@ -138,7 +138,7 @@
 },
 "WizardWin_017.png":
 {
-	"frame": {"x":1,"y":1438,"w":206,"h":416},
+	"frame": {"x":427,"y":227,"w":206,"h":416},
 	"rotated": true,
 	"trimmed": true,
 	"spriteSourceSize": {"x":162,"y":34,"w":206,"h":416},
@@ -152,8 +152,8 @@
 	"version": "1.1",
 	"image": "WizardWin.png",
 	"format": "RGBA8888",
-	"size": {"w":840,"h":1863},
+	"size": {"w":844,"h":1921},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:c0f619117995bb8477c5ee52649863f9:c5c765169704d30d5ded115a24b27b29:77839353e30fb3aa91be252cab1b17ba$"
+	"smartupdate": "$TexturePacker:SmartUpdate:55cdc9f30810fde2a4c7ef36c862dafd:59a7dc86bcad5c3a5afc3e1cc1c4a164:77839353e30fb3aa91be252cab1b17ba$"
 }
 }

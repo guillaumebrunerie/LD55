@@ -1,0 +1,159 @@
+{"frames": {
+
+"WizardDie_000.png":
+{
+	"frame": {"x":1,"y":1,"w":595,"h":615},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":34,"y":24,"w":595,"h":615},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_001.png":
+{
+	"frame": {"x":1,"y":618,"w":577,"h":583},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":43,"y":39,"w":577,"h":583},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_002.png":
+{
+	"frame": {"x":598,"y":455,"w":371,"h":477},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":106,"y":42,"w":371,"h":477},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_003.png":
+{
+	"frame": {"x":1158,"y":1,"w":532,"h":452},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":22,"w":532,"h":452},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_004.png":
+{
+	"frame": {"x":598,"y":1,"w":558,"h":452},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":10,"w":558,"h":452},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_005.png":
+{
+	"frame": {"x":580,"y":828,"w":258,"h":441},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":302,"y":8,"w":258,"h":441},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_006.png":
+{
+	"frame": {"x":1,"y":1203,"w":296,"h":493},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":250,"y":22,"w":296,"h":493},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_007.png":
+{
+	"frame": {"x":1077,"y":455,"w":291,"h":441},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":263,"y":73,"w":291,"h":441},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_008.png":
+{
+	"frame": {"x":1398,"y":750,"w":300,"h":312},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":278,"y":205,"w":300,"h":312},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_009.png":
+{
+	"frame": {"x":1520,"y":455,"w":293,"h":195},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":290,"y":344,"w":293,"h":195},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_010.png":
+{
+	"frame": {"x":1321,"y":1282,"w":289,"h":224},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":290,"y":344,"w":289,"h":224},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_011.png":
+{
+	"frame": {"x":1119,"y":1210,"w":301,"h":200},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":290,"y":344,"w":301,"h":200},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_012.png":
+{
+	"frame": {"x":809,"y":1319,"w":308,"h":208},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":290,"y":344,"w":308,"h":208},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_013.png":
+{
+	"frame": {"x":496,"y":1319,"w":311,"h":221},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":290,"y":344,"w":311,"h":221},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_014.png":
+{
+	"frame": {"x":580,"y":1088,"w":319,"h":229},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":290,"y":344,"w":319,"h":229},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_015.png":
+{
+	"frame": {"x":1077,"y":748,"w":319,"h":229},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":290,"y":344,"w":319,"h":229},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_016.png":
+{
+	"frame": {"x":1023,"y":979,"w":319,"h":229},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":290,"y":344,"w":319,"h":229},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_017.png":
+{
+	"frame": {"x":1344,"y":1052,"w":310,"h":228},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":292,"y":345,"w":310,"h":228},
+	"sourceSize": {"w":640,"h":640}
+}},
+"animations": {
+	"WizardDie": ["WizardDie_000.png","WizardDie_001.png","WizardDie_002.png","WizardDie_003.png","WizardDie_004.png","WizardDie_005.png","WizardDie_006.png","WizardDie_007.png","WizardDie_008.png","WizardDie_009.png","WizardDie_010.png","WizardDie_011.png","WizardDie_012.png","WizardDie_013.png","WizardDie_014.png","WizardDie_015.png","WizardDie_016.png","WizardDie_017.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "WizardDie.png",
+	"format": "RGBA8888",
+	"size": {"w":1716,"h":1541},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:6990f625e0995647fac11baeb8f3413a:eb590aeb76b90ed6639d30322fe67a93:d109d164d23a202b086e340198af4cfa$"
+}
+}
