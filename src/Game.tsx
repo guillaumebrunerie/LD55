@@ -257,7 +257,7 @@ const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
 			tint={tint}
 			rotation={0}
 			scale={1}
-			blendMode={BLEND_MODES.NORMAL}
+			blendMode={BLEND_MODES.ADD}
 			texture={getFrame(MonsterIdle[item.strength], 20, gt)}
 			position={item.tmpPosition || { ...item.position }}
 		/>
@@ -295,7 +295,7 @@ const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
 					scale={item.previousItem.scale}
 					rotation={angle + Math.PI / 2}
 					blendMode={BLEND_MODES.NORMAL}
-					alpha={Math.min(item.nt * 5, 1)}
+					alpha={Math.min(item.nt * 3, 1)}
 					texture={ManaPointBlurred}
 					position={item.tmpPosition}
 				/>
@@ -357,7 +357,7 @@ const ManaItem = ({ item }: { item: Item }) => {
 					scale={item.previousItem.scale}
 					rotation={angle + Math.PI / 2}
 					blendMode={BLEND_MODES.NORMAL}
-					alpha={Math.min(item.nt * 5, 1)}
+					alpha={Math.min(item.nt * 3, 1)}
 					texture={ManaPointBlurred}
 					position={item.tmpPosition}
 				/>
