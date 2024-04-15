@@ -43,7 +43,7 @@ export const Game = ({ game }: { game: GameT }) => {
 				<Player
 					game={game}
 					player={game.opponent}
-					monsterTint={0xff0000}
+					monsterTint={0xffdd00}
 				/>
 			</Container>
 			<Container>
@@ -295,6 +295,7 @@ const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
 					scale={item.previousItem.scale}
 					rotation={angle + Math.PI / 2}
 					blendMode={BLEND_MODES.NORMAL}
+					alpha={Math.min(item.nt * 5, 1)}
 					texture={ManaPointBlurred}
 					position={item.tmpPosition}
 				/>
@@ -356,6 +357,7 @@ const ManaItem = ({ item }: { item: Item }) => {
 					scale={item.previousItem.scale}
 					rotation={angle + Math.PI / 2}
 					blendMode={BLEND_MODES.NORMAL}
+					alpha={Math.min(item.nt * 5, 1)}
 					texture={ManaPointBlurred}
 					position={item.tmpPosition}
 				/>
@@ -438,6 +440,7 @@ const DefenseItem = ({ item, i }: { item: Item; i: number }) => {
 					scale={item.previousItem.scale}
 					rotation={angle + Math.PI / 2}
 					blendMode={BLEND_MODES.NORMAL}
+					alpha={Math.min(item.nt * 3, 1)}
 					texture={ManaPointBlurred}
 					position={item.tmpPosition}
 				/>
