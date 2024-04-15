@@ -27,7 +27,9 @@ export const newApp = (): AppT => ({
 export const startApp = (app: AppT) => {
 	window.app = app;
 	sound.init();
-	void Music.play();
+	void Music.play({
+		loop: true,
+	});
 	const tick = action((delta: number) => {
 		tickApp(app, (delta / 60) * app.speed);
 	});

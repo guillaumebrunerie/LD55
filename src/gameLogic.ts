@@ -705,7 +705,7 @@ const pickDefensePair = (game: GameT) => {
 		dieWizard(defender.wizard);
 		winWizard(attacker.wizard);
 		appearButton(game.startButton);
-		runeTombola(attacker);
+		runeTombola()(attacker);
 		game.state = "gameover";
 		game.lt = 0;
 		game.nt = 0;
@@ -744,15 +744,31 @@ const pickDefensePair = (game: GameT) => {
 	}
 };
 
-const runeTombola = (player: Player) => {
-	player.items.defense = [];
-	for (let i = 0; i < 17; i++) {
-		addItem(player.items.defense, feetBounds, 4, {
-			invisible: i == 1 ? false : Math.random() < 0.5,
-		});
+const pickTombola = (previous: number[]) => {
+	const next = [];
+	const tombola = Array(16).fill(false);
+	for (let i = 0; i < 4; i++) {
+		const v = [1, 2, 3, 4].filter((x) => x !== previous[i])[
+			Math.floor(Math.random() * 3)
+		];
+		next.push(v);
+		tombola[v + i * 4] = true;
 	}
-	schedule(runeTombola, player, 0.2);
+	return { next, tombola };
 };
+
+export const runeTombola =
+	(previous: number[] = [1, 2, 3, 1]) =>
+	(player: Player) => {
+		player.items.defense = [];
+		const { tombola, next } = pickTombola(previous);
+		for (let i = 0; i < 17; i++) {
+			addItem(player.items.defense, feetBounds, 4, {
+				invisible: i == 1 ? false : !tombola[i],
+			});
+		}
+		schedule(runeTombola(next), player, 0.12);
+	};
 
 const hasManaToSpawn = (player: Player) => {
 	return player.mana.length < initialMana || player.items.mana.length > 0;

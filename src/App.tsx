@@ -33,6 +33,7 @@ import {
 	buyAttackItem,
 	buyDefenseItem,
 	buyManaItem,
+	runeTombola,
 	type GameT,
 } from "./gameLogic";
 import { Game } from "./Game";
@@ -300,6 +301,8 @@ export const App = () => {
 				app.speed = 0;
 			} else if (event.key == "ArrowRight") {
 				app.speed = 1;
+			} else if (event.key == "t") {
+				runeTombola()(game.player);
 			}
 		});
 		if (import.meta.env.DEV) {
@@ -308,7 +311,7 @@ export const App = () => {
 				window.removeEventListener("keydown", callback);
 			};
 		}
-	}, [app]);
+	}, [app, game.player]);
 
 	const startButtonInCenter = true; //game.isGameOver || game.state == "gameover";
 
