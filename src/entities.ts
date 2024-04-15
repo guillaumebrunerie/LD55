@@ -13,11 +13,12 @@ export type Entity<State extends string> = {
 
 export const newEntity = <State extends string>(
 	initialState: State,
+	transition: Transition<State> | null = null,
 ): Entity<State> => ({
 	state: initialState,
 	lt: 0,
 	nt: 0,
-	transition: null,
+	transition,
 });
 
 export const changeState = <State extends string>(
