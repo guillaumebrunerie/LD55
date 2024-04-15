@@ -43,7 +43,7 @@ export const Game = ({ game }: { game: GameT }) => {
 				<Player
 					game={game}
 					player={game.opponent}
-					monsterTint={0xffdd00}
+					monsterTint={0xffff00}
 				/>
 			</Container>
 			<Container>
