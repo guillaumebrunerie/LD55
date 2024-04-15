@@ -2,70 +2,54 @@
 
 "Monster3Die_022.png":
 {
-	"frame": {"x":143,"y":107,"w":103,"h":153},
+	"frame": {"x":250,"y":1,"w":112,"h":155},
 	"rotated": true,
 	"trimmed": true,
-	"spriteSourceSize": {"x":100,"y":66,"w":103,"h":153},
+	"spriteSourceSize": {"x":97,"y":69,"w":112,"h":155},
 	"sourceSize": {"w":300,"h":300}
 },
 "Monster3Die_023.png":
 {
-	"frame": {"x":143,"y":1,"w":104,"h":153},
+	"frame": {"x":82,"y":1,"w":97,"h":166},
 	"rotated": true,
 	"trimmed": true,
-	"spriteSourceSize": {"x":100,"y":66,"w":104,"h":153},
+	"spriteSourceSize": {"x":103,"y":64,"w":97,"h":166},
 	"sourceSize": {"w":300,"h":300}
 },
 "Monster3Die_024.png":
 {
-	"frame": {"x":1,"y":1,"w":140,"h":210},
-	"rotated": false,
+	"frame": {"x":1,"y":100,"w":124,"h":193},
+	"rotated": true,
 	"trimmed": true,
-	"spriteSourceSize": {"x":83,"y":36,"w":140,"h":210},
+	"spriteSourceSize": {"x":89,"y":48,"w":124,"h":193},
 	"sourceSize": {"w":300,"h":300}
 },
 "Monster3Die_025.png":
 {
-	"frame": {"x":1,"y":213,"w":55,"h":28},
-	"rotated": false,
+	"frame": {"x":196,"y":115,"w":124,"h":207},
+	"rotated": true,
 	"trimmed": true,
-	"spriteSourceSize": {"x":97,"y":54,"w":55,"h":28},
+	"spriteSourceSize": {"x":91,"y":39,"w":124,"h":207},
 	"sourceSize": {"w":300,"h":300}
 },
 "Monster3Die_026.png":
 {
-	"frame": {"x":58,"y":213,"w":55,"h":28},
-	"rotated": false,
+	"frame": {"x":1,"y":1,"w":72,"h":79},
+	"rotated": true,
 	"trimmed": true,
-	"spriteSourceSize": {"x":97,"y":54,"w":55,"h":28},
-	"sourceSize": {"w":300,"h":300}
-},
-"Monster3Die_027.png":
-{
-	"frame": {"x":115,"y":213,"w":55,"h":28},
-	"rotated": false,
-	"trimmed": true,
-	"spriteSourceSize": {"x":97,"y":54,"w":55,"h":28},
-	"sourceSize": {"w":300,"h":300}
-},
-"Monster3Die_028.png":
-{
-	"frame": {"x":172,"y":212,"w":55,"h":28},
-	"rotated": false,
-	"trimmed": true,
-	"spriteSourceSize": {"x":97,"y":54,"w":55,"h":28},
+	"spriteSourceSize": {"x":102,"y":144,"w":72,"h":79},
 	"sourceSize": {"w":300,"h":300}
 }},
 "animations": {
-	"Monster3Die": ["Monster3Die_022.png","Monster3Die_023.png","Monster3Die_024.png","Monster3Die_025.png","Monster3Die_026.png","Monster3Die_027.png","Monster3Die_028.png"]
+	"Monster3Die": ["Monster3Die_022.png","Monster3Die_023.png","Monster3Die_024.png","Monster3Die_025.png","Monster3Die_026.png"]
 },
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.1",
 	"image": "Monster3Die.png",
 	"format": "RGBA8888",
-	"size": {"w":297,"h":242},
+	"size": {"w":406,"h":240},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:a2a93aa029a9aa13f9f5e3f14e378cbe:8b5ab0ae14baf4b8b595b1b974323138:d21e9cdc3e1aabde60e4dcd5e636fc76$"
+	"smartupdate": "$TexturePacker:SmartUpdate:f5f1f9f77e1ff6c29d0185b132959424:791811c2aa8fca9d385791bb428cf3c5:d21e9cdc3e1aabde60e4dcd5e636fc76$"
 }
 }
