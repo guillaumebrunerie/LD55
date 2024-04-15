@@ -23,7 +23,7 @@ export const newEntity = <State extends string>(
 export const changeState = <State extends string>(
 	entity: Entity<State>,
 	state: NoInfer<State>,
-	transition: Transition<NoInfer<State>> | null,
+	transition: Transition<NoInfer<State>> | null = null,
 ) => {
 	entity.state = state;
 	entity.lt = 0;
@@ -45,7 +45,7 @@ export const tick =
 	(entity: T, delta: number) => {
 		const stateCallbacks = callback(entity, delta);
 		entity.lt += delta;
-		if (entity.transition !== null) {
+		if (entity.transition) {
 			entity.nt = entity.lt / entity.transition.duration;
 			if (entity.nt >= 1) {
 				if (entity.transition.callback) {
@@ -67,6 +67,13 @@ export const schedule = <State extends string, T extends Entity<State>>(
 ) => {
 	entity.transition = {
 		duration: entity.lt + delay,
-		callback,
+		callback: (v) => {
+			entity.transition = null;
+			callback(v);
+		},
 	};
+};
+
+export const areIdle = (...entities: Entity<string>[]) => {
+	return entities.every((entity) => !entity.transition);
 };

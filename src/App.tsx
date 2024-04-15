@@ -121,11 +121,13 @@ const SoundButton = () => {
 };
 
 const UIButton = ({
+	button,
 	onClick,
 	texture,
 	x,
 	game,
 }: {
+	button: ButtonT;
 	onClick: () => void;
 	texture: Texture;
 	x: number;
@@ -137,6 +139,23 @@ const UIButton = ({
 		:	0xffffff;
 	// const proportion = (player.mana / itemCost(player)) * 100;
 	// const i = Math.min(Math.round(proportion), 99);
+	if (button.state == "hidden") {
+		return null;
+	}
+
+	let alpha = 0;
+	switch (button.state) {
+		case "idle":
+			alpha = 1;
+			break;
+		case "appearing":
+			alpha = button.nt;
+			break;
+		case "disappearing":
+			alpha = 1 - button.nt;
+			break;
+	}
+
 	return (
 		<Container x={x} y={1080 - 120}>
 			<Sprite
@@ -146,6 +165,7 @@ const UIButton = ({
 				eventMode="static"
 				tint={tint}
 				pointerdown={onClick}
+				alpha={alpha}
 			/>
 			{/* <Sprite texture={BtnBar.animations.BtnBar[i]} anchor={0.5} /> */}
 		</Container>
@@ -156,18 +176,21 @@ const UIButtons = ({ game }: { game: GameT }) => {
 	return (
 		<>
 			<UIButton
+				button={game.defenseButton}
 				texture={BtnDefense}
 				x={600}
 				onClick={action(() => buyDefenseItem(game, game.player))}
 				game={game}
 			/>
 			<UIButton
+				button={game.manaButton}
 				texture={BtnMana}
 				x={960}
 				onClick={action(() => buyManaItem(game, game.player))}
 				game={game}
 			/>
 			<UIButton
+				button={game.attackButton}
 				texture={BtnAttack}
 				x={1320}
 				onClick={action(() => buyAttackItem(game, game.player))}
@@ -336,7 +359,7 @@ export const App = () => {
 			<Sprite texture={Cloud2} position={cloud2} />
 			<Sprite texture={Cloud1} position={cloud1} />
 			<Sprite texture={BgFront} x={0} y={0} />
-			{!game.isGameOver && <Game game={game} />}
+			<Game game={game} />
 			<Sprite
 				texture={InactiveSideWhite}
 				anchor={[1, 0]}
@@ -376,7 +399,7 @@ export const App = () => {
 				alpha={screenAlpha}
 			/>
 			<LogoMoon app={app} filters={filters} alpha={screenAlpha} />
-			{!game.isGameOver && <UIButtons game={game} />}
+			<UIButtons game={game} />
 			<StartButton
 				button={game.startButton}
 				position={

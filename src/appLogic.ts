@@ -21,7 +21,7 @@ export const newApp = (): AppT => ({
 	gt: 0,
 	lt: 0,
 	nt: 0,
-	game: newGame(true),
+	game: newGame(),
 });
 
 export const startApp = (app: AppT) => {
@@ -60,13 +60,5 @@ const tickApp = (app: AppT, delta: number) => {
 				app.state = "game";
 			}
 	}
-	tickGame(app.game, () => gameOver(app), delta);
-};
-
-const gameOver = (app: AppT) => {
-	if (!app.game.isGameOver) {
-		app.game.isGameOver = true;
-		fadeVolume(Music, musicVolume.low, musicVolume.high, 500);
-		app.highScore = Math.max(app.highScore, app.game.score);
-	}
+	tickGame(app.game, delta);
 };

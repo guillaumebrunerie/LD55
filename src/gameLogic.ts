@@ -1,4 +1,10 @@
-import { disappearButton, newButton, tickButton, type ButtonT } from "./button";
+import {
+	appearButton,
+	disappearButton,
+	newButton,
+	tickButton,
+	type ButtonT,
+} from "./button";
 import {
 	attackBounds,
 	shieldImpactBounds,
@@ -23,7 +29,14 @@ import {
 	type Curtain,
 } from "./curtain";
 import { wave } from "./ease";
-import { newEntity, schedule, type Entity } from "./entities";
+import {
+	areIdle,
+	changeState,
+	newEntity,
+	schedule,
+	tick,
+	type Entity,
+} from "./entities";
 import { smartStrategy, type Strategy } from "./strategies";
 import {
 	actWizardWhenBuying,
@@ -39,14 +52,12 @@ export type Point = {
 	y: number;
 };
 
-export type Item = {
-	lt: number;
+type ItemState = "visible" | "hidden" | "fighting" | "preSpawning" | "spawning";
+export type Item = Entity<ItemState> & {
 	position: Point;
 	tmpPosition?: Point;
 	strength: number;
 	hp: number;
-	state: "visible" | "hidden" | "fighting" | "preSpawning" | "spawning";
-	nt: number;
 	scale?: number;
 	offset?: number;
 	previousItem?: Item;
@@ -59,7 +70,7 @@ export type Buys = {
 	defense: number;
 };
 
-export type Player = {
+export type Player = Entity<""> & {
 	wizard: WizardT;
 	mana: Item[];
 	items: {
@@ -70,6 +81,8 @@ export type Player = {
 	boughtThisRound: Buys;
 	boughtPreviousRound: Buys;
 };
+
+const tickPlayer = tick<"", Player>(() => ({}));
 
 const delta = 150;
 
@@ -157,12 +170,14 @@ const addItem = (
 		strength,
 		hp: strength,
 		state: "visible",
+		transition: null,
 		...props,
 	});
 };
 
 const newPlayer = (): Player => {
 	const player: Player = {
+		...newEntity(""),
 		wizard: newWizard(),
 		mana: [],
 		items: {
@@ -231,6 +246,8 @@ const addManaPoints = (player: Player) => {
 };
 
 type GameState =
+	| "intro"
+	| "transition"
 	| "buildUp"
 	| "toAttack"
 	| "attack"
@@ -239,7 +256,6 @@ type GameState =
 	| "gameover";
 
 export type GameT = Entity<GameState> & {
-	isGameOver: boolean;
 	player: Player;
 	opponent: Player;
 	attackers?: [Item, Item];
@@ -250,9 +266,8 @@ export type GameT = Entity<GameState> & {
 	defenseButton: ButtonT;
 };
 
-export const newGame = (isGameOver = false): GameT => ({
-	...newEntity("buildUp"),
-	isGameOver,
+export const newGame = (): GameT => ({
+	...newEntity("intro"),
 	player: newPlayer(),
 	opponent: newPlayer(),
 	curtain: newCurtain(),
@@ -263,11 +278,51 @@ export const newGame = (isGameOver = false): GameT => ({
 });
 
 export const startGame = (game: GameT) => {
-	game.isGameOver = false;
+	changeState(game, "transition");
 	disappearButton(game.startButton);
-	schedule(showCurtain, game.curtain, 2);
 	appearWizard(game.opponent.wizard);
-	schedule(appearWizard, game.player.wizard, 1);
+	appearWizard(game.player.wizard);
+	schedule(showCurtain, game.curtain, 0.5);
+	schedule(appearButton, game.manaButton, 1);
+	schedule(appearButton, game.attackButton, 1);
+	schedule(appearButton, game.defenseButton, 1);
+
+	// // :D
+	// schedule(
+	// 	(p) => {
+	// 		rebuildManaPoint(p);
+	// 		schedule(
+	// 			(p) => {
+	// 				rebuildManaPoint(p);
+	// 				schedule(
+	// 					(p) => {
+	// 						rebuildManaPoint(p);
+	// 						schedule(
+	// 							(p) => {
+	// 								rebuildManaPoint(p);
+	// 								schedule(
+	// 									(p) => {
+	// 										rebuildManaPoint(p);
+	// 									},
+	// 									game.player,
+	// 									0.2,
+	// 								);
+	// 							},
+	// 							game.player,
+	// 							0.2,
+	// 						);
+	// 					},
+	// 					game.player,
+	// 					0.2,
+	// 				);
+	// 			},
+	// 			game.player,
+	// 			0.2,
+	// 		);
+	// 	},
+	// 	game.player,
+	// 	0.2,
+	// );
 };
 
 const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
@@ -318,10 +373,7 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 const toAttackDuration = 0.5;
 const rebuildDuration = 0.2;
 
-export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
-	if (game.isGameOver) {
-		return;
-	}
+export const tickGame = (game: GameT, delta: number) => {
 	game.lt += delta;
 	tickItems(game, game.player, delta);
 	tickWizard(game.player.wizard, delta);
@@ -331,7 +383,24 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 	tickButton(game.manaButton, delta);
 	tickButton(game.attackButton, delta);
 	tickButton(game.defenseButton, delta);
+	tickPlayer(game.player, delta);
+	tickPlayer(game.opponent, delta);
 	switch (game.state) {
+		case "transition":
+			if (
+				areIdle(
+					game.player.wizard,
+					game.opponent.wizard,
+					game.curtain,
+					game.startButton,
+					game.manaButton,
+					game.attackButton,
+					game.defenseButton,
+				)
+			) {
+				changeState(game, "buildUp", null);
+			}
+			break;
 		case "buildUp":
 			if (
 				game.player.mana.length == 0 &&
@@ -360,7 +429,7 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 			moveAttack(game);
 			break;
 		}
-		case "defense":
+		case "defense": {
 			const duration =
 				isFinalHitGame(game) ?
 					attackApproachDuration
@@ -371,6 +440,7 @@ export const tickGame = (game: GameT, _gameOver: () => void, delta: number) => {
 			}
 			moveDefense(game);
 			break;
+		}
 		case "rebuild":
 			game.nt = game.lt / rebuildDuration;
 			if (game.lt >= rebuildDuration) {
@@ -461,6 +531,30 @@ const tickItem = (item: Item, delta: number) => {
 };
 
 const manaSpawnDuration = 0.5;
+
+// const tickManaItem = tick<ItemState, Item>((item) => {
+// 	return {
+// 		visible: () => {
+// 			item.tmpPosition = undefined;
+// 		},
+// 		spawning: () => {
+// 			const nt = Math.max((item.lt - 0.2) / (manaSpawnDuration - 0.2), 0);
+// 			if (!item.previousItem) {
+// 				item.tmpPosition = item.position;
+// 			} else {
+// 				item.tmpPosition = {
+// 					x:
+// 						item.previousItem.position.x +
+// 						(item.position.x - item.previousItem.position.x) * nt,
+// 					y:
+// 						item.previousItem.position.y +
+// 						(item.position.y - item.previousItem.position.y) * nt,
+// 				};
+// 			}
+// 		},
+// 	};
+// });
+
 const tickManaItem = (item: Item, delta: number) => {
 	item.lt += delta;
 	switch (item.state) {
