@@ -15,14 +15,12 @@ import {
 	Bg,
 	BgFront,
 	BtnAttack,
-	// BtnBar,
 	BtnDefense,
 	BtnMana,
 	Cloud1,
 	Cloud2,
 	Cloud3,
 	InactiveSide,
-	InactiveSideBlack,
 	InactiveSideWhite,
 	Logo,
 	Moon,
@@ -36,11 +34,8 @@ import {
 	buyDefenseItem,
 	buyManaItem,
 	type GameT,
-	type Player,
 } from "./gameLogic";
 import { Game } from "./Game";
-import { CustomText } from "./CustomText";
-import { useLocalTime } from "./useLocalTime";
 import { wave } from "./ease";
 
 const StartButton = ({
@@ -110,7 +105,7 @@ const UIButton = ({
 	game: GameT;
 }) => {
 	const tint =
-		game.player.mana.length == 0 || game.phase != "buildUp" ?
+		game.player.mana.length == 0 || game.state != "buildUp" ?
 			0x333333
 		:	0xffffff;
 	// const proportion = (player.mana / itemCost(player)) * 100;
@@ -259,25 +254,22 @@ export const App = () => {
 		};
 	}, [app]);
 
-	const startButtonInCenter = game.isGameOver || game.phase == "gameover";
+	const startButtonInCenter = game.isGameOver || game.state == "gameover";
 
 	let screenAlpha = 0;
-	switch (game.phase) {
-		case "buildUp":
-			screenAlpha = 1;
-			break;
-		case "toAttack":
-			screenAlpha = wave(1 - game.nt);
-			break;
-		case "rebuild":
-			screenAlpha = wave(game.nt);
-			break;
-		case "gameover":
+	switch (game.curtain.state) {
+		case "hidden":
 			screenAlpha = 0;
 			break;
-	}
-	if (game.isGameOver) {
-		screenAlpha = 0;
+		case "appearing":
+			screenAlpha = wave(game.curtain.nt);
+			break;
+		case "disappearing":
+			screenAlpha = wave(1 - game.curtain.nt);
+			break;
+		case "idle":
+			screenAlpha = 1;
+			break;
 	}
 
 	const cloud1 = {

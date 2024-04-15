@@ -10,6 +10,7 @@ echo "// @ts-nocheck"
 echo
 
 names=()
+exports=()
 
 echo "/** Textures */"
 for file in $root/gfx/*.(png|jpg)
@@ -20,6 +21,7 @@ do
 	then
 		echo "import ${name}_ from \"../gfx/$texture?texture\";"
 		names+=(${name})
+		exports+=(${name})
 	fi
 done
 
@@ -30,6 +32,9 @@ do
 	spritesheet=$(basename ${file%.*})
 	echo "import ${spritesheet}_ from \"../gfx/$spritesheet.png?spritesheet\";"
 	names+=($spritesheet)
+	exports+=(${spritesheet}Sheet)
+	names+=($spritesheet)
+	exports+=("{ animations: { $spritesheet } }")
 done
 
 echo
@@ -39,13 +44,14 @@ do
 	sound=$(basename ${file%.*})
 	echo "import ${sound}_ from \"../audio/$sound.mp3?sound\";"
 	names+=($sound)
+	exports+=(${sound})
 done
 
 echo
 echo "export const ["
-for name in $names
+for export_ in $exports
 do
-	echo "	${name},"
+	echo "	${export_},"
 done
 echo "] = await Promise.all(["
 for name in $names
