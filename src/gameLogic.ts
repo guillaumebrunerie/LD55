@@ -27,6 +27,7 @@ import { smartStrategy, type Strategy } from "./strategies";
 import {
 	actWizardWhenBuying,
 	appearWizard,
+	disappearWizard,
 	newWizard,
 	tickWizard,
 	type WizardT,
@@ -263,12 +264,9 @@ export const newGame = (isGameOver = false): GameT => ({
 export const startGame = (game: GameT) => {
 	game.isGameOver = false;
 	disappearButton(game.startButton);
-	showCurtain(game.curtain);
-
+	schedule(showCurtain, game.curtain, 2);
 	appearWizard(game.opponent.wizard);
-	schedule(appearWizard, game.player.wizard, 0.5);
-
-	// appearWizard(game.player.wizard);
+	schedule(appearWizard, game.player.wizard, 1);
 };
 
 const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
@@ -561,6 +559,7 @@ const pickDefensePair = (game: GameT) => {
 	const defender =
 		game.player.items.attack.length > 0 ? game.opponent : game.player;
 	if (defender.items.defense.length == 0) {
+		disappearWizard(defender.wizard);
 		game.state = "gameover";
 		game.lt = 0;
 		game.nt = 0;

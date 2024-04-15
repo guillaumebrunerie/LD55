@@ -1,7 +1,10 @@
 import { Spritesheet, Texture } from "pixi.js";
 
-const duration = (spritesheet: Spritesheet, fps: number) =>
-	((spritesheet.animations.animation?.length || 0) * 1000) / fps;
+// const duration = (spritesheet: Spritesheet, fps: number) =>
+// 	((spritesheet.animations.animation?.length || 0) * 1000) / fps;
+
+export const getDuration = (animation: Texture[], fps: number) =>
+	animation.length / fps;
 
 export const getFrame = (
 	animation: Texture[],
@@ -35,18 +38,18 @@ export const getNtFrame = (animation: Texture[], nt: number) => {
 	return animation[i];
 };
 
-export const getFrameMultiple = (
-	spritesheet1: Spritesheet,
-	fps1: number,
-	spritesheet2: Spritesheet,
-	fps2: number,
-	t: number,
-	time: "hold" | "loop" | "remove" = "loop",
-) => {
-	const d1 = duration(spritesheet1, fps1);
-	if (t < d1) {
-		return getFrame(spritesheet1, fps1, t, time);
-	} else {
-		return getFrame(spritesheet2, fps2, t - d1, time);
-	}
-};
+// export const getFrameMultiple = (
+// 	spritesheet1: Spritesheet,
+// 	fps1: number,
+// 	spritesheet2: Spritesheet,
+// 	fps2: number,
+// 	t: number,
+// 	time: "hold" | "loop" | "remove" = "loop",
+// ) => {
+// 	const d1 = duration(spritesheet1, fps1);
+// 	if (t < d1) {
+// 		return getFrame(spritesheet1, fps1, t, time);
+// 	} else {
+// 		return getFrame(spritesheet2, fps2, t - d1, time);
+// 	}
+// };

@@ -1,3 +1,5 @@
+import { getDuration } from "./Animation";
+import { WizardDie } from "./assets";
 import { changeState, newEntity, tick, type Entity } from "./entities";
 import type { GameT, Player } from "./gameLogic";
 
@@ -29,7 +31,10 @@ export const magicEndWizard = (wizard: WizardT) => {
 };
 
 export const disappearWizard = (wizard: WizardT) => {
-	changeState(wizard, "disappearing", { duration: 1, state: "hidden" });
+	changeState(wizard, "disappearing", {
+		duration: getDuration(WizardDie, 20),
+		state: "hidden",
+	});
 };
 
 export const actWizardWhenBuying = (game: GameT, player: Player) => {

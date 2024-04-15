@@ -1,4 +1,4 @@
-/** Generated on Mon Apr 15 18:21:16 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Mon Apr 15 21:11:06 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -46,10 +46,12 @@ import Monster3Dies_ from "../gfx/Monster3Dies.png?spritesheet";
 import Runes_ from "../gfx/Runes.png?spritesheet";
 import ShieldHit_ from "../gfx/ShieldHit.png?spritesheet";
 import Spawn_ from "../gfx/Spawn.png?spritesheet";
+import WizardDie_ from "../gfx/WizardDie.png?spritesheet";
 import WizardIdle_ from "../gfx/WizardIdle.png?spritesheet";
 import WizardMagicEnd_ from "../gfx/WizardMagicEnd.png?spritesheet";
 import WizardMagicLoop_ from "../gfx/WizardMagicLoop.png?spritesheet";
 import WizardMagicStart_ from "../gfx/WizardMagicStart.png?spritesheet";
+import WizardWin_ from "../gfx/WizardWin.png?spritesheet";
 
 /** Sounds */
 import Click_ from "../audio/Click.mp3?sound";
@@ -107,6 +109,8 @@ export const [
 	{ animations: { ShieldHit } },
 	SpawnSheet,
 	{ animations: { Spawn } },
+	WizardDieSheet,
+	{ animations: { WizardDie } },
 	WizardIdleSheet,
 	{ animations: { WizardIdle } },
 	WizardMagicEndSheet,
@@ -115,6 +119,8 @@ export const [
 	{ animations: { WizardMagicLoop } },
 	WizardMagicStartSheet,
 	{ animations: { WizardMagicStart } },
+	WizardWinSheet,
+	{ animations: { WizardWin } },
 	Click,
 	Music,
 	Pop,
@@ -169,6 +175,8 @@ export const [
 	ShieldHit_,
 	Spawn_,
 	Spawn_,
+	WizardDie_,
+	WizardDie_,
 	WizardIdle_,
 	WizardIdle_,
 	WizardMagicEnd_,
@@ -177,6 +185,8 @@ export const [
 	WizardMagicLoop_,
 	WizardMagicStart_,
 	WizardMagicStart_,
+	WizardWin_,
+	WizardWin_,
 	Click_,
 	Music_,
 	Pop_,

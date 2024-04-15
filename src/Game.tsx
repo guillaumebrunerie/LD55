@@ -21,6 +21,7 @@ import {
 	WizardMagicEnd,
 	RunesSheet,
 	WizardMagicStart,
+	WizardDie,
 } from "./assets";
 import { BLEND_MODES, ColorMatrixFilter } from "pixi.js";
 import { getFrame, getNtFrame } from "./Animation";
@@ -109,7 +110,7 @@ const Wizard = ({
 		case "disappearing":
 			return (
 				<Sprite
-					texture={getFrame(WizardIdle, 30, wizard.lt)}
+					texture={getNtFrame(WizardDie, wizard.nt)}
 					x={-15}
 					y={230}
 					alpha={1 - wizard.nt}
@@ -380,14 +381,6 @@ const DefenseItem = ({ item, i }: { item: Item; i: number }) => {
 					position={[18, -70]}
 					anchor={0}
 					scale={2}
-				/>
-			)}
-			{item.state == "fighting" && i == 0 && (
-				<Sprite
-					texture={CloudFight}
-					blendMode={BLEND_MODES.NORMAL}
-					position={item.position}
-					anchor={0.5}
 				/>
 			)}
 		</>
