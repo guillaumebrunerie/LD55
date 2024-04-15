@@ -11,7 +11,7 @@ export type WizardT = Entity<
 	| "magicLoop"
 	| "magicEnd"
 	| "winning"
-	| "disappearing"
+	| "die"
 >;
 
 export const newWizard = (): WizardT => newEntity("hidden");
@@ -33,11 +33,15 @@ export const magicEndWizard = (wizard: WizardT) => {
 	changeState(wizard, "magicEnd", { duration: 0.5, state: "idle" });
 };
 
-export const disappearWizard = (wizard: WizardT) => {
-	changeState(wizard, "disappearing", {
+export const dieWizard = (wizard: WizardT) => {
+	changeState(wizard, "die", {
 		duration: getDuration(WizardDie, 20),
 		state: "hidden",
 	});
+};
+
+export const winWizard = (wizard: WizardT) => {
+	changeState(wizard, "winning");
 };
 
 export const actWizardWhenBuying = (game: GameT, player: Player) => {

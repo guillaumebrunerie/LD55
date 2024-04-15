@@ -41,9 +41,10 @@ import { smartStrategy, type Strategy } from "./strategies";
 import {
 	actWizardWhenBuying,
 	appearWizard,
-	disappearWizard,
+	dieWizard,
 	newWizard,
 	tickWizard,
+	winWizard,
 	type WizardT,
 } from "./wizard";
 
@@ -304,10 +305,10 @@ export const startGame = (game: GameT) => {
 	disappearButton(game.startButton);
 	appearWizard(game.opponent.wizard);
 	appearWizard(game.player.wizard);
-	schedule(showCurtain, game.curtain, 0.5);
-	schedule(appearButton, game.manaButton, 1);
-	schedule(appearButton, game.attackButton, 1);
-	schedule(appearButton, game.defenseButton, 1);
+	schedule(showCurtain, game.curtain, 0.7);
+	schedule(appearButton, game.manaButton, 1.2);
+	schedule(appearButton, game.attackButton, 1.2);
+	schedule(appearButton, game.defenseButton, 1.2);
 
 	// let scheduledFunction = () => {};
 	// for (let i = 0; i < 5; i++) {
@@ -357,7 +358,7 @@ export const startGame = (game: GameT) => {
 			);
 		},
 		game.player,
-		0.2,
+		1.2,
 	);
 
 	schedule(
@@ -393,7 +394,7 @@ export const startGame = (game: GameT) => {
 			);
 		},
 		game.opponent,
-		0.2,
+		1.2,
 	);
 };
 
@@ -741,7 +742,8 @@ const pickDefensePair = (game: GameT) => {
 	const defender =
 		game.player.items.attack.length > 0 ? game.opponent : game.player;
 	if (defender.items.defense.length == 0) {
-		disappearWizard(defender.wizard);
+		dieWizard(defender.wizard);
+		winWizard(attacker.wizard);
 		game.state = "gameover";
 		game.lt = 0;
 		game.nt = 0;

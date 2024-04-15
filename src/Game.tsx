@@ -29,6 +29,7 @@ import {
 	Monster1Die,
 	Monster2Die,
 	Monster3Die,
+	WizardWin,
 } from "./assets";
 import { BLEND_MODES, ColorMatrixFilter } from "pixi.js";
 import { getFrame, getNtFrame } from "./Animation";
@@ -68,11 +69,21 @@ const Wizard = ({
 	player: Player;
 	wizard: WizardT;
 }) => {
+	const gt = useGlobalTime();
 	switch (wizard.state) {
 		case "idle":
 			return (
 				<Sprite
-					texture={getFrame(WizardIdle, 10, wizard.lt)}
+					texture={getFrame(WizardIdle, 10, gt)}
+					x={-15}
+					y={230}
+					filters={player == game.opponent ? [filter] : []}
+				/>
+			);
+		case "winning":
+			return (
+				<Sprite
+					texture={getFrame(WizardWin, 20, gt)}
 					x={-15}
 					y={230}
 					filters={player == game.opponent ? [filter] : []}
@@ -114,7 +125,7 @@ const Wizard = ({
 					filters={player == game.opponent ? [filter] : []}
 				/>
 			);
-		case "disappearing":
+		case "die":
 			return (
 				<Sprite
 					texture={getNtFrame(WizardDie, wizard.nt)}
