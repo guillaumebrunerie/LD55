@@ -1,4 +1,4 @@
-/** Generated on Tue Apr 16 02:32:35 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Tue Apr 16 02:45:16 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -7,29 +7,24 @@
 import Bg_ from "../gfx/Bg.jpg?texture";
 import BgFront_ from "../gfx/BgFront.png?texture";
 import BtnAttack_ from "../gfx/BtnAttack.png?texture";
+import BtnAttackOn_ from "../gfx/BtnAttackOn.png?texture";
 import BtnDefense_ from "../gfx/BtnDefense.png?texture";
+import BtnDefenseOn_ from "../gfx/BtnDefenseOn.png?texture";
 import BtnMana_ from "../gfx/BtnMana.png?texture";
+import BtnManaOn_ from "../gfx/BtnManaOn.png?texture";
 import Cloud1_ from "../gfx/Cloud1.png?texture";
 import Cloud2_ from "../gfx/Cloud2.png?texture";
 import Cloud3_ from "../gfx/Cloud3.png?texture";
-import CloudFight_ from "../gfx/CloudFight.png?texture";
-import Defense1_ from "../gfx/Defense1.png?texture";
-import Defense2_ from "../gfx/Defense2.png?texture";
-import Defense3_ from "../gfx/Defense3.png?texture";
-import Division_ from "../gfx/Division.png?texture";
-import Hero_ from "../gfx/Hero.png?texture";
 import InactiveSide_ from "../gfx/InactiveSide.png?texture";
-import InactiveSideBlack_ from "../gfx/InactiveSideBlack.png?texture";
 import InactiveSideWhite_ from "../gfx/InactiveSideWhite.png?texture";
 import Logo_ from "../gfx/Logo.png?texture";
 import Mana1_ from "../gfx/Mana1.png?texture";
 import Mana2_ from "../gfx/Mana2.png?texture";
 import ManaPoint_ from "../gfx/ManaPoint.png?texture";
 import ManaPointBlurred_ from "../gfx/ManaPointBlurred.png?texture";
-import Monster1_ from "../gfx/Monster1.png?texture";
-import Monster2_ from "../gfx/Monster2.png?texture";
-import Monster3_ from "../gfx/Monster3.png?texture";
 import Moon_ from "../gfx/Moon.png?texture";
+import RestartBtnDefault_ from "../gfx/RestartBtnDefault.png?texture";
+import RestartBtnOn_ from "../gfx/RestartBtnOn.png?texture";
 import ShieldLoop_ from "../gfx/ShieldLoop.png?texture";
 import SoundOff_ from "../gfx/SoundOff.png?texture";
 import SoundOn_ from "../gfx/SoundOn.png?texture";
@@ -37,7 +32,6 @@ import StartButtonDefault_ from "../gfx/StartButtonDefault.png?texture";
 import StartButtonPressed_ from "../gfx/StartButtonPressed.png?texture";
 
 /** Spritesheets */
-import BtnBar_ from "../gfx/BtnBar.png?spritesheet";
 import Font_ from "../gfx/Font.png?spritesheet";
 import Mana1End_ from "../gfx/Mana1End.png?spritesheet";
 import Mana2End_ from "../gfx/Mana2End.png?spritesheet";
@@ -74,36 +68,29 @@ export const [
 	Bg,
 	BgFront,
 	BtnAttack,
+	BtnAttackOn,
 	BtnDefense,
+	BtnDefenseOn,
 	BtnMana,
+	BtnManaOn,
 	Cloud1,
 	Cloud2,
 	Cloud3,
-	CloudFight,
-	Defense1,
-	Defense2,
-	Defense3,
-	Division,
-	Hero,
 	InactiveSide,
-	InactiveSideBlack,
 	InactiveSideWhite,
 	Logo,
 	Mana1,
 	Mana2,
 	ManaPoint,
 	ManaPointBlurred,
-	Monster1,
-	Monster2,
-	Monster3,
 	Moon,
+	RestartBtnDefault,
+	RestartBtnOn,
 	ShieldLoop,
 	SoundOff,
 	SoundOn,
 	StartButtonDefault,
 	StartButtonPressed,
-	BtnBarSheet,
-	{ animations: { BtnBar } },
 	FontSheet,
 	{ animations: { Font } },
 	Mana1EndSheet,
@@ -158,36 +145,29 @@ export const [
 	Bg_,
 	BgFront_,
 	BtnAttack_,
+	BtnAttackOn_,
 	BtnDefense_,
+	BtnDefenseOn_,
 	BtnMana_,
+	BtnManaOn_,
 	Cloud1_,
 	Cloud2_,
 	Cloud3_,
-	CloudFight_,
-	Defense1_,
-	Defense2_,
-	Defense3_,
-	Division_,
-	Hero_,
 	InactiveSide_,
-	InactiveSideBlack_,
 	InactiveSideWhite_,
 	Logo_,
 	Mana1_,
 	Mana2_,
 	ManaPoint_,
 	ManaPointBlurred_,
-	Monster1_,
-	Monster2_,
-	Monster3_,
 	Moon_,
+	RestartBtnDefault_,
+	RestartBtnOn_,
 	ShieldLoop_,
 	SoundOff_,
 	SoundOn_,
 	StartButtonDefault_,
 	StartButtonPressed_,
-	BtnBar_,
-	BtnBar_,
 	Font_,
 	Font_,
 	Mana1End_,
