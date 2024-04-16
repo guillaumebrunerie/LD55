@@ -21,7 +21,7 @@ const attackStrategy: Strategy = () => {
 };
 attackStrategy.strategy = "Attack ";
 
-const manaStrategy: Strategy = () => {
+export const manaStrategy: Strategy = () => {
 	if (Math.random() < 0.8) {
 		return "mana";
 	} else if (Math.random() < 0.5) {

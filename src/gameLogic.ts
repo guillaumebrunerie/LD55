@@ -45,7 +45,7 @@ import {
 	tick,
 	type Entity,
 } from "./entities";
-import { smartStrategy, type Strategy } from "./strategies";
+import { manaStrategy, smartStrategy, type Strategy } from "./strategies";
 import {
 	actWizardWhenBuying,
 	appearWizard,
