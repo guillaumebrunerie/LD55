@@ -2,7 +2,7 @@ import { action } from "mobx";
 import { fadeVolume, musicVolume } from "./sounds";
 import { Ticker } from "pixi.js";
 import { sound } from "@pixi/sound";
-import { Music, StartButton } from "./assets";
+import { Music } from "./assets";
 import { newGame, startGame, tickGame, type GameT } from "./gameLogic";
 import { wave } from "./ease";
 
@@ -46,7 +46,6 @@ export const startNewGame = (app: AppT) => {
 	}
 	app.lt = 0;
 	// fadeVolume(Music, musicVolume.high, musicVolume.low, 500);
-	// void StartButton.play();
 	app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
 	startGame(app.game);
 };

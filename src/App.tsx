@@ -17,6 +17,9 @@ import {
 	BtnAttack,
 	BtnDefense,
 	BtnMana,
+	ClickAttack,
+	ClickDefense,
+	ClickMana,
 	Cloud1,
 	Cloud2,
 	Cloud3,
@@ -186,21 +189,30 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				button={game.defenseButton}
 				texture={BtnDefense}
 				x={600}
-				onClick={action(() => buyDefenseItem(game, game.player))}
+				onClick={action(() => {
+					void ClickDefense.play();
+					buyDefenseItem(game, game.player);
+				})}
 				game={game}
 			/>
 			<UIButton
 				button={game.manaButton}
 				texture={BtnMana}
 				x={960}
-				onClick={action(() => buyManaItem(game, game.player))}
+				onClick={action(() => {
+					void ClickMana.play();
+					buyManaItem(game, game.player);
+				})}
 				game={game}
 			/>
 			<UIButton
 				button={game.attackButton}
 				texture={BtnAttack}
 				x={1320}
-				onClick={action(() => buyAttackItem(game, game.player))}
+				onClick={action(() => {
+					void ClickAttack.play();
+					buyAttackItem(game, game.player);
+				})}
 				game={game}
 			/>
 		</>

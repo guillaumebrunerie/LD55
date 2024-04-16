@@ -1,4 +1,4 @@
-/** Generated on Mon Apr 15 23:31:42 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Tue Apr 16 02:32:35 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -61,10 +61,14 @@ import WizardMagicStart_ from "../gfx/WizardMagicStart.png?spritesheet";
 import WizardWin_ from "../gfx/WizardWin.png?spritesheet";
 
 /** Sounds */
-import Click_ from "../audio/Click.mp3?sound";
+import ClickAttack_ from "../audio/ClickAttack.mp3?sound";
+import ClickDefense_ from "../audio/ClickDefense.mp3?sound";
+import ClickMana_ from "../audio/ClickMana.mp3?sound";
+import ClickStart_ from "../audio/ClickStart.mp3?sound";
+import ManaCreated_ from "../audio/ManaCreated.mp3?sound";
+import MonsterAttacks_ from "../audio/MonsterAttacks.mp3?sound";
 import Music_ from "../audio/Music.mp3?sound";
-import Pop_ from "../audio/Pop.mp3?sound";
-import StartButton_ from "../audio/StartButton.mp3?sound";
+import ShieldDefends_ from "../audio/ShieldDefends.mp3?sound";
 
 export const [
 	Bg,
@@ -142,10 +146,14 @@ export const [
 	{ animations: { WizardMagicStart } },
 	WizardWinSheet,
 	{ animations: { WizardWin } },
-	Click,
+	ClickAttack,
+	ClickDefense,
+	ClickMana,
+	ClickStart,
+	ManaCreated,
+	MonsterAttacks,
 	Music,
-	Pop,
-	StartButton,
+	ShieldDefends,
 ] = await Promise.all([
 	Bg_,
 	BgFront_,
@@ -222,8 +230,12 @@ export const [
 	WizardMagicStart_,
 	WizardWin_,
 	WizardWin_,
-	Click_,
+	ClickAttack_,
+	ClickDefense_,
+	ClickMana_,
+	ClickStart_,
+	ManaCreated_,
+	MonsterAttacks_,
 	Music_,
-	Pop_,
-	StartButton_,
+	ShieldDefends_,
 ]);

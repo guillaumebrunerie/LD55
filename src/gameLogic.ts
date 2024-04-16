@@ -1,4 +1,10 @@
 import {
+	ClickStart,
+	ManaCreated,
+	MonsterAttacks,
+	ShieldDefends,
+} from "./assets";
+import {
 	appearButton,
 	disappearButton,
 	newButton,
@@ -316,6 +322,7 @@ export const newGame = (state: "intro" | "restart"): GameT => ({
 });
 
 export const startGame = (game: GameT) => {
+	void ClickStart.play();
 	if (game.state == "gameover") {
 		restartGame(game);
 		return;
@@ -329,7 +336,10 @@ export const startGame = (game: GameT) => {
 	schedule(appearButton, game.attackButton, 1.2);
 	schedule(appearButton, game.defenseButton, 1.2);
 
+	let t = 1;
 	for (let i = 0; i < 5; i++) {
+		t += 0.2;
+		void ManaCreated.play({ start: t });
 		schedule(spawnManaPoint, game.player, i == 0 ? 1.2 : 0.2);
 		schedule(spawnManaPoint, game.opponent, i == 0 ? 1.2 : 0.2);
 	}
@@ -477,6 +487,7 @@ export const tickGame = (game: GameT, delta: number) => {
 			game.nt = game.lt / rebuildDuration;
 			if (game.lt >= rebuildDuration) {
 				if (hasManaToSpawn(game.player)) {
+					void ManaCreated.play();
 					rebuildManaPoint(game.player);
 					game.lt = 0;
 				} else {
@@ -686,6 +697,8 @@ const pickAttackPair = (game: GameT) => {
 	playerAttacker.hp -= fightStrength;
 	opponentAttacker.hp -= fightStrength;
 
+	void MonsterAttacks.play();
+
 	return;
 };
 
@@ -768,6 +781,8 @@ const pickDefensePair = (game: GameT) => {
 		}
 		hasFought = true;
 	}
+
+	void ShieldDefends.play();
 };
 
 const pickTombola = (previous: number[]) => {
