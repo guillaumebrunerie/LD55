@@ -250,7 +250,7 @@ const LogoMoon = ({
 						texture={Moon}
 						anchor={[0.5, 0.5]}
 						x={1920 / 2}
-						y={400 - app.nt * 500}
+						y={300 - app.nt * 400}
 						filters={filters}
 						alpha={alpha}
 					/>
@@ -258,13 +258,13 @@ const LogoMoon = ({
 						texture={Logo}
 						anchor={[0.5, 0.5]}
 						x={1920 / 2}
-						y={400 - app.nt * 500}
+						y={300 - app.nt * 400}
 						alpha={1 - app.nt}
 					/>
 				</>
 			);
 		case "intro":
-			return <Sprite texture={Logo} x={1920 / 2} y={400} anchor={0.5} />;
+			return <Sprite texture={Logo} x={1920 / 2} y={300} anchor={0.5} />;
 	}
 };
 
@@ -421,8 +421,8 @@ export const App = () => {
 					button={game.startButton}
 					position={
 						startButtonInCenter ?
-							[1920 / 2, 800]
-						:	[1920 - 100, 1030]
+							[1920 / 2, 900]
+						:	[1920 - 100, 1430]
 					}
 					scale={startButtonInCenter ? 1 : 0.5}
 					onClick={action(() => {
