@@ -421,7 +421,7 @@ export const App = () => {
 					button={game.startButton}
 					position={
 						startButtonInCenter ?
-							[1920 / 2, 900]
+							[1920 / 2, 780]
 						:	[1920 - 100, 1430]
 					}
 					scale={startButtonInCenter ? 1 : 0.5}
