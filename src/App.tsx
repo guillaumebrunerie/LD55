@@ -138,15 +138,12 @@ const UIButton = ({
 	x: number;
 	game: GameT;
 }) => {
-	const tint =
-		(
-			game.player.mana.length == 0 ||
-			game.state != "buildUp" ||
-			(button == game.defenseButton &&
-				game.player.items.defense.length >= 17)
-		) ?
-			0x333333
-		:	0xffffff;
+	const disabled =
+		game.player.mana.length == 0 ||
+		game.state != "buildUp" ||
+		(button == game.defenseButton &&
+			game.player.items.defense.length >= 17);
+	const tint = disabled ? 0x333333 : 0xffffff;
 	// const proportion = (player.mana / itemCost(player)) * 100;
 	// const i = Math.min(Math.round(proportion), 99);
 	if (button.state == "hidden") {
@@ -171,10 +168,10 @@ const UIButton = ({
 			<Sprite
 				texture={texture}
 				anchor={0.5}
-				cursor="pointer"
+				cursor={disabled ? "auto" : "pointer"}
 				eventMode="static"
 				tint={tint}
-				pointerdown={onClick}
+				pointerdown={disabled ? () => {} : onClick}
 				alpha={alpha}
 			/>
 			{/* <Sprite texture={BtnBar.animations.BtnBar[i]} anchor={0.5} /> */}

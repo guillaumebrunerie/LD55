@@ -1,4 +1,4 @@
-/** Generated on Tue Apr 16 02:45:16 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Tue Apr 16 03:07:31 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -63,6 +63,7 @@ import ManaCreated_ from "../audio/ManaCreated.mp3?sound";
 import MonsterAttacks_ from "../audio/MonsterAttacks.mp3?sound";
 import Music_ from "../audio/Music.mp3?sound";
 import ShieldDefends_ from "../audio/ShieldDefends.mp3?sound";
+import WinMusic_ from "../audio/WinMusic.mp3?sound";
 
 export const [
 	Bg,
@@ -141,6 +142,7 @@ export const [
 	MonsterAttacks,
 	Music,
 	ShieldDefends,
+	WinMusic,
 ] = await Promise.all([
 	Bg_,
 	BgFront_,
@@ -218,4 +220,5 @@ export const [
 	MonsterAttacks_,
 	Music_,
 	ShieldDefends_,
+	WinMusic_,
 ]);

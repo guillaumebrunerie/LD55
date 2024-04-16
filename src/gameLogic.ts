@@ -2,7 +2,9 @@ import {
 	ClickStart,
 	ManaCreated,
 	MonsterAttacks,
+	Music,
 	ShieldDefends,
+	WinMusic,
 } from "./assets";
 import {
 	appearButton,
@@ -322,6 +324,8 @@ export const newGame = (state: "intro" | "restart"): GameT => ({
 });
 
 export const startGame = (game: GameT) => {
+	void WinMusic.stop();
+	void Music.play({ loop: true });
 	void ClickStart.play();
 	if (game.state == "gameover") {
 		restartGame(game);
@@ -736,6 +740,8 @@ const pickDefensePair = (game: GameT) => {
 	if (defender.items.defense.length == 0) {
 		dieWizard(defender.wizard);
 		winWizard(attacker.wizard);
+		void Music.stop();
+		void WinMusic.play({ loop: true });
 		appearButton(game.startButton);
 		runeTombola()(attacker);
 		for (const item of attacker.items.attack) {

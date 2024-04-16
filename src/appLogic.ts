@@ -2,7 +2,7 @@ import { action } from "mobx";
 import { fadeVolume, musicVolume } from "./sounds";
 import { Ticker } from "pixi.js";
 import { sound } from "@pixi/sound";
-import { Music } from "./assets";
+import { Music, WinMusic } from "./assets";
 import { newGame, startGame, tickGame, type GameT } from "./gameLogic";
 import { wave } from "./ease";
 
@@ -27,9 +27,6 @@ export const newApp = (): AppT => ({
 export const startApp = (app: AppT) => {
 	window.app = app;
 	sound.init();
-	void Music.play({
-		loop: true,
-	});
 	const tick = action((delta: number) => {
 		tickApp(app, (delta / 60) * app.speed);
 	});
