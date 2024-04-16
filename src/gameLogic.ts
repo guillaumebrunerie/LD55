@@ -170,6 +170,24 @@ const addItem = (
 	});
 };
 
+const addDefenseItem = (
+	array: Item[],
+	strength: number,
+	props?: Partial<Item>,
+) => {
+	const position = { x: 230, y: 644 };
+	array.push({
+		lt: 0,
+		nt: 0,
+		position,
+		strength,
+		hp: strength,
+		state: "visible",
+		transitions: [],
+		...props,
+	});
+};
+
 const newPlayer = (): Player => {
 	const player: Player = {
 		...newEntity(""),
@@ -197,7 +215,7 @@ const newPlayer = (): Player => {
 	// }
 	addItem(player.items.defense, playerBounds, 1);
 	for (const defenseItem of initialDefenseItems) {
-		addItem(player.items.defense, feetBounds, defenseItem);
+		addDefenseItem(player.items.defense, defenseItem);
 	}
 	// for (const attackItem of initialAttackItems) {
 	// 	addItem(player.items.attack, attackBounds, attackItem);
@@ -477,6 +495,7 @@ const tickItems = (game: GameT, player: Player, delta: number) => {
 		if (game.state == "attack" || game.state == "defense") {
 			item.position.x += delta * 25;
 		}
+		tickItem(item, delta);
 	}
 	for (const item of player.items.attack) {
 		if (game.state == "attack" || game.state == "defense") {
@@ -706,6 +725,13 @@ const pickDefensePair = (game: GameT) => {
 		winWizard(attacker.wizard);
 		appearButton(game.startButton);
 		runeTombola()(attacker);
+		for (const item of attacker.items.attack) {
+			item.hp = 0;
+			changeState(item, "visible", [
+				{ duration: fightDuration * 2, state: "fighting" },
+				{ duration: fightDuration, state: "hidden" },
+			]);
+		}
 		game.state = "gameover";
 		game.lt = 0;
 		game.nt = 0;
@@ -763,7 +789,7 @@ export const runeTombola =
 		player.items.defense = [];
 		const { tombola, next } = pickTombola(previous);
 		for (let i = 0; i < 17; i++) {
-			addItem(player.items.defense, feetBounds, 4, {
+			addDefenseItem(player.items.defense, 4, {
 				invisible: i == 1 ? false : !tombola[i],
 			});
 		}
@@ -913,7 +939,7 @@ export const buyDefenseItem = (game: GameT, player: Player) => {
 		if (player == game.player) {
 			spawnItem(player.items.defense, feetBounds, 4, manaPoint, hidden);
 		} else {
-			addItem(player.items.defense, feetBounds, 4);
+			addDefenseItem(player.items.defense, 4);
 		}
 	};
 	add(false);
