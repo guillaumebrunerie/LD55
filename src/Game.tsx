@@ -1,15 +1,10 @@
 import { Container, Sprite } from "@pixi/react";
 import type { GameT as GameT, Item, Player } from "./gameLogic";
 import {
-	Monster1,
-	Monster2,
-	Monster3,
 	Mana1,
-	Monster3Dies,
 	ManaPoint,
 	ShieldLoop,
 	ShieldHit,
-	CloudFight,
 	Mana2,
 	Spawn,
 	Mana1End,
