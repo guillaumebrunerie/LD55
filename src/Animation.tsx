@@ -1,4 +1,4 @@
-import { Spritesheet, Texture } from "pixi.js";
+import { Texture } from "pixi.js";
 
 // const duration = (spritesheet: Spritesheet, fps: number) =>
 // 	((spritesheet.animations.animation?.length || 0) * 1000) / fps;
@@ -12,9 +12,6 @@ export const getFrame = (
 	t: number,
 	time: "hold" | "loop" | "remove" = "loop",
 ) => {
-	if (!animation) {
-		debugger;
-	}
 	switch (time) {
 		case "loop":
 			return animation[Math.floor(t * fps) % animation.length];
@@ -34,9 +31,6 @@ export const getFrame = (
 };
 
 export const getNtFrame = (animation: Texture[], nt: number) => {
-	if (!animation) {
-		debugger;
-	}
 	const i = Math.min(
 		Math.max(Math.floor(nt * animation.length), 0),
 		animation.length - 1,

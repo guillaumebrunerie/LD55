@@ -1,5 +1,13 @@
 import { Container, Sprite } from "@pixi/react";
-import type { GameT as GameT, Item, Player } from "./gameLogic";
+import type {
+	GameT as GameT,
+	Mana,
+	Monster,
+	Rune,
+	Mushroom,
+	Player,
+	Shield,
+} from "./gameLogic";
 import {
 	Mana1,
 	ManaPoint,
@@ -30,6 +38,7 @@ import { BLEND_MODES, ColorMatrixFilter } from "pixi.js";
 import { getFrame, getNtFrame } from "./Animation";
 import type { WizardT } from "./wizard";
 import { useGlobalTime } from "./useGlobalTime";
+import { wave } from "./ease";
 
 export const Game = ({ game }: { game: GameT }) => {
 	return (
@@ -148,16 +157,17 @@ const Player = ({
 }) => {
 	return (
 		<Container>
-			<ManaPoints items={player.mana} />
+			<ManaPoints items={player.manaPoints} />
 			<Wizard game={game} player={player} wizard={player.wizard} />
-			<DefenseItems items={player.items.defense} />
-			<ManaItems items={player.items.mana} />
-			<MonsterItems items={player.items.attack} tint={monsterTint} />
+			<Shield shield={player.items.shield} />
+			<Runes runes={player.items.runes} />
+			<Mushrooms items={player.items.mushrooms} />
+			<MonsterItems items={player.items.monsters} tint={monsterTint} />
 		</Container>
 	);
 };
 
-const ManaPoints = ({ items }: { items: Item[] }) => {
+const ManaPoints = ({ items }: { items: Mana[] }) => {
 	return items.map((item, i) => <ManaPointC key={i} item={item} />);
 };
 
@@ -166,9 +176,26 @@ const manaEndAnimations = {
 	2: Mana2End,
 } as const;
 
-const ManaPointC = ({ item }: { item: Item }) => {
+const ManaPointC = ({ item }: { item: Mana }) => {
 	const lt = item.lt;
 	switch (item.state) {
+		case "anticipating": {
+			const dx = (Math.random() - 0.5) * 20;
+			const dy = (Math.random() - 0.5) * 20;
+			return (
+				<Sprite
+					anchor={0.5}
+					scale={item.scale}
+					rotation={lt * 3 + item.offset}
+					blendMode={BLEND_MODES.NORMAL}
+					texture={ManaPoint}
+					position={{
+						x: item.position.x + dx,
+						y: item.position.y + dy,
+					}}
+				/>
+			);
+		}
 		case "visible":
 			return (
 				<Sprite
@@ -226,7 +253,7 @@ const ManaPointC = ({ item }: { item: Item }) => {
 	}
 };
 
-const MonsterItems = ({ items, tint }: { items: Item[]; tint: number }) => {
+const MonsterItems = ({ items, tint }: { items: Monster[]; tint: number }) => {
 	return items.map((item, i) => (
 		<MonsterItem key={i} item={item} tint={tint} />
 	));
@@ -244,7 +271,7 @@ const MonsterDie = {
 	3: Monster3Die,
 } as const;
 
-const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
+const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 	const gt = useGlobalTime();
 	const visible = (
 		<Sprite
@@ -254,10 +281,32 @@ const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
 			scale={1}
 			blendMode={BLEND_MODES.ADD}
 			texture={getFrame(MonsterIdle[item.strength], 20, gt)}
-			position={item.tmpPosition || { ...item.position }}
+			position={{ ...item.position }}
 		/>
 	);
 	switch (item.state) {
+		case "approach": {
+			if (!item.destination) {
+				console.error("No destination");
+				item.destination = item.position;
+			}
+			const nt = wave(item.nt);
+			const position = {
+				x: (1 - nt) * item.position.x + nt * item.destination.x,
+				y: (1 - nt) * item.position.y + nt * item.destination.y,
+			};
+			return (
+				<Sprite
+					anchor={0.5}
+					tint={tint}
+					rotation={0}
+					scale={1}
+					blendMode={BLEND_MODES.ADD}
+					texture={getFrame(MonsterIdle[item.strength], 20, gt)}
+					position={position}
+				/>
+			);
+		}
 		case "visible":
 			return visible;
 		case "fighting": {
@@ -272,7 +321,7 @@ const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
 						MonsterDie[item.strength],
 						item.nt || 0,
 					)}
-					position={item.tmpPosition || item.position}
+					position={item.position}
 				/>
 			);
 		}
@@ -292,7 +341,7 @@ const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
 					blendMode={BLEND_MODES.NORMAL}
 					alpha={Math.min(item.nt * 3, 1)}
 					texture={ManaPointBlurred}
-					position={item.tmpPosition}
+					position={item.destination}
 				/>
 			);
 		}
@@ -313,10 +362,10 @@ const MonsterItem = ({ item, tint }: { item: Item; tint: number }) => {
 	return null;
 };
 
-const ManaItems = ({ items }: { items: Item[] }) => {
+const Mushrooms = ({ items }: { items: Mushroom[] }) => {
 	return items
 		.toSorted((a, b) => a.position.y - b.position.y)
-		.map((item, i) => <ManaItem key={i} item={item} />);
+		.map((item, i) => <Mushroom key={i} item={item} />);
 };
 
 const ManaTexture = {
@@ -324,10 +373,10 @@ const ManaTexture = {
 	2: Mana2,
 } as const;
 
-const ManaItem = ({ item }: { item: Item }) => {
+const Mushroom = ({ item }: { item: Mushroom }) => {
 	const visible = (
 		<Sprite
-			texture={ManaTexture[item.strength as 1 | 2]}
+			texture={ManaTexture[item.strength]}
 			rotation={0}
 			blendMode={BLEND_MODES.NORMAL}
 			scale={1}
@@ -375,48 +424,36 @@ const ManaItem = ({ item }: { item: Item }) => {
 	return null;
 };
 
-const DefenseItems = ({ items }: { items: Item[] }) => {
-	return items.map((item, i) => <DefenseItem key={i} item={item} i={i} />);
+const Runes = ({ runes: items }: { runes: Rune[] }) => {
+	return items.map((item, i) => <RuneC key={i} item={item} i={i} />);
 };
 
-const DefenseItem = ({ item, i }: { item: Item; i: number }) => {
-	if (item.invisible) {
-		return null;
-	}
-
+const RuneC = ({ item, i }: { item: Rune; i: number }) => {
 	const visible = (
-		<>
-			{i > 0 && (
-				<Sprite
-					texture={RunesSheet.animations.Rune[i - 1]}
-					anchor={0}
-					position={[-14, 613]}
-				/>
-			)}
-			{i == 1 && (
-				<Sprite
-					texture={ShieldLoop}
-					blendMode={BLEND_MODES.ADD}
-					position={[18, -70]}
-					anchor={0}
-					scale={2}
-				/>
-			)}
-			{item.state == "fighting" && i > 0 && (
-				<Sprite
-					texture={getNtFrame(ShieldHit, item.nt)}
-					blendMode={BLEND_MODES.ADD}
-					position={[18, -70]}
-					anchor={0}
-					scale={2}
-				/>
-			)}
-		</>
+		<Sprite
+			texture={RunesSheet.animations.Rune[i + 1]}
+			anchor={0}
+			rotation={0}
+			scale={1}
+			alpha={1}
+			position={[-14, 613]}
+		/>
 	);
 
 	switch (item.state) {
+		case "disappearing":
+			return (
+				<Sprite
+					texture={RunesSheet.animations.Rune[i + 1]}
+					anchor={0}
+					rotation={0}
+					scale={1}
+					alpha={1 - item.nt}
+					position={[-14, 613]}
+				/>
+			);
+
 		case "visible":
-		case "fighting":
 			return visible;
 		case "preSpawning": {
 			if (item.hidden) {
@@ -454,6 +491,62 @@ const DefenseItem = ({ item, i }: { item: Item; i: number }) => {
 						blendMode={BLEND_MODES.ADD}
 						texture={getFrame(Spawn, 30, item.lt)}
 						position={item.position}
+					/>
+				</>
+			);
+	}
+	return null;
+};
+
+const Shield = ({ shield }: { shield: Shield }) => {
+	switch (shield.state) {
+		case "visible":
+			return (
+				<>
+					<Sprite
+						texture={RunesSheet.animations.Rune[0]}
+						anchor={0}
+						rotation={0}
+						scale={1}
+						alpha={1}
+						blendMode={BLEND_MODES.NORMAL}
+						position={[-14, 613]}
+					/>
+					<Sprite
+						texture={ShieldLoop}
+						blendMode={BLEND_MODES.ADD}
+						position={[18, -70]}
+						anchor={0}
+						scale={2}
+					/>
+				</>
+			);
+
+		case "fighting":
+			return (
+				<>
+					<Sprite
+						texture={RunesSheet.animations.Rune[0]}
+						anchor={0}
+						rotation={0}
+						scale={1}
+						alpha={1}
+						blendMode={BLEND_MODES.NORMAL}
+						position={[-14, 613]}
+					/>
+					<Sprite
+						texture={ShieldLoop}
+						blendMode={BLEND_MODES.ADD}
+						position={[18, -70]}
+						anchor={0}
+						scale={2}
+					/>
+					<Sprite
+						texture={getNtFrame(ShieldHit, shield.nt)}
+						blendMode={BLEND_MODES.ADD}
+						position={[18, -70]}
+						anchor={0}
+						scale={2}
 					/>
 				</>
 			);

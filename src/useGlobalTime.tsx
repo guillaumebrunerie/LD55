@@ -1,6 +1,5 @@
-import { createContext, useContext } from "react";
-
-export const GlobalTimeContext = createContext(0);
+import { useContext } from "react";
+import { GlobalTimeContext } from "./globalTimeContext";
 
 export const useGlobalTime = () => {
 	return useContext(GlobalTimeContext);

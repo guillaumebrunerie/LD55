@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 import { Sprite } from "@pixi/react";
-import { Font } from "./assets";
+import { FontSheet } from "./assets";
 import type { Point } from "./gameLogic";
 
 export const CustomText = ({
@@ -29,7 +29,7 @@ export const CustomText = ({
 			x += space * scale;
 			return;
 		}
-		const texture = Font.textures[char];
+		const texture = FontSheet.textures[char];
 		if (!texture) {
 			console.error(`Missing character ${char}`);
 			return;

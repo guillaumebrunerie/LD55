@@ -1,6 +1,7 @@
-import { useState, useEffect, useReducer, useRef } from "react";
+import { useState, useEffect, useReducer } from "react";
 import {
 	ColorMatrixFilter,
+	FederatedPointerEvent,
 	Filter,
 	Rectangle,
 	SpriteMaskFilter,
@@ -33,27 +34,25 @@ import {
 	StartButtonPressed,
 } from "./assets";
 import {
-	buyAttackItem,
-	buyDefenseItem,
-	buyManaItem,
+	buyMonster,
+	buyDefense,
+	buyMushroom,
 	runeTombola,
 	type GameT,
 } from "./gameLogic";
 import { Game } from "./Game";
 import { wave } from "./ease";
 import type { ButtonT } from "./button";
-import { GlobalTimeContext } from "./useGlobalTime";
+import { GlobalTimeContext } from "./globalTimeContext";
 
 const StartButton = ({
 	button,
 	onClick,
 	position,
-	scale,
 }: {
 	button: ButtonT;
 	onClick: () => void;
 	position: [number, number];
-	scale: number;
 }) => {
 	const { isActive, props } = useButton({
 		onClick,
@@ -81,7 +80,6 @@ const StartButton = ({
 			texture={isActive ? StartButtonPressed : StartButtonDefault}
 			anchor={0.5}
 			position={position}
-			scale={scale}
 			alpha={alpha}
 			hitArea={
 				button.state == "idle" ?
@@ -130,30 +128,31 @@ const UIButton = ({
 	onClick,
 	texture,
 	x,
-	game,
 }: {
 	button: ButtonT;
 	onClick: () => void;
 	texture: Texture;
 	x: number;
-	game: GameT;
 }) => {
-	const disabled =
-		game.player.mana.length == 0 ||
-		game.state != "buildUp" ||
-		(button == game.defenseButton &&
-			game.player.items.defense.length >= 17);
-	const tint = disabled ? 0x333333 : 0xffffff;
-	// const proportion = (player.mana / itemCost(player)) * 100;
-	// const i = Math.min(Math.round(proportion), 99);
-	if (button.state == "hidden") {
-		return null;
-	}
+	const disabled = button.state !== "idle";
 
 	let alpha = 0;
+	let alphaTint = 0;
 	switch (button.state) {
 		case "idle":
 			alpha = 1;
+			break;
+		case "faded":
+			alpha = 1;
+			alphaTint = 1;
+			break;
+		case "fadingIn":
+			alpha = 1;
+			alphaTint = 1 - button.nt;
+			break;
+		case "fadingOut":
+			alpha = 1;
+			alphaTint = button.nt;
 			break;
 		case "appearing":
 			alpha = button.nt;
@@ -170,11 +169,16 @@ const UIButton = ({
 				anchor={0.5}
 				cursor={disabled ? "auto" : "pointer"}
 				eventMode="static"
-				tint={tint}
+				tint={0xffffff}
 				pointerdown={disabled ? () => {} : onClick}
 				alpha={alpha}
 			/>
-			{/* <Sprite texture={BtnBar.animations.BtnBar[i]} anchor={0.5} /> */}
+			<Sprite
+				texture={texture}
+				anchor={0.5}
+				tint={0x333333}
+				alpha={alphaTint}
+			/>
 		</Container>
 	);
 };
@@ -188,9 +192,8 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				x={600}
 				onClick={action(() => {
 					void ClickDefense.play();
-					buyDefenseItem(game, game.player);
+					void buyDefense(game, game.player);
 				})}
-				game={game}
 			/>
 			<UIButton
 				button={game.manaButton}
@@ -198,9 +201,8 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				x={960}
 				onClick={action(() => {
 					void ClickMana.play();
-					buyManaItem(game, game.player);
+					void buyMushroom(game, game.player);
 				})}
-				game={game}
 			/>
 			<UIButton
 				button={game.attackButton}
@@ -208,18 +210,11 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				x={1320}
 				onClick={action(() => {
 					void ClickAttack.play();
-					buyAttackItem(game, game.player);
+					void buyMonster(game, game.player);
 				})}
-				game={game}
 			/>
 		</>
 	);
-};
-
-const requestFullScreen = async () => {
-	const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-	// await canvas.requestFullscreen();
-	// await screen.orientation.lock("landscape");
 };
 
 const LogoMoon = ({
@@ -306,6 +301,9 @@ export const App = () => {
 				app.speed *= 2;
 			} else if (event.key == "ArrowDown") {
 				app.speed *= 1 / 2;
+				if (app.speed == 0) {
+					app.speed = 1 / 64;
+				}
 			} else if (event.key == "ArrowLeft") {
 				app.speed = 0;
 			} else if (event.key == "ArrowRight") {
@@ -321,8 +319,6 @@ export const App = () => {
 			};
 		}
 	}, [app, game.player]);
-
-	const startButtonInCenter = true; //game.isGameOver || game.state == "gameover";
 
 	let screenAlpha = 0;
 	switch (game.curtain.state) {
@@ -366,7 +362,7 @@ export const App = () => {
 					x={0}
 					y={0}
 					eventMode="static"
-					pointerdown={(e) => {
+					pointerdown={(e: FederatedPointerEvent) => {
 						const { x, y } = e.global;
 						console.log(`${Math.round(x)}, ${Math.round(y)}`);
 					}}
@@ -419,14 +415,8 @@ export const App = () => {
 				<UIButtons game={game} />
 				<StartButton
 					button={game.startButton}
-					position={
-						startButtonInCenter ?
-							[1920 / 2, 780]
-						:	[1920 - 100, 1430]
-					}
-					scale={startButtonInCenter ? 1 : 0.5}
+					position={[1920 / 2, 780]}
 					onClick={action(() => {
-						void requestFullScreen();
 						startNewGame(app);
 					})}
 				/>

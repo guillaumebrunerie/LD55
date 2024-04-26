@@ -1,7 +1,6 @@
 import fs from "fs";
 import type { Plugin, ResolvedConfig } from "vite";
 
-/* eslint-disable import/no-unused-modules */
 export const pixiAssetPlugin = (): Plugin => {
 	let config: ResolvedConfig;
 	return {

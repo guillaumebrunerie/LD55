@@ -1,8 +1,6 @@
 import { action } from "mobx";
-import { fadeVolume, musicVolume } from "./sounds";
 import { Ticker } from "pixi.js";
 import { sound } from "@pixi/sound";
-import { Music, WinMusic } from "./assets";
 import { newGame, startGame, tickGame, type GameT } from "./gameLogic";
 import { wave } from "./ease";
 
@@ -24,8 +22,22 @@ export const newApp = (): AppT => ({
 	game: newGame("intro"),
 });
 
+declare global {
+	interface Window {
+		app: AppT;
+		appR: AppT;
+	}
+}
+
 export const startApp = (app: AppT) => {
-	window.app = app;
+	if (import.meta.env.DEV) {
+		window.appR = app;
+		if (!window.app) {
+			Object.defineProperty(window, "app", {
+				get: () => JSON.parse(JSON.stringify(app)) as AppT,
+			});
+		}
+	}
 	sound.init();
 	const tick = action((delta: number) => {
 		tickApp(app, (delta / 60) * app.speed);

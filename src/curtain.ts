@@ -1,15 +1,25 @@
-import { changeState, newEntity, tick, type Entity } from "./entities";
+import {
+	idleState,
+	newEntity,
+	makeTick,
+	type Entity,
+	changeState,
+} from "./entities";
 
 export type Curtain = Entity<"hidden" | "appearing" | "idle" | "disappearing">;
 
 export const newCurtain = (): Curtain => newEntity("hidden");
 
-export const tickCurtain = tick<Curtain["state"], Curtain>(() => ({}));
+export const tickCurtain = makeTick<Curtain["state"], Curtain>();
 
 export const showCurtain = (curtain: Curtain) => {
-	changeState(curtain, "appearing", [{ duration: 0.5, state: "idle" }]);
+	changeState(curtain, "appearing", 0.5, () => {
+		idleState(curtain, "idle");
+	});
 };
 
 export const hideCurtain = (curtain: Curtain) => {
-	changeState(curtain, "disappearing", [{ duration: 0.5, state: "hidden" }]);
+	changeState(curtain, "disappearing", 0.5, () => {
+		idleState(curtain, "hidden");
+	});
 };

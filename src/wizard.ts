@@ -1,9 +1,15 @@
 import { getDuration } from "./Animation";
 import { WizardAppear, WizardDie } from "./assets";
-import { changeState, newEntity, tick, type Entity } from "./entities";
+import {
+	idleState,
+	newEntity,
+	makeTick,
+	type Entity,
+	changeState,
+} from "./entities";
 import type { GameT, Player } from "./gameLogic";
 
-export type WizardT = Entity<
+type WizardState =
 	| "hidden"
 	| "appearing"
 	| "idle"
@@ -11,41 +17,40 @@ export type WizardT = Entity<
 	| "magicLoop"
 	| "magicEnd"
 	| "winning"
-	| "die"
->;
+	| "die";
 
-export const newWizard = (): WizardT => newEntity("hidden");
+export type WizardT = Entity<WizardState>;
 
-export const tickWizard = tick<WizardT["state"], WizardT>(() => ({}));
+export const newWizard = (): WizardT => newEntity<WizardState>("hidden");
+
+export const tickWizard = makeTick<WizardState, WizardT>();
 
 export const appearWizard = (wizard: WizardT) => {
-	changeState(wizard, "appearing", [
-		{
-			duration: getDuration(WizardAppear, 20),
-			state: "idle",
-		},
-	]);
+	changeState(wizard, "appearing", getDuration(WizardAppear, 20), () => {
+		idleState(wizard, "idle");
+	});
 };
 
 export const magicStartWizard = (wizard: WizardT) => {
-	changeState(wizard, "magicStart", [{ duration: 0.5, state: "magicLoop" }]);
+	changeState(wizard, "magicStart", 0.5, () => {
+		idleState(wizard, "magicLoop");
+	});
 };
 
 export const magicEndWizard = (wizard: WizardT) => {
-	changeState(wizard, "magicEnd", [{ duration: 0.5, state: "idle" }]);
+	changeState(wizard, "magicEnd", 0.5, () => {
+		idleState(wizard, "idle");
+	});
 };
 
 export const dieWizard = (wizard: WizardT) => {
-	changeState(wizard, "die", [
-		{
-			duration: getDuration(WizardDie, 20),
-			state: "hidden",
-		},
-	]);
+	changeState(wizard, "die", getDuration(WizardDie, 20), () => {
+		idleState(wizard, "hidden");
+	});
 };
 
 export const winWizard = (wizard: WizardT) => {
-	changeState(wizard, "winning");
+	idleState(wizard, "winning");
 };
 
 export const actWizardWhenBuying = (game: GameT, player: Player) => {
@@ -54,7 +59,7 @@ export const actWizardWhenBuying = (game: GameT, player: Player) => {
 	}
 	if (player.wizard.state == "idle") {
 		magicStartWizard(player.wizard);
-	} else if (player.mana.length == 1) {
+	} else if (player.manaPoints.length == 1) {
 		magicEndWizard(player.wizard);
 	}
 };

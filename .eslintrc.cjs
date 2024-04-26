@@ -79,7 +79,7 @@ module.exports = {
 		],
 		"@typescript-eslint/prefer-nullish-coalescing": "off",
 
-		"@typescript-eslint/no-unnecessary-condition": "warn",
+		"@typescript-eslint/no-unnecessary-condition": "off",
 		"@typescript-eslint/no-unsafe-argument": "warn",
 		"@typescript-eslint/no-unsafe-assignment": "off",
 		"@typescript-eslint/no-unsafe-call": "warn",

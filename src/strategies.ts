@@ -1,16 +1,16 @@
-import { type Buys, type Item } from "./gameLogic";
+import { type Buys, type Monster, type Mushroom, type Rune } from "./gameLogic";
 
 export type Strategy = { strategy: string } & ((
 	buys: Buys,
 	opponentBuys: Buys,
 	items: {
-		mana: Item[];
-		attack: Item[];
-		defense: Item[];
+		mushrooms: Mushroom[];
+		monsters: Monster[];
+		runes: Rune[];
 	},
 ) => "mana" | "attack" | "defense");
 
-const attackStrategy: Strategy = () => {
+export const attackStrategy: Strategy = () => {
 	if (Math.random() < 0.8) {
 		return "attack";
 	} else if (Math.random() < 0.5) {
@@ -72,7 +72,7 @@ export const smartStrategy: Strategy = (buys, opponentBuys, items) => {
 smartStrategy.strategy = "Smart  ";
 
 const smart2Strategy: Strategy = (buys, opponentBuys, items) => {
-	if (items.defense.length < 4) {
+	if (items.runes.length < 4) {
 		return defenseStrategy(buys, opponentBuys, items);
 	} else {
 		return smartStrategy(buys, opponentBuys, items);

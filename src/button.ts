@@ -1,16 +1,46 @@
-import { changeState, newEntity, tick, type Entity } from "./entities";
+import {
+	idleState,
+	newEntity,
+	makeTick,
+	type Entity,
+	changeState,
+} from "./entities";
 
-export type ButtonT = Entity<"hidden" | "appearing" | "idle" | "disappearing">;
+export type ButtonT = Entity<
+	| "hidden"
+	| "appearing"
+	| "idle"
+	| "fadingIn"
+	| "faded"
+	| "fadingOut"
+	| "disappearing"
+>;
 
 export const newButton = (state: "idle" | "hidden"): ButtonT =>
 	newEntity(state);
 
-export const tickButton = tick<ButtonT["state"], ButtonT>(() => ({}));
+export const tickButton = makeTick<ButtonT["state"], ButtonT>();
 
 export const appearButton = (button: ButtonT) => {
-	changeState(button, "appearing", [{ duration: 1, state: "idle" }]);
+	changeState(button, "appearing", 1, () => {
+		idleState(button, "idle");
+	});
 };
 
 export const disappearButton = (button: ButtonT) => {
-	changeState(button, "disappearing", [{ duration: 0.2, state: "hidden" }]);
+	changeState(button, "disappearing", 1, () => {
+		idleState(button, "hidden");
+	});
+};
+
+export const fadeButtonIn = (button: ButtonT) => {
+	changeState(button, "fadingIn", 0.2, () => {
+		idleState(button, "idle");
+	});
+};
+
+export const fadeButtonOut = (button: ButtonT) => {
+	changeState(button, "fadingOut", 0.2, () => {
+		idleState(button, "faded");
+	});
 };
