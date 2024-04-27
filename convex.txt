@@ -1,0 +1,15 @@
+Game state on server:
+- for both players
+  - number of mana points
+  - number/position/strength of monsters
+  - number of runes/shield
+  - number/strength of mushrooms
+  - did the player receive the final state
+
+Mutations:
+- buy rune
+- buy mushroom
+- buy monster
+
+Queries:
+- wait until opponent is ready and return whole state
