@@ -1,0 +1,71 @@
+{"frames": {
+
+"StartVsHumanBtnMatch_000.png":
+{
+	"frame": {"x":1,"y":1,"w":294,"h":294},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":3,"w":294,"h":294},
+	"sourceSize": {"w":300,"h":300}
+},
+"StartVsHumanBtnMatch_001.png":
+{
+	"frame": {"x":297,"y":1,"w":276,"h":280},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":12,"y":10,"w":276,"h":280},
+	"sourceSize": {"w":300,"h":300}
+},
+"StartVsHumanBtnMatch_002.png":
+{
+	"frame": {"x":836,"y":1,"w":256,"h":262},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":22,"y":19,"w":256,"h":262},
+	"sourceSize": {"w":300,"h":300}
+},
+"StartVsHumanBtnMatch_003.png":
+{
+	"frame": {"x":575,"y":1,"w":264,"h":259},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":18,"y":20,"w":264,"h":259},
+	"sourceSize": {"w":300,"h":300}
+},
+"StartVsHumanBtnMatch_004.png":
+{
+	"frame": {"x":1356,"y":1,"w":260,"h":258},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":20,"y":21,"w":260,"h":258},
+	"sourceSize": {"w":300,"h":300}
+},
+"StartVsHumanBtnMatch_005.png":
+{
+	"frame": {"x":1094,"y":1,"w":260,"h":260},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":20,"y":20,"w":260,"h":260},
+	"sourceSize": {"w":300,"h":300}
+},
+"StartVsHumanBtnMatch_006.png":
+{
+	"frame": {"x":1616,"y":1,"w":182,"h":182},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":59,"y":59,"w":182,"h":182},
+	"sourceSize": {"w":300,"h":300}
+}},
+"animations": {
+	"StartVsHumanBtnMatch": ["StartVsHumanBtnMatch_000.png","StartVsHumanBtnMatch_001.png","StartVsHumanBtnMatch_002.png","StartVsHumanBtnMatch_003.png","StartVsHumanBtnMatch_004.png","StartVsHumanBtnMatch_005.png","StartVsHumanBtnMatch_006.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "StartVsHumanBtnMatch.png",
+	"format": "RGBA8888",
+	"size": {"w":1799,"h":296},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:2664fffd07076561b31d12aa38593d2e:14fbb22785cd637ef5992e759dee5f10:26a57003cf8d1fc2982996cc5dbda790$"
+}
+}
