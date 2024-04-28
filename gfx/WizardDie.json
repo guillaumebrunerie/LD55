@@ -122,7 +122,7 @@
 },
 "WizardDie_015.png":
 {
-	"frame": {"x":1077,"y":748,"w":319,"h":229},
+	"frame": {"x":580,"y":1088,"w":319,"h":229},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":290,"y":344,"w":319,"h":229},
@@ -130,13 +130,53 @@
 },
 "WizardDie_016.png":
 {
-	"frame": {"x":1023,"y":979,"w":319,"h":229},
+	"frame": {"x":580,"y":1088,"w":319,"h":229},
 	"rotated": false,
 	"trimmed": true,
 	"spriteSourceSize": {"x":290,"y":344,"w":319,"h":229},
 	"sourceSize": {"w":640,"h":640}
 },
 "WizardDie_017.png":
+{
+	"frame": {"x":580,"y":1088,"w":319,"h":229},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":290,"y":344,"w":319,"h":229},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_018.png":
+{
+	"frame": {"x":580,"y":1088,"w":319,"h":229},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":290,"y":344,"w":319,"h":229},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_019.png":
+{
+	"frame": {"x":580,"y":1088,"w":319,"h":229},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":290,"y":344,"w":319,"h":229},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_020.png":
+{
+	"frame": {"x":1077,"y":748,"w":319,"h":229},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":290,"y":344,"w":319,"h":229},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_021.png":
+{
+	"frame": {"x":1023,"y":979,"w":319,"h":229},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":290,"y":344,"w":319,"h":229},
+	"sourceSize": {"w":640,"h":640}
+},
+"WizardDie_022.png":
 {
 	"frame": {"x":1344,"y":1052,"w":310,"h":228},
 	"rotated": false,
@@ -145,7 +185,7 @@
 	"sourceSize": {"w":640,"h":640}
 }},
 "animations": {
-	"WizardDie": ["WizardDie_000.png","WizardDie_001.png","WizardDie_002.png","WizardDie_003.png","WizardDie_004.png","WizardDie_005.png","WizardDie_006.png","WizardDie_007.png","WizardDie_008.png","WizardDie_009.png","WizardDie_010.png","WizardDie_011.png","WizardDie_012.png","WizardDie_013.png","WizardDie_014.png","WizardDie_015.png","WizardDie_016.png","WizardDie_017.png"]
+	"WizardDie": ["WizardDie_000.png","WizardDie_001.png","WizardDie_002.png","WizardDie_003.png","WizardDie_004.png","WizardDie_005.png","WizardDie_006.png","WizardDie_007.png","WizardDie_008.png","WizardDie_009.png","WizardDie_010.png","WizardDie_011.png","WizardDie_012.png","WizardDie_013.png","WizardDie_014.png","WizardDie_015.png","WizardDie_016.png","WizardDie_017.png","WizardDie_018.png","WizardDie_019.png","WizardDie_020.png","WizardDie_021.png","WizardDie_022.png"]
 },
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
@@ -154,6 +194,6 @@
 	"format": "RGBA8888",
 	"size": {"w":1716,"h":1541},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:6990f625e0995647fac11baeb8f3413a:eb590aeb76b90ed6639d30322fe67a93:d109d164d23a202b086e340198af4cfa$"
+	"smartupdate": "$TexturePacker:SmartUpdate:f212f676e2cc2ca688231bc79e2291d4:e986ad9e67d0ef656b7dc6d1eb7f6d2e:d109d164d23a202b086e340198af4cfa$"
 }
 }
