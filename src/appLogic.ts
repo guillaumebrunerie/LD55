@@ -54,9 +54,10 @@ export const startApp = (app: AppT) => {
 
 export const startNewGame = async (
 	app: AppT,
-	joinGameMutation: ReactMutation<typeof api.buttons.joinGame>,
+	playVsComputer: boolean,
+	joinGameMutation: ReactMutation<typeof api.functions.joinGame>,
 ) => {
-	const player = await joinGameMutation();
+	const player = playVsComputer ? undefined : await joinGameMutation();
 	runInAction(() => {
 		if (app.state == "intro") {
 			app.state = "transition";

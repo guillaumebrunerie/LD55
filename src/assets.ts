@@ -1,4 +1,4 @@
-/** Generated on Tue Apr 16 03:07:31 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sun Apr 28 22:09:39 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -15,8 +15,11 @@ import BtnManaOn_ from "../gfx/BtnManaOn.png?texture";
 import Cloud1_ from "../gfx/Cloud1.png?texture";
 import Cloud2_ from "../gfx/Cloud2.png?texture";
 import Cloud3_ from "../gfx/Cloud3.png?texture";
+import ConnectionOff_ from "../gfx/ConnectionOff.png?texture";
+import ConnectionOn_ from "../gfx/ConnectionOn.png?texture";
 import InactiveSide_ from "../gfx/InactiveSide.png?texture";
 import InactiveSideWhite_ from "../gfx/InactiveSideWhite.png?texture";
+import LinkGenerated_ from "../gfx/LinkGenerated.png?texture";
 import Logo_ from "../gfx/Logo.png?texture";
 import Mana1_ from "../gfx/Mana1.png?texture";
 import Mana2_ from "../gfx/Mana2.png?texture";
@@ -30,6 +33,10 @@ import SoundOff_ from "../gfx/SoundOff.png?texture";
 import SoundOn_ from "../gfx/SoundOn.png?texture";
 import StartButtonDefault_ from "../gfx/StartButtonDefault.png?texture";
 import StartButtonPressed_ from "../gfx/StartButtonPressed.png?texture";
+import StartVsComputerDefault_ from "../gfx/StartVsComputerDefault.png?texture";
+import StartVsHumanOffDefault_ from "../gfx/StartVsHumanOffDefault.png?texture";
+import StartVsHumanOnDefault_ from "../gfx/StartVsHumanOnDefault.png?texture";
+import WizzyWizzy_Mocup_Buttons_ from "../gfx/WizzyWizzy_Mocup_Buttons.jpg?texture";
 
 /** Spritesheets */
 import Font_ from "../gfx/Font.png?spritesheet";
@@ -63,7 +70,10 @@ import ManaCreated_ from "../audio/ManaCreated.mp3?sound";
 import MonsterAttacks_ from "../audio/MonsterAttacks.mp3?sound";
 import Music_ from "../audio/Music.mp3?sound";
 import ShieldDefends_ from "../audio/ShieldDefends.mp3?sound";
+import ShieldDown_ from "../audio/ShieldDown.mp3?sound";
 import WinMusic_ from "../audio/WinMusic.mp3?sound";
+import WizardHit_ from "../audio/WizardHit.mp3?sound";
+import WizardStart_ from "../audio/WizardStart.mp3?sound";
 
 export const [
 	Bg,
@@ -77,8 +87,11 @@ export const [
 	Cloud1,
 	Cloud2,
 	Cloud3,
+	ConnectionOff,
+	ConnectionOn,
 	InactiveSide,
 	InactiveSideWhite,
+	LinkGenerated,
 	Logo,
 	Mana1,
 	Mana2,
@@ -92,6 +105,10 @@ export const [
 	SoundOn,
 	StartButtonDefault,
 	StartButtonPressed,
+	StartVsComputerDefault,
+	StartVsHumanOffDefault,
+	StartVsHumanOnDefault,
+	WizzyWizzy_Mocup_Buttons,
 	FontSheet,
 	{ animations: { Font } },
 	Mana1EndSheet,
@@ -142,7 +159,10 @@ export const [
 	MonsterAttacks,
 	Music,
 	ShieldDefends,
+	ShieldDown,
 	WinMusic,
+	WizardHit,
+	WizardStart,
 ] = await Promise.all([
 	Bg_,
 	BgFront_,
@@ -155,8 +175,11 @@ export const [
 	Cloud1_,
 	Cloud2_,
 	Cloud3_,
+	ConnectionOff_,
+	ConnectionOn_,
 	InactiveSide_,
 	InactiveSideWhite_,
+	LinkGenerated_,
 	Logo_,
 	Mana1_,
 	Mana2_,
@@ -170,6 +193,10 @@ export const [
 	SoundOn_,
 	StartButtonDefault_,
 	StartButtonPressed_,
+	StartVsComputerDefault_,
+	StartVsHumanOffDefault_,
+	StartVsHumanOnDefault_,
+	WizzyWizzy_Mocup_Buttons_,
 	Font_,
 	Font_,
 	Mana1End_,
@@ -220,5 +247,8 @@ export const [
 	MonsterAttacks_,
 	Music_,
 	ShieldDefends_,
+	ShieldDown_,
 	WinMusic_,
+	WizardHit_,
+	WizardStart_,
 ]);

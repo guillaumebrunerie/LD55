@@ -22,13 +22,13 @@ export const newButton = (state: "idle" | "hidden"): ButtonT =>
 export const tickButton = makeTick<ButtonT["state"], ButtonT>();
 
 export const appearButton = (button: ButtonT) => {
-	changeState(button, "appearing", 1, () => {
+	changeState(button, "appearing", 0.2, () => {
 		idleState(button, "idle");
 	});
 };
 
 export const disappearButton = (button: ButtonT) => {
-	changeState(button, "disappearing", 1, () => {
+	changeState(button, "disappearing", 0.2, () => {
 		idleState(button, "hidden");
 	});
 };

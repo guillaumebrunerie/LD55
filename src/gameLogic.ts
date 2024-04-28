@@ -46,7 +46,7 @@ import {
 	type Entity,
 	changeState,
 } from "./entities";
-// import { smartStrategy, type Strategy } from "./strategies";
+import { smartStrategy, type Strategy } from "./strategies";
 import {
 	actWizardWhenBuying,
 	appearWizard,
@@ -461,6 +461,7 @@ export const setupFight = (game: GameT, lastFight: LastFight) => {
 	if (lastFight.round != game.round + 1) {
 		throw new Error("Invalid round");
 	}
+
 	// Set up monsters
 	game.opponent.items.monsters = [];
 	for (const monsterData of lastFight.opponent.monsters) {
@@ -511,37 +512,73 @@ export const setupFight = (game: GameT, lastFight: LastFight) => {
 	});
 };
 
-// const opponentMove = async (
-// 	game: GameT,
-// 	opponent: Player,
-// 	strategy: Strategy,
-// ) => {
-// 	while (opponent.manaPoints.some((p) => p.state == "visible")) {
-// 		const type = strategy(
-// 			game.opponent.boughtPreviousRound,
-// 			game.player.boughtPreviousRound,
-// 			game.opponent.items,
-// 		);
+const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
+	while (opponent.manaPoints.some((p) => p.state == "visible")) {
+		const type = strategy(
+			game.opponent.boughtPreviousRound,
+			game.player.boughtPreviousRound,
+			game.opponent.items,
+		);
 
-// 		switch (type) {
-// 			case "mana":
-// 				await runInAction(async () => {
-// 					await buyMushroom(game, opponent);
-// 				});
-// 				break;
-// 			case "attack":
-// 				await runInAction(async () => {
-// 					await buyMonster(game, opponent);
-// 				});
-// 				break;
-// 			case "defense":
-// 				await runInAction(async () => {
-// 					await buyDefense(game, opponent);
-// 				});
-// 				break;
-// 		}
-// 	}
-// };
+		switch (type) {
+			case "mana": {
+				const { strength } = getMushroomStrength();
+				const mushroom: Mushroom = {
+					...newEntity("visible"),
+					position: pickPosition(
+						game.opponent.items.mushrooms,
+						manaBounds,
+						delta,
+					),
+					strength,
+				};
+				game.opponent.items.mushrooms.push(mushroom);
+				break;
+			}
+			case "attack": {
+				const { strength, position } = getMonsterData(opponent);
+				const monster: Monster = {
+					...newEntity("visible"),
+					position,
+					strength,
+					hp: strength,
+				};
+				game.opponent.items.monsters.push(monster);
+				break;
+			}
+			case "defense": {
+				const result = getDefenseStrength(opponent);
+				if (!result) {
+					continue;
+				}
+				const { strength } = result;
+
+				const add = () => {
+					if (game.opponent.items.shield.state == "hidden") {
+						idleState(game.opponent.items.shield, "visible");
+					} else {
+						addRune(game.opponent.items.runes);
+					}
+				};
+				add();
+				if (strength >= 2) {
+					add();
+				}
+				if (strength >= 3) {
+					add();
+				}
+				break;
+			}
+		}
+
+		const manaPoint = opponent.manaPoints.find(
+			(item) => item.state == "visible",
+		);
+		opponent.manaPoints = opponent.manaPoints.filter(
+			(item) => item != manaPoint,
+		);
+	}
+};
 
 const toAttackDuration = 0.5;
 const rebuildDuration = 0.2;
@@ -581,18 +618,20 @@ export const tickGame = makeTick<GameState, GameT>(
 					areAllItemsVisible(game.player)
 				) {
 					idleState(game, "waiting");
-					// void opponentMove(game, game.opponent, smartStrategy);
+					if (!game.gameId) {
+						opponentMove(game, game.opponent, smartStrategy);
+					}
 				}
 			},
-			// waiting: () => {
-			// 	if (game.opponent.manaPoints.length == 0) {
-			// 		hideCurtain(game.curtain);
-			// 		changeState(game, "toAttack", toAttackDuration, () => {
-			// 			idleState(game, "attack");
-			// 			pickAttackOrDefensePair(game);
-			// 		});
-			// 	}
-			// },
+			waiting: () => {
+				if (!game.gameId && game.opponent.manaPoints.length == 0) {
+					hideCurtain(game.curtain);
+					changeState(game, "toAttack", toAttackDuration, () => {
+						idleState(game, "attack");
+						pickAttackOrDefensePair(game);
+					});
+				}
+			},
 			attack: () => {
 				if (areAllItemsVisible(game.player)) {
 					pickAttackOrDefensePair(game);
@@ -945,33 +984,35 @@ const nextRound = (game: GameT) => {
 
 ////// Buying
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+// const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const getMushroomStrength = async () => {
-	await sleep(Math.random() * 300 + 100);
+const getMushroomStrength = () => {
 	return { strength: Math.random() < 0.6 ? 2 : 1 };
 };
 
-const getMonsterStrength = async (player: Player) => {
-	await sleep(Math.random() * 300 + 100);
+const getMonsterData = (player: Player) => {
+	const position = pickPosition(player.items.monsters, attackBounds, delta);
+
 	if (Math.random() < 0.5) {
-		return 1;
+		return { strength: 1, position };
 	} else if (
 		Math.random() < 0.5 ||
 		// false
 		(player.items.mushrooms.length > 0 &&
 			player.boughtThisRound.defense > 0)
 	) {
-		return 2;
+		return { strength: 2, position };
 	} else {
-		return 3;
+		return { strength: 3, position };
 	}
 };
 
-const getDefenseStrength = async (player: Player) => {
-	await sleep(Math.random() * 300 + 100);
+const getDefenseStrength = (player: Player) => {
+	if (player.items.runes.length == 15) {
+		return null;
+	}
 	if (player.items.monsters.length > 0 && player.items.mushrooms.length > 0) {
-		return 1;
+		return { strength: 1 };
 	}
 	if (
 		player.items.runes.length > 0 &&
@@ -979,11 +1020,11 @@ const getDefenseStrength = async (player: Player) => {
 		Math.random() < 0.5
 	) {
 		if (player.items.runes.length < 13 && Math.random() < 0.5) {
-			return 3;
+			return { strength: 3 };
 		}
-		return 2;
+		return { strength: 2 };
 	}
-	return 1;
+	return { strength: 1 };
 };
 
 const ensureButtonOn = (button: ButtonT) => {
@@ -1050,7 +1091,7 @@ export const buyMushroom = async (
 			await buyMushroomMutation({
 				playerId,
 			})
-		:	await getMushroomStrength();
+		:	getMushroomStrength();
 	if (!result) {
 		return;
 	}
@@ -1080,15 +1121,15 @@ export const buyMonster = async (
 	const manaPoint = spendManaPoint(game, player);
 	player.boughtThisRound.attack++;
 	const playerId = game.playerId;
-	if (!playerId) {
-		return;
-	}
-	const result = await buyMonsterMutation({ playerId });
+	const result =
+		playerId ?
+			await buyMonsterMutation({ playerId })
+		:	getMonsterData(player);
 	if (!result) {
 		return;
 	}
-	const { strength, position } = result;
 	runInAction(() => {
+		const { strength, position } = result;
 		player.manaPoints = player.manaPoints.filter(
 			(item) => item != manaPoint,
 		);
@@ -1118,11 +1159,10 @@ export const buyDefense = async (
 	}
 	player.boughtThisRound.defense++;
 	const playerId = game.playerId;
-	if (!playerId) {
-		restoreManaPoint(game, manaPoint);
-		return;
-	}
-	const result = await buyDefenseMutation({ playerId });
+	const result =
+		playerId ?
+			await buyDefenseMutation({ playerId })
+		:	getDefenseStrength(player);
 	runInAction(() => {
 		if (!result) {
 			restoreManaPoint(game, manaPoint);

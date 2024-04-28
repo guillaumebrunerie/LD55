@@ -32,6 +32,8 @@ import {
 	SoundOn,
 	StartButtonDefault,
 	StartButtonPressed,
+	StartVsComputerDefault,
+	StartVsHumanOffDefault,
 } from "./assets";
 import {
 	buyMonster,
@@ -53,11 +55,17 @@ const StartButton = ({
 	position,
 }: {
 	button: ButtonT;
-	onClick: () => void;
+	onClick: (playVsComputer: boolean) => void;
 	position: [number, number];
 }) => {
 	const { isActive, props } = useButton({
-		onClick,
+		onClick: () => onClick(playVsComputer),
+		enabled: button.state == "idle",
+	});
+
+	const [playVsComputer, setPlayVsComputer] = useState(true);
+	const { props: props2 } = useButton({
+		onClick: () => setPlayVsComputer((b) => !b),
 		enabled: button.state == "idle",
 	});
 
@@ -78,18 +86,39 @@ const StartButton = ({
 			break;
 	}
 	return (
-		<Sprite
-			texture={isActive ? StartButtonPressed : StartButtonDefault}
-			anchor={0.5}
-			position={position}
-			alpha={alpha}
-			hitArea={
-				button.state == "idle" ?
-					new Rectangle(-200, -100, 400, 200)
-				:	null
-			}
-			{...props}
-		/>
+		<>
+			<Sprite
+				texture={isActive ? StartButtonPressed : StartButtonDefault}
+				anchor={0.5}
+				position={position}
+				alpha={alpha}
+				hitArea={
+					button.state == "idle" ?
+						new Rectangle(-100, -100, 200, 200)
+					:	null
+				}
+				{...props}
+			/>
+			<Sprite
+				texture={
+					playVsComputer ?
+						StartVsComputerDefault
+					:	StartVsHumanOffDefault
+				}
+				anchor={0.5}
+				position={{
+					x: position[0] + 220,
+					y: position[1],
+				}}
+				alpha={alpha}
+				hitArea={
+					button.state == "idle" ?
+						new Rectangle(-100, -100, 200, 200)
+					:	null
+				}
+				{...props2}
+			/>
+		</>
 	);
 };
 
@@ -423,8 +452,12 @@ export const App = () => {
 				<StartButton
 					button={game.startButton}
 					position={[1920 / 2, 780]}
-					onClick={action(() => {
-						void startNewGame(app, joinGameMutation);
+					onClick={action((playVsComputer: boolean) => {
+						void startNewGame(
+							app,
+							playVsComputer,
+							joinGameMutation,
+						);
 					})}
 				/>
 				<SoundButton />

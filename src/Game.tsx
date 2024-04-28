@@ -45,7 +45,7 @@ import { api } from "../convex/_generated/api";
 import { useEffect } from "react";
 import { runInAction } from "mobx";
 
-export const Game = ({ game }: { game: GameT }) => {
+const SyncLastFight = ({ game }: { game: GameT }) => {
 	const lastFight = useQuery(api.functions.lastFight, {
 		playerId: game.playerId,
 	});
@@ -57,9 +57,13 @@ export const Game = ({ game }: { game: GameT }) => {
 			}
 		});
 	}, [lastFight, game]);
+	return null;
+};
 
+export const Game = ({ game }: { game: GameT }) => {
 	return (
 		<Container>
+			{game.playerId && <SyncLastFight game={game} />}
 			<Container scale={[-1, 1]} x={1920}>
 				<Player
 					game={game}
@@ -327,6 +331,9 @@ const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 		case "visible":
 			return visible;
 		case "fighting": {
+			if (item.hp > 0) {
+				return visible;
+			}
 			return (
 				<Sprite
 					anchor={0.5}
