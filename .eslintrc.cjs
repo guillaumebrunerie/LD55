@@ -19,7 +19,11 @@ module.exports = {
 		},
 		ecmaVersion: 12,
 		sourceType: "module",
-		project: ["tsconfig.json", "tsconfig.node.json"],
+		project: [
+			"tsconfig.json",
+			"tsconfig.node.json",
+			"convex/tsconfig.json",
+		],
 		tsconfigRootDir: ".",
 	},
 	plugins: ["react-refresh", "react", "import", "@typescript-eslint"],

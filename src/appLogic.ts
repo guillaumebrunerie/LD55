@@ -1,8 +1,11 @@
-import { action } from "mobx";
+import { action, runInAction } from "mobx";
 import { Ticker } from "pixi.js";
 import { sound } from "@pixi/sound";
 import { newGame, startGame, tickGame, type GameT } from "./gameLogic";
 import { wave } from "./ease";
+import type { Id } from "../convex/_generated/dataModel";
+import type { api } from "../convex/_generated/api";
+import type { ReactMutation } from "convex/react";
 
 export type AppT = {
 	speed: number;
@@ -49,14 +52,21 @@ export const startApp = (app: AppT) => {
 	};
 };
 
-export const startNewGame = (app: AppT) => {
-	if (app.state == "intro") {
-		app.state = "transition";
-	}
-	app.lt = 0;
-	// fadeVolume(Music, musicVolume.high, musicVolume.low, 500);
-	app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
-	startGame(app.game);
+export const startNewGame = async (
+	app: AppT,
+	joinGameMutation: ReactMutation<typeof api.buttons.joinGame>,
+) => {
+	const player = await joinGameMutation();
+	runInAction(() => {
+		if (app.state == "intro") {
+			app.state = "transition";
+		}
+		app.lt = 0;
+		app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
+		app.game.gameId = player?.gameId;
+		app.game.playerId = player?._id;
+		startGame(app.game);
+	});
 };
 
 const transitionDuration = 0.5;

@@ -44,6 +44,8 @@ import { Game } from "./Game";
 import { wave } from "./ease";
 import type { ButtonT } from "./button";
 import { GlobalTimeContext } from "./globalTimeContext";
+import { useMutation } from "convex/react";
+import { api } from "../convex/_generated/api";
 
 const StartButton = ({
 	button,
@@ -184,6 +186,9 @@ const UIButton = ({
 };
 
 const UIButtons = ({ game }: { game: GameT }) => {
+	const buyDefenseMutation = useMutation(api.functions.buyDefense);
+	const buyMushroomMutation = useMutation(api.functions.buyMushroom);
+	const buyMonsterMutation = useMutation(api.functions.buyMonster);
 	return (
 		<>
 			<UIButton
@@ -192,7 +197,7 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				x={600}
 				onClick={action(() => {
 					void ClickDefense.play();
-					void buyDefense(game, game.player);
+					void buyDefense(game, game.player, buyDefenseMutation);
 				})}
 			/>
 			<UIButton
@@ -201,7 +206,7 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				x={960}
 				onClick={action(() => {
 					void ClickMana.play();
-					void buyMushroom(game, game.player);
+					void buyMushroom(game, game.player, buyMushroomMutation);
 				})}
 			/>
 			<UIButton
@@ -210,7 +215,7 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				x={1320}
 				onClick={action(() => {
 					void ClickAttack.play();
-					void buyMonster(game, game.player);
+					void buyMonster(game, game.player, buyMonsterMutation);
 				})}
 			/>
 		</>
@@ -354,6 +359,8 @@ export const App = () => {
 	const [filter, setFilter] = useState<Filter>();
 	const filters = filter ? [filter, filter2] : [];
 
+	const joinGameMutation = useMutation(api.functions.joinGame);
+
 	return (
 		<GlobalTimeContext.Provider value={app.gt}>
 			<Container>
@@ -417,7 +424,7 @@ export const App = () => {
 					button={game.startButton}
 					position={[1920 / 2, 780]}
 					onClick={action(() => {
-						startNewGame(app);
+						void startNewGame(app, joinGameMutation);
 					})}
 				/>
 				<SoundButton />

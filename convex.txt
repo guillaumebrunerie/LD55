@@ -4,12 +4,15 @@ Game state on server:
   - number/position/strength of monsters
   - number of runes/shield
   - number/strength of mushrooms
-  - did the player receive the final state
+  - (did the player receive the final state)
 
 Mutations:
 - buy rune
 - buy mushroom
 - buy monster
 
-Queries:
-- wait until opponent is ready and return whole state
+Long queries:
+- wait until opponent is ready and return opponent move
+
+If fully real time:
+- receive opponent moves

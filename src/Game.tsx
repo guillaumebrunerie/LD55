@@ -1,12 +1,13 @@
 import { Container, Sprite } from "@pixi/react";
-import type {
-	GameT as GameT,
-	Mana,
-	Monster,
-	Rune,
-	Mushroom,
-	Player,
-	Shield,
+import {
+	type GameT as GameT,
+	type Mana,
+	type Monster,
+	type Rune,
+	type Mushroom,
+	type Player,
+	type Shield,
+	setupFight,
 } from "./gameLogic";
 import {
 	Mana1,
@@ -39,8 +40,24 @@ import { getFrame, getNtFrame } from "./Animation";
 import type { WizardT } from "./wizard";
 import { useGlobalTime } from "./useGlobalTime";
 import { wave } from "./ease";
+import { useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
+import { useEffect } from "react";
+import { runInAction } from "mobx";
 
 export const Game = ({ game }: { game: GameT }) => {
+	const lastFight = useQuery(api.functions.lastFight, {
+		playerId: game.playerId,
+	});
+	useEffect(() => {
+		runInAction(() => {
+			if (lastFight) {
+				console.log("Fight:", lastFight);
+				setupFight(game, lastFight);
+			}
+		});
+	}, [lastFight, game]);
+
 	return (
 		<Container>
 			<Container scale={[-1, 1]} x={1920}>

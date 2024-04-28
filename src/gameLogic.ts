@@ -46,7 +46,7 @@ import {
 	type Entity,
 	changeState,
 } from "./entities";
-import { smartStrategy, type Strategy } from "./strategies";
+// import { smartStrategy, type Strategy } from "./strategies";
 import {
 	actWizardWhenBuying,
 	appearWizard,
@@ -56,6 +56,11 @@ import {
 	winWizard,
 	type WizardT,
 } from "./wizard";
+import type { Id } from "../convex/_generated/dataModel";
+import { pickPosition } from "./utils";
+import type { api } from "../convex/_generated/api";
+import type { ReactMutation } from "convex/react";
+import { pickFighter } from "./rules";
 
 export type Point = {
 	x: number;
@@ -86,7 +91,6 @@ type RuneState =
 	| "preSpawning"
 	| "spawning";
 export type Rune = Entity<RuneState> & {
-	index: number;
 	position: Point;
 	tmpPosition?: Point;
 	previousItem?: Mana;
@@ -145,11 +149,12 @@ const delta = 150;
 
 const spawnMonster = (
 	array: Monster[],
-	bounds: Bounds,
+	// bounds: Bounds,
 	strength: 1 | 2 | 3,
+	position: Point,
 	manaPoint: Mana | undefined,
 ) => {
-	const position = pickPosition(array, bounds, delta);
+	// const position = pickPosition(array, bounds, delta);
 	const monster: Monster = {
 		...newEntity("preSpawning"),
 		position,
@@ -191,14 +196,12 @@ const spawnMushroom = (
 const spawnRune = (
 	array: Rune[],
 	bounds: Bounds,
-	index: number,
 	manaPoint: Mana | undefined,
 	hidden: boolean,
 ) => {
 	const position = pickPosition(array, bounds, delta);
 	const rune: Rune = {
 		...newEntity("preSpawning"),
-		index,
 		position,
 		tmpPosition: manaPoint?.position,
 		previousItem: manaPoint,
@@ -210,46 +213,6 @@ const spawnRune = (
 		});
 	});
 	array.push(rune);
-};
-
-const ITERATION_COUNT = 100;
-
-const pickPosition = (
-	array: { position: Point }[],
-	bounds: Bounds,
-	delta: number,
-) => {
-	const { left, top, width, height, polygon } = bounds;
-	let bestPosition = {
-		x: left + Math.random() * width,
-		y: top + Math.random() * height,
-	};
-	let bestDistance = 0;
-	for (let iteration = 0; iteration < ITERATION_COUNT; iteration++) {
-		const position = {
-			x: left + Math.random() * width,
-			y: top + Math.random() * height,
-		};
-		if (!polygon.contains(position.x, position.y)) {
-			continue;
-		}
-		const distance = Math.min(
-			...array.map((item) => {
-				const dx = item.position.x - position.x;
-				const dy = item.position.y - position.y;
-				return Math.sqrt(dx * dx + dy * dy);
-			}),
-		);
-		if (distance > delta) {
-			bestPosition = position;
-			bestDistance = distance;
-			break;
-		} else if (distance > bestDistance) {
-			bestPosition = position;
-			bestDistance = distance;
-		}
-	}
-	return bestPosition;
 };
 
 const addManaPoint = (
@@ -283,12 +246,11 @@ const addMonster = (array: Monster[], bounds: Bounds, strength: 1 | 2 | 3) => {
 	});
 };
 
-const addRune = (array: Rune[], index: number, props?: Partial<Rune>) => {
+const addRune = (array: Rune[], props?: Partial<Rune>) => {
 	const position = { x: 230, y: 644 };
 	array.push({
 		lt: 0,
 		nt: 0,
-		index,
 		position,
 		state: "visible",
 		transitions: [],
@@ -333,8 +295,8 @@ const newPlayer = (): Player => {
 			defense: 0,
 		},
 	};
-	for (const defenseItem of initialDefenseItems) {
-		addRune(player.items.runes, defenseItem);
+	for (let i = 0; i < initialDefenseItems - 1; i++) {
+		addRune(player.items.runes);
 	}
 	return player;
 };
@@ -411,6 +373,9 @@ type GameState =
 	| "restart";
 
 export type GameT = Entity<GameState> & {
+	gameId?: Id<"games">;
+	playerId?: Id<"players">;
+	round: number;
 	player: Player;
 	opponent: Player;
 	curtain: Curtain;
@@ -422,6 +387,7 @@ export type GameT = Entity<GameState> & {
 
 export const newGame = (state: "intro" | "restart"): GameT => ({
 	...newEntity<GameState>(state),
+	round: 0,
 	player: newPlayer(),
 	opponent: newPlayer(),
 	curtain: newCurtain(),
@@ -478,37 +444,104 @@ const restartGame = (game: GameT) => {
 	}
 };
 
-const opponentMove = async (
-	game: GameT,
-	opponent: Player,
-	strategy: Strategy,
-) => {
-	while (opponent.manaPoints.some((p) => p.state == "visible")) {
-		const type = strategy(
-			game.opponent.boughtPreviousRound,
-			game.player.boughtPreviousRound,
-			game.opponent.items,
-		);
+type LastFight = {
+	round: number;
+	opponent: {
+		defense: number;
+		mushrooms: { strength: number }[];
+		monsters: {
+			hp: number;
+			strength: number;
+			position: { x: number; y: number };
+		}[];
+	};
+};
 
-		switch (type) {
-			case "mana":
-				await runInAction(async () => {
-					await buyMushroom(game, opponent);
-				});
-				break;
-			case "attack":
-				await runInAction(async () => {
-					await buyMonster(game, opponent);
-				});
-				break;
-			case "defense":
-				await runInAction(async () => {
-					await buyDefense(game, opponent);
-				});
-				break;
+export const setupFight = (game: GameT, lastFight: LastFight) => {
+	if (lastFight.round != game.round + 1) {
+		throw new Error("Invalid round");
+	}
+	// Set up monsters
+	game.opponent.items.monsters = [];
+	for (const monsterData of lastFight.opponent.monsters) {
+		const { hp, strength, position } = monsterData;
+		const monster: Monster = {
+			...newEntity("visible"),
+			position,
+			strength,
+			hp,
+		};
+		game.opponent.items.monsters.push(monster);
+	}
+	// Set up defense
+	game.opponent.items.runes = [];
+	idleState(game.opponent.items.shield, "hidden");
+	for (let i = 0; i < lastFight.opponent.defense; i++) {
+		if (i == 0) {
+			idleState(game.opponent.items.shield, "visible");
+		} else {
+			addRune(game.opponent.items.runes);
 		}
 	}
+	// Set up mushrooms
+	game.opponent.items.mushrooms = [];
+	for (const mushroomData of lastFight.opponent.mushrooms) {
+		const { strength } = mushroomData;
+		const mushroom: Mushroom = {
+			...newEntity("visible"),
+			position: pickPosition(
+				game.opponent.items.mushrooms,
+				manaBounds,
+				delta,
+			),
+			strength,
+		};
+		game.opponent.items.mushrooms.push(mushroom);
+	}
+	// Set up mana points
+	game.opponent.manaPoints = [];
+	// Clear round data
+	game.round = lastFight.round;
+
+	// Start the fight
+	hideCurtain(game.curtain);
+	changeState(game, "toAttack", toAttackDuration, () => {
+		idleState(game, "attack");
+		pickAttackOrDefensePair(game);
+	});
 };
+
+// const opponentMove = async (
+// 	game: GameT,
+// 	opponent: Player,
+// 	strategy: Strategy,
+// ) => {
+// 	while (opponent.manaPoints.some((p) => p.state == "visible")) {
+// 		const type = strategy(
+// 			game.opponent.boughtPreviousRound,
+// 			game.player.boughtPreviousRound,
+// 			game.opponent.items,
+// 		);
+
+// 		switch (type) {
+// 			case "mana":
+// 				await runInAction(async () => {
+// 					await buyMushroom(game, opponent);
+// 				});
+// 				break;
+// 			case "attack":
+// 				await runInAction(async () => {
+// 					await buyMonster(game, opponent);
+// 				});
+// 				break;
+// 			case "defense":
+// 				await runInAction(async () => {
+// 					await buyDefense(game, opponent);
+// 				});
+// 				break;
+// 		}
+// 	}
+// };
 
 const toAttackDuration = 0.5;
 const rebuildDuration = 0.2;
@@ -548,18 +581,18 @@ export const tickGame = makeTick<GameState, GameT>(
 					areAllItemsVisible(game.player)
 				) {
 					idleState(game, "waiting");
-					void opponentMove(game, game.opponent, smartStrategy);
+					// void opponentMove(game, game.opponent, smartStrategy);
 				}
 			},
-			waiting: () => {
-				if (game.opponent.manaPoints.length == 0) {
-					hideCurtain(game.curtain);
-					changeState(game, "toAttack", toAttackDuration, () => {
-						idleState(game, "attack");
-						pickAttackOrDefensePair(game);
-					});
-				}
-			},
+			// waiting: () => {
+			// 	if (game.opponent.manaPoints.length == 0) {
+			// 		hideCurtain(game.curtain);
+			// 		changeState(game, "toAttack", toAttackDuration, () => {
+			// 			idleState(game, "attack");
+			// 			pickAttackOrDefensePair(game);
+			// 		});
+			// 	}
+			// },
 			attack: () => {
 				if (areAllItemsVisible(game.player)) {
 					pickAttackOrDefensePair(game);
@@ -693,12 +726,6 @@ const tickManaPoint = makeTick<ManaState, Mana>((item) => {
 		},
 	};
 });
-
-const pickFighter = (items: Monster[]): Monster => {
-	const a = items.find((item) => item.hp != item.strength);
-	const b = items.toSorted((a, b) => b.position.x - a.position.x)[0];
-	return a || b;
-};
 
 const pickAttackOrDefensePair = (game: GameT) => {
 	const playerMonsters = game.player.items.monsters.length;
@@ -885,7 +912,7 @@ export const runeTombola =
 		player.items.runes = [];
 		const { tombola, next } = pickTombola(previous);
 		for (let i = 0; i < 15; i++) {
-			addRune(player.items.runes, 4, {
+			addRune(player.items.runes, {
 				state: tombola[i] ? "visible" : "hidden",
 			});
 		}
@@ -922,7 +949,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const getMushroomStrength = async () => {
 	await sleep(Math.random() * 300 + 100);
-	return Math.random() < 0.6 ? 2 : 1;
+	return { strength: Math.random() < 0.6 ? 2 : 1 };
 };
 
 const getMonsterStrength = async (player: Player) => {
@@ -960,13 +987,13 @@ const getDefenseStrength = async (player: Player) => {
 };
 
 const ensureButtonOn = (button: ButtonT) => {
-	if (button.state == "faded") {
+	if (button.state != "idle") {
 		fadeButtonIn(button);
 	}
 };
 
 const ensureButtonOff = (button: ButtonT) => {
-	if (button.state == "idle") {
+	if (button.state != "faded") {
 		fadeButtonOut(button);
 	}
 };
@@ -1005,10 +1032,29 @@ const spendManaPoint = (game: GameT, player: Player) => {
 	return manaPoint;
 };
 
-export const buyMushroom = async (game: GameT, player: Player) => {
+const restoreManaPoint = (game: GameT, manaPoint: Mana) => {
+	idleState(manaPoint, "visible");
+	updateButtons(game);
+};
+
+export const buyMushroom = async (
+	game: GameT,
+	player: Player,
+	buyMushroomMutation: ReactMutation<typeof api.functions.buyMushroom>,
+) => {
 	const manaPoint = spendManaPoint(game, player);
 	player.boughtThisRound.mana++;
-	const strength = await getMushroomStrength();
+	const playerId = game.playerId;
+	const result =
+		playerId ?
+			await buyMushroomMutation({
+				playerId,
+			})
+		:	await getMushroomStrength();
+	if (!result) {
+		return;
+	}
+	const strength = result.strength;
 	runInAction(() => {
 		player.manaPoints = player.manaPoints.filter(
 			(item) => item != manaPoint,
@@ -1026,10 +1072,22 @@ export const buyMushroom = async (game: GameT, player: Player) => {
 	});
 };
 
-export const buyMonster = async (game: GameT, player: Player) => {
+export const buyMonster = async (
+	game: GameT,
+	player: Player,
+	buyMonsterMutation: ReactMutation<typeof api.functions.buyMonster>,
+) => {
 	const manaPoint = spendManaPoint(game, player);
 	player.boughtThisRound.attack++;
-	const strength = await getMonsterStrength(player);
+	const playerId = game.playerId;
+	if (!playerId) {
+		return;
+	}
+	const result = await buyMonsterMutation({ playerId });
+	if (!result) {
+		return;
+	}
+	const { strength, position } = result;
 	runInAction(() => {
 		player.manaPoints = player.manaPoints.filter(
 			(item) => item != manaPoint,
@@ -1037,8 +1095,9 @@ export const buyMonster = async (game: GameT, player: Player) => {
 		if (player == game.player) {
 			spawnMonster(
 				player.items.monsters,
-				attackBounds,
+				// attackBounds,
 				strength,
+				position,
 				manaPoint,
 			);
 		} else {
@@ -1047,22 +1106,46 @@ export const buyMonster = async (game: GameT, player: Player) => {
 	});
 };
 
-export const buyDefense = async (game: GameT, player: Player) => {
+export const buyDefense = async (
+	game: GameT,
+	player: Player,
+	buyDefenseMutation: ReactMutation<typeof api.functions.buyDefense>,
+) => {
 	const manaPoint = spendManaPoint(game, player);
+	if (!manaPoint) {
+		console.error("No mana point");
+		return;
+	}
 	player.boughtThisRound.defense++;
-	const strength = await getDefenseStrength(player);
+	const playerId = game.playerId;
+	if (!playerId) {
+		restoreManaPoint(game, manaPoint);
+		return;
+	}
+	const result = await buyDefenseMutation({ playerId });
 	runInAction(() => {
+		if (!result) {
+			restoreManaPoint(game, manaPoint);
+			return;
+		}
+		const { strength } = result;
 		player.manaPoints = player.manaPoints.filter(
 			(item) => item != manaPoint,
 		);
 		const add = (hidden: boolean) => {
 			if (player.items.shield.state == "hidden") {
 				idleState(player.items.shield, "visible");
-			}
-			if (player == game.player) {
-				spawnRune(player.items.runes, feetBounds, 4, manaPoint, hidden);
 			} else {
-				addRune(player.items.runes, 4);
+				if (player == game.player) {
+					spawnRune(
+						player.items.runes,
+						feetBounds,
+						manaPoint,
+						hidden,
+					);
+				} else {
+					addRune(player.items.runes);
+				}
 			}
 		};
 		add(false);
