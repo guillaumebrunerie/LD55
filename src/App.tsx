@@ -46,8 +46,10 @@ import { Game } from "./Game";
 import { wave } from "./ease";
 import type { ButtonT } from "./button";
 import { GlobalTimeContext } from "./globalTimeContext";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
+import { CustomText } from "./CustomText";
+import type { Id } from "../convex/_generated/dataModel";
 
 const StartButton = ({
 	button,
@@ -247,6 +249,29 @@ const UIButtons = ({ game }: { game: GameT }) => {
 					void buyMonster(game, game.player, buyMonsterMutation);
 				})}
 			/>
+		</>
+	);
+};
+
+const PlayerNames = ({ playerId }: { playerId: Id<"players"> }) => {
+	const playerName = useQuery(api.functions.playerName, { playerId });
+	const opponentName = useQuery(api.functions.opponentName, { playerId });
+	return (
+		<>
+			{playerName && (
+				<CustomText
+					text={playerName}
+					position={{ x: 20, y: 1080 - 20 }}
+					anchor={[0, 1]}
+				/>
+			)}
+			{opponentName && (
+				<CustomText
+					text={opponentName}
+					position={{ x: 1920 - 20, y: 1080 - 20 }}
+					anchor={[1, 1]}
+				/>
+			)}
 		</>
 	);
 };
@@ -460,6 +485,7 @@ export const App = () => {
 						);
 					})}
 				/>
+				{game.playerId && <PlayerNames playerId={game.playerId} />}
 				<SoundButton />
 				{/* <PolygonShape polygon={manaBounds.polygon} alpha={0.4} /> */}
 			</Container>

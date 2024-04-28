@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { pickPosition } from "../src/utils";
+import { pickName } from "./names";
 import {
 	attackBounds,
 	initialDefenseItems,
@@ -32,10 +33,44 @@ export const lastFight = query({
 	},
 });
 
+export const playerName = query({
+	args: {
+		playerId: v.id("players"),
+	},
+	handler: async (ctx, { playerId }) => {
+		const player = await getPlayer(ctx, playerId);
+		return player.name;
+	},
+});
+
+export const opponentName = query({
+	args: {
+		playerId: v.id("players"),
+	},
+	handler: async (ctx, { playerId }) => {
+		const player = await getPlayer(ctx, playerId);
+		const game = await getGame(ctx, player.gameId);
+		if (!game) {
+			return;
+		}
+		const opponentId =
+			game.playerId == playerId ? game.opponentId : game.playerId;
+		if (!opponentId) {
+			return;
+		}
+		const opponent = await ctx.db.get(opponentId);
+		if (!opponent) {
+			return;
+		}
+		return opponent.name;
+	},
+});
+
 export const joinGame = mutation({
 	handler: async (ctx) => {
 		// Create a new player
 		const playerId = await ctx.db.insert("players", {
+			name: pickName(),
 			mana: initialMana,
 			defense: initialDefenseItems,
 			mushrooms: [],

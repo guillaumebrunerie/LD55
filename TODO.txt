@@ -1,0 +1,13 @@
+Features
+- lobby
+- various flows and loading states
+
+Bugs
+- buttons should be disabled until all mana is visible
+- monsters sliding on the shield
+- handle reloading game
+
+Tweaks
+- play sound for first 5 mana points
+- implements remaining sound triggers
+- tweak volumes and delays

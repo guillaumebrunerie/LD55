@@ -24,6 +24,7 @@ const player = {
 export default defineSchema({
 	players: defineTable({
 		gameId: v.optional(v.id("games")),
+		name: v.string(),
 		...player,
 	}),
 	games: defineTable({
