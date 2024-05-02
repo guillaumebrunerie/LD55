@@ -871,6 +871,7 @@ const removeRune = (player: Player, rune: Rune) => {
 };
 
 const removeMonster = (player: Player, monster: Monster) => {
+	monster.hp = 0;
 	changeState(monster, "fighting", fightDuration, (monster) => {
 		player.items.monsters = player.items.monsters.filter(
 			(item) => item.id != monster.id,
@@ -929,16 +930,16 @@ const pickDefensePair = (game: GameT) => {
 		fighter.destination = destination;
 		changeState(fighter, "approach", attackApproachDuration, () => {
 			fighter.position = { ...destination };
-			removeMonster(attacker, fighter);
-			changeState(shield, "fighting", fightDuration, () => {
-				idleState(shield, "visible");
-			});
 			defender.items.runes
 				.toReversed()
 				.slice(0, Math.min(fighter.hp, runes))
 				.forEach((rune) => {
 					removeRune(defender, rune);
 				});
+			removeMonster(attacker, fighter);
+			changeState(shield, "fighting", fightDuration, () => {
+				idleState(shield, "visible");
+			});
 		});
 	}
 

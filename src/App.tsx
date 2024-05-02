@@ -34,13 +34,7 @@ import {
 	StartVsHumanOffDefault,
 	TextBox,
 } from "./assets";
-import {
-	buyMonster,
-	buyDefense,
-	buyMushroom,
-	runeTombola,
-	type GameT,
-} from "./gameLogic";
+import { buyMonster, buyDefense, buyMushroom, type GameT } from "./gameLogic";
 import { Game } from "./Game";
 import { wave } from "./ease";
 import type { ButtonT } from "./button";
@@ -59,7 +53,7 @@ const hitBoxAlpha = 0.01;
 const hitBoxHeight = lineHeight * 0.8;
 const hitBoxWidth = 1100;
 
-const Lobby = ({ app }: { app: AppT }) => {
+const Lobby = ({ app, onClick }: { app: AppT; onClick: () => void }) => {
 	const joinGameMutation = useMutation(api.functions.joinGame);
 	const createNewGameMutation = useMutation(api.functions.createNewGame);
 	const availableGames = useQuery(api.functions.availableGames, {
@@ -99,6 +93,7 @@ const Lobby = ({ app }: { app: AppT }) => {
 				cursor="pointer"
 				eventMode="static"
 				pointerdown={action(() => {
+					onClick();
 					void startNewGame(app, false, createNewGameMutation);
 				})}
 			/>
@@ -126,6 +121,7 @@ const Lobby = ({ app }: { app: AppT }) => {
 						cursor="pointer"
 						eventMode="static"
 						pointerdown={action(() => {
+							onClick();
 							void startNewGame(app, false, async () =>
 								joinGameMutation({ gameId }),
 							);
@@ -205,7 +201,7 @@ const StartButton = ({
 				eventMode="static"
 				pointerdown={() => setInLobby(true)}
 			/>
-			{inLobby && <Lobby app={app} />}
+			{inLobby && <Lobby app={app} onClick={() => setInLobby(false)} />}
 		</>
 	);
 };
@@ -321,14 +317,14 @@ const PlayerNames = ({ playerId }: { playerId: Id<"players"> }) => {
 			{playerName && (
 				<CustomText
 					text={playerName}
-					position={{ x: 20, y: 1080 - 20 }}
+					position={{ x: 20, y: 1080 - 11 }}
 					anchor={[0, 1]}
 				/>
 			)}
 			{opponentName && (
 				<CustomText
 					text={opponentName}
-					position={{ x: 1920 - 20, y: 1080 - 20 }}
+					position={{ x: 1920 - 20, y: 1080 - 11 }}
 					anchor={[1, 1]}
 				/>
 			)}
@@ -533,7 +529,7 @@ export const App = () => {
 				<StartButton
 					app={app}
 					button={game.startButton}
-					position={[1920 / 2, 780]}
+					position={[1920 / 2, 730]}
 				/>
 				{game.playerId && <PlayerNames playerId={game.playerId} />}
 				<SoundButton />
