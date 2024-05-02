@@ -10,7 +10,7 @@ import {
 } from "../src/configuration";
 import type { DataModel, Doc, Id } from "./_generated/dataModel";
 import { pickFighter } from "../src/rules";
-import { GenericMutationCtx, GenericQueryCtx } from "convex/server";
+import type { GenericMutationCtx, GenericQueryCtx } from "convex/server";
 
 export const lastFight = query({
 	args: {

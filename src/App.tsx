@@ -30,8 +30,6 @@ import {
 	Moon,
 	SoundOff,
 	SoundOn,
-	StartButtonDefault,
-	StartButtonPressed,
 	StartVsComputerDefault,
 	StartVsHumanOffDefault,
 	TextBox,
@@ -148,49 +146,26 @@ const StartButton = ({
 	button: ButtonT;
 	position: [number, number];
 }) => {
-	const { isActive: isActive1, props: props1 } = useButton({
-		onClick: action(() => {
-			void startNewGame(app, true, () => {
-				throw new Error("Should not be called");
-			});
-		}),
-		enabled: button.state == "idle",
-	});
-
 	const [inLobby, setInLobby] = useState(false);
-	// const { isActive: isActive2, props: props2 } = useButton({
-	// 	onClick: () => {}, // setInLobby(true),
-	// 	enabled: button.state == "idle",
-	// });
 
-	if (button.state == "hidden") {
+	if (button.alpha < 0.01) {
 		return null;
 	}
 
-	let alpha = 0;
-	switch (button.state) {
-		case "idle":
-			alpha = 1;
-			break;
-		case "appearing":
-			alpha = button.nt;
-			break;
-		case "disappearing":
-			alpha = 1 - button.nt;
-			break;
-	}
 	return (
 		<>
-			<Box
-				x={0}
-				y={0}
-				width={1920}
-				height={1080}
-				alpha={hitBoxAlpha}
-				cursor="pointer"
-				eventMode="static"
-				pointerdown={() => setInLobby(false)}
-			/>
+			{inLobby && (
+				<Box
+					x={0}
+					y={0}
+					width={1920}
+					height={1080}
+					alpha={hitBoxAlpha}
+					cursor="pointer"
+					eventMode="static"
+					pointerdown={() => setInLobby(false)}
+				/>
+			)}
 			<Sprite
 				texture={StartVsComputerDefault}
 				anchor={0.5}
@@ -198,13 +173,20 @@ const StartButton = ({
 					x: position[0] - 200,
 					y: position[1],
 				}}
-				alpha={alpha}
+				alpha={button.alpha}
 				hitArea={
 					button.state == "idle" ?
 						new Rectangle(-100, -100, 200, 200)
 					:	null
 				}
-				{...props1}
+				cursor="pointer"
+				eventMode="static"
+				pointerdown={action(() => {
+					setInLobby(false);
+					void startNewGame(app, true, () => {
+						throw new Error("Should not be called");
+					});
+				})}
 			/>
 			<Sprite
 				texture={StartVsHumanOffDefault}
@@ -213,7 +195,7 @@ const StartButton = ({
 					x: position[0] + 200,
 					y: position[1],
 				}}
-				alpha={alpha}
+				alpha={button.alpha}
 				hitArea={
 					button.state == "idle" ?
 						new Rectangle(-100, -100, 200, 200)
@@ -222,7 +204,6 @@ const StartButton = ({
 				cursor="pointer"
 				eventMode="static"
 				pointerdown={() => setInLobby(true)}
-				//				{...props2}
 			/>
 			{inLobby && <Lobby app={app} />}
 		</>
@@ -272,50 +253,24 @@ const UIButton = ({
 	texture: Texture;
 	x: number;
 }) => {
-	const disabled = button.state !== "idle";
-
-	let alpha = 0;
-	let alphaTint = 0;
-	switch (button.state) {
-		case "idle":
-			alpha = 1;
-			break;
-		case "faded":
-			alpha = 1;
-			alphaTint = 1;
-			break;
-		case "fadingIn":
-			alpha = 1;
-			alphaTint = 1 - button.nt;
-			break;
-		case "fadingOut":
-			alpha = 1;
-			alphaTint = button.nt;
-			break;
-		case "appearing":
-			alpha = button.nt;
-			break;
-		case "disappearing":
-			alpha = 1 - button.nt;
-			break;
-	}
+	const enabled = button.alpha > 0.95 && button.fade < 0.05;
 
 	return (
 		<Container x={x} y={1080 - 120}>
 			<Sprite
 				texture={texture}
 				anchor={0.5}
-				cursor={disabled ? "auto" : "pointer"}
+				cursor={enabled ? "pointer" : "auto"}
 				eventMode="static"
 				tint={0xffffff}
-				pointerdown={disabled ? () => {} : onClick}
-				alpha={alpha}
+				pointerdown={enabled ? onClick : () => {}}
+				alpha={button.alpha < button.fade ? 0 : 1}
 			/>
 			<Sprite
 				texture={texture}
 				anchor={0.5}
 				tint={0x333333}
-				alpha={alphaTint}
+				alpha={button.fade * button.alpha}
 			/>
 		</Container>
 	);
@@ -472,8 +427,6 @@ export const App = () => {
 				app.speed = 0;
 			} else if (event.key == "ArrowRight") {
 				app.speed = 1;
-			} else if (event.key == "t") {
-				runeTombola()(game.player);
 			}
 		});
 		if (import.meta.env.DEV) {

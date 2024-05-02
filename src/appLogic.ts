@@ -3,7 +3,6 @@ import { Ticker } from "pixi.js";
 import { sound } from "@pixi/sound";
 import { newGame, startGame, tickGame, type GameT } from "./gameLogic";
 import { wave } from "./ease";
-import type { Id } from "../convex/_generated/dataModel";
 import type { api } from "../convex/_generated/api";
 import type { ReactMutation } from "convex/react";
 
@@ -22,7 +21,7 @@ export const newApp = (): AppT => ({
 	gt: 0,
 	lt: 0,
 	nt: 0,
-	game: newGame("intro"),
+	game: newGame("intro", false),
 });
 
 declare global {
