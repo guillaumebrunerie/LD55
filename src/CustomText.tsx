@@ -1,7 +1,7 @@
-import { Sprite, type _ReactPixi } from "@pixi/react";
+import { Sprite, Text, type _ReactPixi } from "@pixi/react";
 import { Font2Sheet } from "./assets";
 import type { Point } from "./gameLogic";
-import type { Texture } from "pixi.js";
+import { TextStyle, type Texture } from "pixi.js";
 
 export const CustomText = ({
 	text,
@@ -12,14 +12,31 @@ export const CustomText = ({
 	position: Point;
 	anchor: [number, number];
 }) => {
+	return (
+		<Text
+			text={text}
+			position={position}
+			anchor={anchor}
+			style={
+				new TextStyle({
+					fontFamily: "monospace",
+					fontSize: 50,
+					fontWeight: "bold",
+					fill: "#FFFFFF",
+				})
+			}
+		/>
+	);
+
 	const scale = 0.4;
-	const kerning = 10;
+	const kerning = 15;
 	const space = 30;
 	let x = 0;
 	const letters: { texture: Texture; x: number }[] = [];
 	text.split("").forEach((char) => {
+		char = char.toUpperCase();
 		if (char == ":") {
-			char = "collon";
+			char = "Collon";
 		}
 		if (char == ".") {
 			char = "dot";
@@ -31,7 +48,7 @@ export const CustomText = ({
 			x += space * scale;
 			return;
 		}
-		const texture = Font2Sheet.textures[`${char.toUpperCase()}.png`];
+		const texture = Font2Sheet.textures[`${char}.png`];
 		if (!texture) {
 			console.error(`Missing character ${char}`);
 			return;

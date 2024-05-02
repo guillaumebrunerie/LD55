@@ -1,10 +1,10 @@
-import { useState, useEffect, useReducer } from "react";
+import { useState, useEffect, useReducer, Fragment } from "react";
 import {
 	ColorMatrixFilter,
 	FederatedPointerEvent,
 	Filter,
-	Rectangle,
 	SpriteMaskFilter,
+	Rectangle,
 	Texture,
 } from "pixi.js";
 import { Container, Sprite } from "@pixi/react";
@@ -34,6 +34,7 @@ import {
 	StartButtonPressed,
 	StartVsComputerDefault,
 	StartVsHumanOffDefault,
+	TextBox,
 } from "./assets";
 import {
 	buyMonster,
@@ -50,26 +51,117 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { CustomText } from "./CustomText";
 import type { Id } from "../convex/_generated/dataModel";
+import { Rectangle as Box } from "./Rectangle";
+
+const left = 420;
+const top = 170;
+const lineHeight = 80;
+
+const hitBoxAlpha = 0.01;
+const hitBoxHeight = lineHeight * 0.8;
+const hitBoxWidth = 1100;
+
+const Lobby = ({ app }: { app: AppT }) => {
+	const joinGameMutation = useMutation(api.functions.joinGame);
+	const createNewGameMutation = useMutation(api.functions.createNewGame);
+	const availableGames = useQuery(api.functions.availableGames, {
+		playerId: app.game.playerId,
+	});
+	// const [availableGames, setAvailableGames] =
+	// 	useState<typeof availableGamesQueryResult>();
+	// if (
+	// 	availableGamesQueryResult &&
+	// 	availableGamesQueryResult !== availableGames
+	// ) {
+	// 	setAvailableGames(availableGamesQueryResult);
+	// }
+	// console.log({ availableGames });
+	return (
+		<>
+			<Sprite
+				texture={TextBox}
+				position={[1920 / 2, 1080 / 2]}
+				anchor={0.5}
+				eventMode="static"
+			/>
+			<CustomText
+				text="New game"
+				anchor={[0, 0.5]}
+				position={{
+					x: left,
+					y: top,
+				}}
+			/>
+			<Box
+				x={left}
+				y={top - hitBoxHeight / 2}
+				width={hitBoxWidth}
+				height={hitBoxHeight}
+				alpha={hitBoxAlpha}
+				cursor="pointer"
+				eventMode="static"
+				pointerdown={action(() => {
+					void startNewGame(app, false, createNewGameMutation);
+				})}
+			/>
+			{!availableGames && (
+				<CustomText
+					text="Loading…"
+					anchor={[0, 0.5]}
+					position={{ x: left, y: top + lineHeight }}
+				/>
+			)}
+			{availableGames?.map(({ gameId, playerName }, i) => (
+				<Fragment key={gameId}>
+					<CustomText
+						key={gameId}
+						text={"Join " + playerName}
+						anchor={[0, 0.5]}
+						position={{ x: left, y: top + (i + 1) * lineHeight }}
+					/>
+					<Box
+						x={left}
+						y={top + (i + 1) * lineHeight - hitBoxHeight / 2}
+						width={hitBoxWidth}
+						height={hitBoxHeight}
+						alpha={hitBoxAlpha}
+						cursor="pointer"
+						eventMode="static"
+						pointerdown={action(() => {
+							void startNewGame(app, false, async () =>
+								joinGameMutation({ gameId }),
+							);
+						})}
+					/>
+				</Fragment>
+			))}
+		</>
+	);
+};
 
 const StartButton = ({
+	app,
 	button,
-	onClick,
 	position,
 }: {
+	app: AppT;
 	button: ButtonT;
-	onClick: (playVsComputer: boolean) => void;
 	position: [number, number];
 }) => {
-	const { isActive, props } = useButton({
-		onClick: () => onClick(playVsComputer),
+	const { isActive: isActive1, props: props1 } = useButton({
+		onClick: action(() => {
+			void startNewGame(app, true, () => {
+				throw new Error("Should not be called");
+			});
+		}),
 		enabled: button.state == "idle",
 	});
 
-	const [playVsComputer, setPlayVsComputer] = useState(true);
-	const { props: props2 } = useButton({
-		onClick: () => setPlayVsComputer((b) => !b),
-		enabled: button.state == "idle",
-	});
+	const [inLobby, setInLobby] = useState(false);
+	// const { isActive: isActive2, props: props2 } = useButton({
+	// 	onClick: () => {}, // setInLobby(true),
+	// 	enabled: button.state == "idle",
+	// });
 
 	if (button.state == "hidden") {
 		return null;
@@ -89,27 +181,21 @@ const StartButton = ({
 	}
 	return (
 		<>
-			<Sprite
-				texture={isActive ? StartButtonPressed : StartButtonDefault}
-				anchor={0.5}
-				position={position}
-				alpha={alpha}
-				hitArea={
-					button.state == "idle" ?
-						new Rectangle(-100, -100, 200, 200)
-					:	null
-				}
-				{...props}
+			<Box
+				x={0}
+				y={0}
+				width={1920}
+				height={1080}
+				alpha={hitBoxAlpha}
+				cursor="pointer"
+				eventMode="static"
+				pointerdown={() => setInLobby(false)}
 			/>
 			<Sprite
-				texture={
-					playVsComputer ?
-						StartVsComputerDefault
-					:	StartVsHumanOffDefault
-				}
+				texture={StartVsComputerDefault}
 				anchor={0.5}
 				position={{
-					x: position[0] + 220,
+					x: position[0] - 200,
 					y: position[1],
 				}}
 				alpha={alpha}
@@ -118,8 +204,27 @@ const StartButton = ({
 						new Rectangle(-100, -100, 200, 200)
 					:	null
 				}
-				{...props2}
+				{...props1}
 			/>
+			<Sprite
+				texture={StartVsHumanOffDefault}
+				anchor={0.5}
+				position={{
+					x: position[0] + 200,
+					y: position[1],
+				}}
+				alpha={alpha}
+				hitArea={
+					button.state == "idle" ?
+						new Rectangle(-100, -100, 200, 200)
+					:	null
+				}
+				cursor="pointer"
+				eventMode="static"
+				pointerdown={() => setInLobby(true)}
+				//				{...props2}
+			/>
+			{inLobby && <Lobby app={app} />}
 		</>
 	);
 };
@@ -413,8 +518,6 @@ export const App = () => {
 	const [filter, setFilter] = useState<Filter>();
 	const filters = filter ? [filter, filter2] : [];
 
-	const joinGameMutation = useMutation(api.functions.joinGame);
-
 	return (
 		<GlobalTimeContext.Provider value={app.gt}>
 			<Container>
@@ -475,15 +578,9 @@ export const App = () => {
 				<LogoMoon app={app} filters={filters} alpha={screenAlpha} />
 				<UIButtons game={game} />
 				<StartButton
+					app={app}
 					button={game.startButton}
 					position={[1920 / 2, 780]}
-					onClick={action((playVsComputer: boolean) => {
-						void startNewGame(
-							app,
-							playVsComputer,
-							joinGameMutation,
-						);
-					})}
 				/>
 				{game.playerId && <PlayerNames playerId={game.playerId} />}
 				<SoundButton />

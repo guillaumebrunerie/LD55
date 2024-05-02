@@ -856,7 +856,7 @@ const removeRune = (player: Player, rune: Rune) => {
 };
 
 const removeMonster = (player: Player, monster: Monster) => {
-	changeState(monster, "fighting", fightDuration, () => {
+	changeState(monster, "fighting", fightDuration, (monster) => {
 		player.items.monsters = player.items.monsters.filter(
 			(item) => item != monster,
 		);

@@ -66,7 +66,29 @@ export const opponentName = query({
 	},
 });
 
-export const joinGame = mutation({
+export const availableGames = query({
+	args: {
+		playerId: v.optional(v.id("players")),
+	},
+	handler: async (ctx, { playerId }) => {
+		const games = await ctx.db
+			.query("games")
+			.filter((q) => q.eq(q.field("opponentId"), undefined))
+			.filter((q) => q.neq(q.field("playerId"), playerId))
+			.collect();
+		return Promise.all(
+			games.map(async (game) => ({
+				gameId: game._id,
+				playerName:
+					(game.playerId &&
+						(await ctx.db.get(game.playerId))?.name) ||
+					"",
+			})),
+		);
+	},
+});
+
+export const createNewGame = mutation({
 	handler: async (ctx) => {
 		// Create a new player
 		const playerId = await ctx.db.insert("players", {
@@ -77,20 +99,40 @@ export const joinGame = mutation({
 			monsters: [],
 		});
 
-		// Check if there is a game waiting for a player
-		const lastGame = await ctx.db.query("games").order("desc").first();
-		let gameId;
-		if (lastGame && !lastGame.opponentId) {
-			// Join the last game
-			gameId = lastGame._id;
-			await ctx.db.patch(gameId, { opponentId: playerId });
-		} else {
-			// Create a new game
-			gameId = await ctx.db.insert("games", { playerId, rounds: [] });
-		}
+		// Create a new game
+		const gameId = await ctx.db.insert("games", { playerId, rounds: [] });
 
 		// Attach the game to the player and return the player
 		await ctx.db.patch(playerId, { gameId });
+		return await ctx.db.get(playerId);
+	},
+});
+
+export const joinGame = mutation({
+	args: {
+		gameId: v.id("games"),
+	},
+	handler: async (ctx, { gameId }) => {
+		// Check if the game is still available
+		const game = await ctx.db.get(gameId);
+		if (!game) {
+			return null;
+		}
+		if (game.opponentId) {
+			return null;
+		}
+		// Create a new player
+		const playerId = await ctx.db.insert("players", {
+			gameId,
+			name: pickName(),
+			mana: initialMana,
+			defense: initialDefenseItems,
+			mushrooms: [],
+			monsters: [],
+		});
+		// Join the game
+		await ctx.db.patch(gameId, { opponentId: playerId });
+
 		return await ctx.db.get(playerId);
 	},
 });
