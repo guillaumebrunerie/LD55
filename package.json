@@ -7,7 +7,7 @@
 		"generateAssets": "./tools/generate-assets.sh > ./src/assets.ts",
 		"dev": "vite --host",
 		"build": "vite build",
-		"deploy": "cd dist; sed -i 's#/assets#assets#' index.html; zip -r WizzyWizzy.zip *; mv WizzyWizzy.zip ..",
+		"pack": "cd dist; sed -i 's#/assets#assets#' index.html; zip -r WizzyWizzy.zip *; mv WizzyWizzy.zip ..",
 		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
 		"typecheck": "tsc",
 		"preview": "vite preview --host"

@@ -8,7 +8,6 @@ import {
 	Texture,
 } from "pixi.js";
 import { Container, Sprite } from "@pixi/react";
-import { useButton } from "./useButton";
 import { newApp, startApp, startNewGame, type AppT } from "./appLogic";
 import { observable, action } from "mobx";
 import { sound } from "@pixi/sound";
