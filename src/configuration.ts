@@ -1,7 +1,7 @@
 import { Polygon } from "pixi.js";
 
 export const fightDuration = 0.15;
-export const attackApproachDuration = 0.3;
+export const attackApproachDuration = 0.25;
 
 export type Bounds = {
 	left: number;

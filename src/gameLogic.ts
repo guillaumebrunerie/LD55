@@ -403,10 +403,10 @@ export const startGame = (game: GameT) => {
 
 	let t = 1;
 	for (let i = 0; i < initialMana; i++) {
-		t += 0.2;
+		t += 0.1;
 		void ManaCreated.play({ start: t });
-		schedule(spawnInitialManaPoint, game.player, i == 0 ? 1.2 : 0.2);
-		schedule(spawnManaPoint, game.opponent, i == 0 ? 1.2 : 0.2);
+		schedule(spawnInitialManaPoint, game.player, i == 0 ? 1.1 : 0.1);
+		schedule(spawnManaPoint, game.opponent, i == 0 ? 1.1 : 0.1);
 	}
 
 	for (let i = 0; i < initialDefense; i++) {
@@ -607,7 +607,7 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 };
 
 const toAttackDuration = 0.5;
-const rebuildDuration = 0.2;
+const rebuildDuration = 0.1;
 
 export const tickGame = makeTick<GameState, GameT>(
 	(game: GameT, delta: number) => {

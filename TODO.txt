@@ -1,7 +1,3 @@
-- No runes/shield on start
-- Check if dying animation is implemented properly
-- Make mana appear faster when there are many mushroons
-- Make fight faster when there are many monsters
 - Animate lobby appearing/disappearing
 - When player joins, start all animations
 - "On" state for buttons
@@ -13,3 +9,4 @@
 - Hamburger menu
 - Handle reloading the page
 - Handle restarting
+- Make initial mana points appear at the same time as mushrooms
