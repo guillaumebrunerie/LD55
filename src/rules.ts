@@ -1,5 +1,9 @@
 import type { Point } from "./gameLogic";
 
+export const initialMana = 5;
+export const initialDefense = 8;
+export const maxDefense = 16;
+
 type Monster = {
 	hp: number;
 	strength: number;

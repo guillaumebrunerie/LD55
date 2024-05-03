@@ -19,8 +19,6 @@ import {
 import {
 	attackBounds,
 	shieldImpactBounds,
-	initialDefenseItems,
-	initialMana,
 	manaBounds,
 	manaPointsBounds,
 	fightDuration,
@@ -60,7 +58,7 @@ import type { Id } from "../convex/_generated/dataModel";
 import { pickPosition } from "./utils";
 import type { api } from "../convex/_generated/api";
 import type { ReactMutation } from "convex/react";
-import { pickFighter } from "./rules";
+import { initialDefense, initialMana, pickFighter } from "./rules";
 
 export type Point = {
 	x: number;
@@ -85,6 +83,7 @@ export type Shield = Entity<ShieldState> & {
 };
 
 type RuneState =
+	| "appearing"
 	| "visible"
 	| "disappearing"
 	| "hidden"
@@ -269,7 +268,7 @@ const newPlayer = (): Player => {
 		items: {
 			mushrooms: [],
 			shield: {
-				...newEntity<ShieldState>("visible"),
+				...newEntity<ShieldState>("hidden"),
 				position: pickPosition([], playerBounds, 0),
 			},
 			runes: [],
@@ -286,9 +285,6 @@ const newPlayer = (): Player => {
 			defense: 0,
 		},
 	};
-	for (let i = 0; i < initialDefenseItems - 1; i++) {
-		addRune(player.items.runes);
-	}
 	return player;
 };
 
@@ -412,6 +408,29 @@ export const startGame = (game: GameT) => {
 		schedule(spawnInitialManaPoint, game.player, i == 0 ? 1.2 : 0.2);
 		schedule(spawnManaPoint, game.opponent, i == 0 ? 1.2 : 0.2);
 	}
+
+	for (let i = 0; i < initialDefense; i++) {
+		if (i == 0) {
+			idleState(game.player.items.shield, "visible");
+			idleState(game.opponent.items.shield, "visible");
+		} else {
+			appearRune(game.player);
+			appearRune(game.opponent);
+		}
+	}
+};
+
+const appearRune = (player: Player) => {
+	const position = { x: 230, y: 644 };
+	const rune: Rune = {
+		...newEntity("hidden"),
+		position,
+		hidden: false,
+	};
+	changeState(rune, "appearing", spawnDuration, (rune) => {
+		idleState(rune, "visible");
+	});
+	player.items.runes.push(rune);
 };
 
 const restartGame = (game: GameT) => {
@@ -1000,8 +1019,6 @@ const nextRound = (game: GameT) => {
 };
 
 ////// Buying
-
-// const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const getMushroomStrength = () => {
 	return { strength: Math.random() < 0.6 ? 2 : 1 };

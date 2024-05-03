@@ -1,13 +1,5 @@
 import { Polygon } from "pixi.js";
 
-export const initialMana = 5;
-export const initialManaItems = [];
-export const initialDefenseItems = 8;
-export const initialAttackItems = Array(0)
-	.fill(null)
-	.map(() => [2, 3, 4][Math.floor(Math.random() * 3)]);
-export const maxDefense = 16;
-
 export const fightDuration = 0.15;
 export const attackApproachDuration = 0.3;
 

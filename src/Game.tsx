@@ -453,18 +453,21 @@ const Runes = ({ runes: items }: { runes: Rune[] }) => {
 };
 
 const RuneC = ({ item, i }: { item: Rune; i: number }) => {
-	const visible = (
+	const appearing = (
 		<Sprite
 			texture={RunesSheet.animations.Rune[i + 1]}
 			anchor={0}
 			rotation={0}
 			scale={1}
-			alpha={1}
+			alpha={Math.min(item.nt * 2, 1)}
 			position={[-14, 613]}
 		/>
 	);
 
 	switch (item.state) {
+		case "appearing":
+			return appearing;
+
 		case "disappearing":
 			return (
 				<Sprite
@@ -478,7 +481,17 @@ const RuneC = ({ item, i }: { item: Rune; i: number }) => {
 			);
 
 		case "visible":
-			return visible;
+			return (
+				<Sprite
+					texture={RunesSheet.animations.Rune[i + 1]}
+					anchor={0}
+					rotation={0}
+					scale={1}
+					alpha={1}
+					position={[-14, 613]}
+				/>
+			);
+
 		case "preSpawning": {
 			if (item.hidden) {
 				return null;
@@ -502,13 +515,14 @@ const RuneC = ({ item, i }: { item: Rune; i: number }) => {
 				/>
 			);
 		}
+
 		case "spawning":
 			if (item.hidden) {
-				return visible;
+				return appearing;
 			}
 			return (
 				<>
-					{visible}
+					{appearing}
 					<Sprite
 						anchor={0.5}
 						scale={0.5}
