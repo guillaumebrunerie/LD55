@@ -15,8 +15,11 @@ import {
 	Bg,
 	BgFront,
 	BtnAttack,
+	BtnAttackOn,
 	BtnDefense,
+	BtnDefenseOn,
 	BtnMana,
+	BtnManaOn,
 	ClickAttack,
 	ClickDefense,
 	ClickMana,
@@ -36,7 +39,7 @@ import {
 import { buyMonster, buyDefense, buyMushroom, type GameT } from "./gameLogic";
 import { Game } from "./Game";
 import { wave } from "./ease";
-import type { ButtonT } from "./button";
+import { appearButton, disappearButton, type ButtonT } from "./button";
 import { GlobalTimeContext } from "./globalTimeContext";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
@@ -68,7 +71,7 @@ const Lobby = ({ app, onClick }: { app: AppT; onClick: () => void }) => {
 	// }
 	// console.log({ availableGames });
 	return (
-		<>
+		<Container position={{ x: 0, y: -(1 - app.game.lobby.alpha) * 1000 }}>
 			<Sprite
 				texture={TextBox}
 				position={[1920 / 2, 1080 / 2]}
@@ -128,7 +131,7 @@ const Lobby = ({ app, onClick }: { app: AppT; onClick: () => void }) => {
 					/>
 				</Fragment>
 			))}
-		</>
+		</Container>
 	);
 };
 
@@ -141,7 +144,7 @@ const StartButton = ({
 	button: ButtonT;
 	position: [number, number];
 }) => {
-	const [inLobby, setInLobby] = useState(false);
+	const inLobby = app.game.lobby.alpha > 0.01;
 
 	if (button.alpha < 0.01) {
 		return null;
@@ -158,7 +161,7 @@ const StartButton = ({
 					alpha={hitBoxAlpha}
 					cursor="pointer"
 					eventMode="static"
-					pointerdown={() => setInLobby(false)}
+					pointerdown={action(() => disappearButton(app.game.lobby))}
 				/>
 			)}
 			<Sprite
@@ -177,7 +180,7 @@ const StartButton = ({
 				cursor="pointer"
 				eventMode="static"
 				pointerdown={action(() => {
-					setInLobby(false);
+					disappearButton(app.game.lobby);
 					void startNewGame(app, true, () => {
 						throw new Error("Should not be called");
 					});
@@ -198,9 +201,14 @@ const StartButton = ({
 				}
 				cursor="pointer"
 				eventMode="static"
-				pointerdown={() => setInLobby(true)}
+				pointerdown={action(() => appearButton(app.game.lobby))}
 			/>
-			{inLobby && <Lobby app={app} onClick={() => setInLobby(false)} />}
+			{inLobby && (
+				<Lobby
+					app={app}
+					onClick={action(() => disappearButton(app.game.lobby))}
+				/>
+			)}
 		</>
 	);
 };
@@ -240,29 +248,40 @@ const SoundButton = () => {
 const UIButton = ({
 	button,
 	onClick,
-	texture,
+	textureOff,
+	textureOn,
 	x,
 }: {
 	button: ButtonT;
 	onClick: () => void;
-	texture: Texture;
+	textureOff: Texture;
+	textureOn: Texture;
 	x: number;
 }) => {
 	const enabled = button.alpha > 0.95 && button.fade < 0.05;
+	const [isPressed, setIsPressed] = useState(false);
 
 	return (
 		<Container x={x} y={1080 - 120}>
 			<Sprite
-				texture={texture}
+				texture={isPressed ? textureOn : textureOff}
 				anchor={0.5}
 				cursor={enabled ? "pointer" : "auto"}
 				eventMode="static"
 				tint={0xffffff}
-				pointerdown={enabled ? onClick : () => {}}
+				pointerup={() => {
+					setIsPressed(false);
+				}}
+				pointerdown={() => {
+					if (enabled) {
+						onClick();
+						setIsPressed(true);
+					}
+				}}
 				alpha={button.alpha < button.fade ? 0 : 1}
 			/>
 			<Sprite
-				texture={texture}
+				texture={isPressed ? textureOn : textureOff}
 				anchor={0.5}
 				tint={0x333333}
 				alpha={button.fade * button.alpha}
@@ -279,7 +298,8 @@ const UIButtons = ({ game }: { game: GameT }) => {
 		<>
 			<UIButton
 				button={game.defenseButton}
-				texture={BtnDefense}
+				textureOn={BtnDefenseOn}
+				textureOff={BtnDefense}
 				x={600}
 				onClick={action(() => {
 					void ClickDefense.play();
@@ -288,7 +308,8 @@ const UIButtons = ({ game }: { game: GameT }) => {
 			/>
 			<UIButton
 				button={game.manaButton}
-				texture={BtnMana}
+				textureOn={BtnManaOn}
+				textureOff={BtnMana}
 				x={960}
 				onClick={action(() => {
 					void ClickMana.play();
@@ -297,7 +318,8 @@ const UIButtons = ({ game }: { game: GameT }) => {
 			/>
 			<UIButton
 				button={game.attackButton}
-				texture={BtnAttack}
+				textureOn={BtnAttackOn}
+				textureOff={BtnAttack}
 				x={1320}
 				onClick={action(() => {
 					void ClickAttack.play();

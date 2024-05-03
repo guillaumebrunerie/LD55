@@ -367,6 +367,7 @@ export type GameT = Entity<GameState> & {
 	opponent: Player;
 	curtain: Curtain;
 	startButton: ButtonT;
+	lobby: ButtonT;
 	manaButton: ButtonT;
 	attackButton: ButtonT;
 	defenseButton: ButtonT;
@@ -379,6 +380,7 @@ export const newGame = (state: "intro" | "restart", buttons = true): GameT => ({
 	opponent: newPlayer(),
 	curtain: newCurtain(),
 	startButton: newButton(true),
+	lobby: newButton(false),
 	manaButton: newButton(buttons),
 	attackButton: newButton(buttons),
 	defenseButton: newButton(buttons),
@@ -615,6 +617,7 @@ export const tickGame = makeTick<GameState, GameT>(
 		tickPlayer(game.opponent, delta);
 		tickCurtain(game.curtain, delta);
 		tickButton(game.startButton, delta);
+		tickButton(game.lobby, delta);
 		updateButtons(game);
 		tickButton(game.manaButton, delta);
 		tickButton(game.attackButton, delta);
