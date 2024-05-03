@@ -1,13 +1,15 @@
-Features
-- lobby
-- various flows and loading states
-
-Bugs
-- buttons should be disabled until all mana is visible
-- monsters sliding on the shield
-- handle reloading game
-
-Tweaks
-- play sound for first 5 mana points
-- implements remaining sound triggers
-- tweak volumes and delays
+- No runes/shield on start
+- Check if dying animation is implemented properly
+- Make mana appear faster when there are many mushroons
+- Make fight faster when there are many monsters
+- Animate lobby appearing/disappearing
+- When player joins, start all animations
+- "On" state for buttons
+- Implement shield disappear/appear animations
+- When creating new game, show posting + don’t show any wizard/runes
+- Lobby: Join selects a player, Play starts the game
+- Sound triggers (also check sound for first 5 mana points?)
+- Use same rules for both AI and against a player
+- Hamburger menu
+- Handle reloading the page
+- Handle restarting
