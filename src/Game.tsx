@@ -156,7 +156,6 @@ const Wizard = ({
 					texture={getNtFrame(WizardDie, wizard.nt)}
 					x={-80}
 					y={170}
-					alpha={1 - wizard.nt}
 					filters={player == game.opponent ? [filter] : []}
 				/>
 			);

@@ -1,6 +1,7 @@
-(- Handle reloading the page, not sure what to do? Should we keep the current game?)
+- Add a confirmation when leaving the page
 - Handle restarting a new game, no animations currently
 - Make initial mana points appear at the same time as mushrooms (?)
+- Handle players disconnecting
 
 Need animations:
 - Implement shield disappear/appear animations
