@@ -1,4 +1,4 @@
-/** Generated on Mon Apr 29 00:15:44 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sat May  4 01:08:38 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck

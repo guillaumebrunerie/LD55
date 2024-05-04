@@ -1,14 +1,10 @@
-- When creating new game, don’t show any wizard/runes
-- When player joins, start all animations
-- Sound triggers (also check sound for first 5 mana points?)
-- Use same rules for both AI and against a player
-- Make initial mana points appear at the same time as mushrooms
-- Bug with MagicLoop that does not stop
-- Handle reloading the page
+- Handle reloading the page, not sure what to do? Should we keep the current game?
 - Handle restarting a new game, no animations currently
+- Make initial mana points appear at the same time as mushrooms (?)
 
 Need animations:
 - Implement shield disappear/appear animations
-- When creating new game, show posting
+- When creating new game, show posting and no wizard/runes, start all animations
+  when other player joins
 - Lobby: Join selects a player, Play starts the game
 - Hamburger menu

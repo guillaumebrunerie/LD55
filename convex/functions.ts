@@ -1,15 +1,17 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { pickPosition } from "../src/utils";
 import { pickName } from "./names";
+import type { DataModel, Doc, Id } from "./_generated/dataModel";
 import {
-	attackBounds,
-	initialDefenseItems,
+	pickFighter,
+	initialDefense,
 	initialMana,
 	maxDefense,
-} from "../src/configuration";
-import type { DataModel, Doc, Id } from "./_generated/dataModel";
-import { pickFighter } from "../src/rules";
+	pickMushroomData,
+	pickDefenseData,
+	type PlayerData,
+	pickMonsterData,
+} from "../src/rules";
 import type { GenericMutationCtx, GenericQueryCtx } from "convex/server";
 
 export const lastFight = query({
@@ -88,16 +90,22 @@ export const availableGames = query({
 	},
 });
 
+const newPlayer = (gameId?: Id<"games">) => ({
+	gameId,
+	name: pickName(),
+	mana: initialMana,
+	defense: initialDefense,
+	mushrooms: [],
+	monsters: [],
+	boughtThisRound: {
+		defense: 0,
+	},
+});
+
 export const createNewGame = mutation({
 	handler: async (ctx) => {
 		// Create a new player
-		const playerId = await ctx.db.insert("players", {
-			name: pickName(),
-			mana: initialMana,
-			defense: initialDefenseItems,
-			mushrooms: [],
-			monsters: [],
-		});
+		const playerId = await ctx.db.insert("players", newPlayer());
 
 		// Create a new game
 		const gameId = await ctx.db.insert("games", { playerId, rounds: [] });
@@ -122,19 +130,19 @@ export const joinGame = mutation({
 			return null;
 		}
 		// Create a new player
-		const playerId = await ctx.db.insert("players", {
-			gameId,
-			name: pickName(),
-			mana: initialMana,
-			defense: initialDefenseItems,
-			mushrooms: [],
-			monsters: [],
-		});
+		const playerId = await ctx.db.insert("players", newPlayer(gameId));
 		// Join the game
 		await ctx.db.patch(gameId, { opponentId: playerId });
 
 		return await ctx.db.get(playerId);
 	},
+});
+
+const getPlayerData = (player: Doc<"players">): PlayerData => ({
+	monsters: player.monsters,
+	mushrooms: player.mushrooms,
+	defense: player.defense,
+	boughtThisRound: player.boughtThisRound,
 });
 
 export const buyMushroom = mutation({
@@ -144,7 +152,7 @@ export const buyMushroom = mutation({
 		if (player.mana == 0) {
 			return null;
 		}
-		const strength = Math.random() < 0.6 ? 2 : 1;
+		const { strength } = pickMushroomData();
 		await ctx.db.patch(playerId, {
 			mana: player.mana - 1,
 			mushrooms: [...player.mushrooms, { strength }],
@@ -158,26 +166,18 @@ export const buyDefense = mutation({
 	args: { playerId: v.id("players") },
 	handler: async (ctx, { playerId }) => {
 		const player = await getPlayer(ctx, playerId);
-		if (player.mana == 0 || player.defense == maxDefense) {
+		const data = pickDefenseData(getPlayerData(player));
+		if (!data) {
 			return null;
 		}
-
-		let strength = 1;
-		if (player.monsters.length == 0 || player.mushrooms.length == 0) {
-			if (player.defense + strength < maxDefense && Math.random() < 0.5) {
-				strength++;
-				if (
-					player.defense + strength < maxDefense &&
-					Math.random() < 0.5
-				) {
-					strength++;
-				}
-			}
-		}
+		const { strength } = data;
 
 		await ctx.db.patch(playerId, {
 			mana: player.mana - 1,
 			defense: player.defense + strength,
+			boughtThisRound: {
+				defense: player.boughtThisRound.defense + 1,
+			},
 		});
 		await maybeFight(ctx, player);
 		return { strength };
@@ -192,16 +192,7 @@ export const buyMonster = mutation({
 			return null;
 		}
 
-		let strength;
-		if (Math.random() < 0.5) {
-			strength = 1;
-		} else if (Math.random() < 0.4999) {
-			strength = 2;
-		} else {
-			strength = 3;
-		}
-
-		const position = pickPosition(player.monsters, attackBounds, 150);
+		const { position, strength } = pickMonsterData(getPlayerData(player));
 
 		await ctx.db.patch(playerId, {
 			mana: player.mana - 1,
@@ -274,6 +265,9 @@ const clonePlayer = (player: Doc<"players">) => ({
 	defense: player.defense,
 	mushrooms: player.mushrooms.map((mushroom) => ({ ...mushroom })),
 	monsters: player.monsters.map((monster) => ({ ...monster })),
+	boughtThisRound: {
+		defense: player.boughtThisRound.defense,
+	},
 });
 
 export const maybeFight = async (
@@ -374,4 +368,5 @@ const resetState = (player: Doc<"players">) => {
 		player.mana += mushroom.strength;
 	}
 	player.mushrooms = [];
+	player.boughtThisRound.defense = 0;
 };

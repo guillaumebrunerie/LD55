@@ -20,9 +20,7 @@ import {
 	BtnDefenseOn,
 	BtnMana,
 	BtnManaOn,
-	ClickAttack,
-	ClickDefense,
-	ClickMana,
+	ClickStart,
 	Cloud1,
 	Cloud2,
 	Cloud3,
@@ -35,6 +33,7 @@ import {
 	StartVsComputerDefault,
 	StartVsHumanOffDefault,
 	TextBox,
+	TextBoxAppear,
 } from "./assets";
 import { buyMonster, buyDefense, buyMushroom, type GameT } from "./gameLogic";
 import { Game } from "./Game";
@@ -95,6 +94,7 @@ const Lobby = ({ app, onClick }: { app: AppT; onClick: () => void }) => {
 				cursor="pointer"
 				eventMode="static"
 				pointerdown={action(() => {
+					void ClickStart.play();
 					onClick();
 					void startNewGame(app, false, createNewGameMutation);
 				})}
@@ -123,6 +123,7 @@ const Lobby = ({ app, onClick }: { app: AppT; onClick: () => void }) => {
 						cursor="pointer"
 						eventMode="static"
 						pointerdown={action(() => {
+							void ClickStart.play();
 							onClick();
 							void startNewGame(app, false, async () =>
 								joinGameMutation({ gameId }),
@@ -161,7 +162,11 @@ const StartButton = ({
 					alpha={hitBoxAlpha}
 					cursor="pointer"
 					eventMode="static"
-					pointerdown={action(() => disappearButton(app.game.lobby))}
+					pointerdown={action(() => {
+						disappearButton(app.game.lobby);
+						void ClickStart.play();
+						void TextBoxAppear.play();
+					})}
 				/>
 			)}
 			<Sprite
@@ -181,6 +186,7 @@ const StartButton = ({
 				eventMode="static"
 				pointerdown={action(() => {
 					disappearButton(app.game.lobby);
+					void ClickStart.play();
 					void startNewGame(app, true, () => {
 						throw new Error("Should not be called");
 					});
@@ -201,7 +207,11 @@ const StartButton = ({
 				}
 				cursor="pointer"
 				eventMode="static"
-				pointerdown={action(() => appearButton(app.game.lobby))}
+				pointerdown={action(() => {
+					void ClickStart.play();
+					void TextBoxAppear.play();
+					appearButton(app.game.lobby);
+				})}
 			/>
 			{inLobby && (
 				<Lobby
@@ -302,7 +312,7 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				textureOff={BtnDefense}
 				x={600}
 				onClick={action(() => {
-					void ClickDefense.play();
+					void ClickStart.play();
 					void buyDefense(game, game.player, buyDefenseMutation);
 				})}
 			/>
@@ -312,7 +322,7 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				textureOff={BtnMana}
 				x={960}
 				onClick={action(() => {
-					void ClickMana.play();
+					void ClickStart.play();
 					void buyMushroom(game, game.player, buyMushroomMutation);
 				})}
 			/>
@@ -322,7 +332,7 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				textureOff={BtnAttack}
 				x={1320}
 				onClick={action(() => {
-					void ClickAttack.play();
+					void ClickStart.play();
 					void buyMonster(game, game.player, buyMonsterMutation);
 				})}
 			/>

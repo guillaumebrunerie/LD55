@@ -6,19 +6,22 @@ const player = {
 	defense: v.number(),
 	mushrooms: v.array(
 		v.object({
-			strength: v.number(),
+			strength: v.union(v.literal(1), v.literal(2)),
 		}),
 	),
 	monsters: v.array(
 		v.object({
 			hp: v.number(),
-			strength: v.number(),
+			strength: v.union(v.literal(1), v.literal(2), v.literal(3)),
 			position: v.object({
 				x: v.number(),
 				y: v.number(),
 			}),
 		}),
 	),
+	boughtThisRound: v.object({
+		defense: v.number(),
+	}),
 };
 
 export default defineSchema({

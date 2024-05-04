@@ -7,7 +7,7 @@ import {
 	type Entity,
 	changeState,
 } from "./entities";
-import type { GameT, Player } from "./gameLogic";
+import type { Player } from "./gameLogic";
 
 type WizardState =
 	| "hidden"
@@ -53,13 +53,14 @@ export const winWizard = (wizard: WizardT) => {
 	idleState(wizard, "winning");
 };
 
-export const actWizardWhenBuying = (game: GameT, player: Player) => {
-	if (player == game.opponent) {
-		return;
-	}
+export const startWizardMagic = (player: Player) => {
 	if (player.wizard.state == "idle") {
 		magicStartWizard(player.wizard);
-	} else if (player.manaPoints.length == 1) {
+	}
+};
+
+export const endWizardMagic = (player: Player) => {
+	if (player.manaPoints.length == 0) {
 		magicEndWizard(player.wizard);
 	}
 };
