@@ -1,4 +1,4 @@
-- Handle reloading the page, not sure what to do? Should we keep the current game?
+(- Handle reloading the page, not sure what to do? Should we keep the current game?)
 - Handle restarting a new game, no animations currently
 - Make initial mana points appear at the same time as mushrooms (?)
 

@@ -132,12 +132,6 @@ export type Monster = Entity<MonsterState> & {
 	previousItem?: Mana;
 };
 
-export type Buys = {
-	mana: number;
-	attack: number;
-	defense: number;
-};
-
 type PlayerState = "idle" | "fight";
 export type Player = Entity<PlayerState> & {
 	wizard: WizardT;
@@ -148,8 +142,8 @@ export type Player = Entity<PlayerState> & {
 		runes: Rune[];
 		monsters: Monster[];
 	};
-	boughtThisRound: Buys;
-	boughtPreviousRound: Buys;
+	previousStartData: PlayerData;
+	previousEndData: PlayerData;
 };
 
 const tickPlayer = makeTick<"idle" | "fight", Player>((player, delta) => {
@@ -292,14 +286,16 @@ const newPlayer = (): Player => {
 			runes: [],
 			monsters: [],
 		},
-		boughtThisRound: {
+		previousStartData: {
 			mana: 0,
-			attack: 0,
+			monsters: [],
+			mushrooms: [],
 			defense: 0,
 		},
-		boughtPreviousRound: {
+		previousEndData: {
 			mana: 0,
-			attack: 0,
+			monsters: [],
+			mushrooms: [],
 			defense: 0,
 		},
 	};
@@ -550,14 +546,14 @@ export const setupFight = (game: GameT, lastFight: LastFight) => {
 const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 	while (opponent.manaPoints.some((p) => p.state == "visible")) {
 		const type = strategy(
-			game.opponent.boughtPreviousRound,
-			game.player.boughtPreviousRound,
-			game.opponent.items,
+			getPlayerData(game.opponent),
+			game.player.previousStartData,
+			game.player.previousEndData,
 		);
 
 		switch (type) {
 			case "mana": {
-				const { strength } = pickMushroomData();
+				const { strength } = pickMushroomData(getPlayerData(opponent));
 				const mushroom: Mushroom = {
 					...newEntity("visible"),
 					position: pickPosition(
@@ -616,6 +612,10 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 			(item) => item != manaPoint,
 		);
 	}
+
+	// Save the end data before the fight starts
+	game.player.previousEndData = getPlayerData(game.player);
+	game.opponent.previousEndData = getPlayerData(game.opponent);
 };
 
 const toAttackDuration = 0.5;
@@ -1017,18 +1017,8 @@ const hasManaToSpawn = (player: Player) => {
 
 const nextRound = (game: GameT) => {
 	addManaPoints(game.opponent);
-	game.player.boughtPreviousRound = game.player.boughtThisRound;
-	game.opponent.boughtPreviousRound = game.opponent.boughtThisRound;
-	game.player.boughtThisRound = {
-		mana: 0,
-		attack: 0,
-		defense: 0,
-	};
-	game.opponent.boughtThisRound = {
-		mana: 0,
-		attack: 0,
-		defense: 0,
-	};
+	game.player.previousStartData = getPlayerData(game.player);
+	game.opponent.previousStartData = getPlayerData(game.opponent);
 };
 
 ////// Buying
@@ -1084,14 +1074,13 @@ export const buyMushroom = async (
 	buyMushroomMutation: ReactMutation<typeof api.functions.buyMushroom>,
 ) => {
 	const manaPoint = lockManaPoint(player);
-	player.boughtThisRound.mana++;
 	const playerId = game.playerId;
 	const result =
 		playerId ?
 			await buyMushroomMutation({
 				playerId,
 			})
-		:	pickMushroomData();
+		:	pickMushroomData(getPlayerData(player));
 	if (!result) {
 		return;
 	}
@@ -1113,6 +1102,7 @@ export const buyMushroom = async (
 
 const getPlayerData = (player: Player): PlayerData => {
 	return {
+		mana: player.manaPoints.length,
 		monsters: player.items.monsters.map((monster) => ({
 			strength: monster.strength,
 			hp: monster.hp,
@@ -1124,7 +1114,6 @@ const getPlayerData = (player: Player): PlayerData => {
 		defense:
 			player.items.runes.length +
 			(player.items.shield.state == "visible" ? 1 : 0),
-		boughtThisRound: player.boughtThisRound,
 	};
 };
 
@@ -1134,7 +1123,6 @@ export const buyMonster = async (
 	buyMonsterMutation: ReactMutation<typeof api.functions.buyMonster>,
 ) => {
 	const manaPoint = lockManaPoint(player);
-	player.boughtThisRound.attack++;
 	const playerId = game.playerId;
 	const result =
 		playerId ?
@@ -1160,7 +1148,6 @@ export const buyDefense = async (
 		console.error("No mana point");
 		return;
 	}
-	player.boughtThisRound.defense++;
 	const playerId = game.playerId;
 	const result =
 		playerId ?

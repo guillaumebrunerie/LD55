@@ -1,12 +1,21 @@
-import { type Buys, type Monster, type Mushroom, type Rune } from "./gameLogic";
-
 export type Strategy = { strategy: string } & ((
-	buys: Buys,
-	opponentBuys: Buys,
-	items: {
-		mushrooms: Mushroom[];
-		monsters: Monster[];
-		runes: Rune[];
+	player: {
+		// Current state of the player
+		mana: number;
+		monsters: { strength: 1 | 2 | 3 }[];
+		mushrooms: { strength: 1 | 2 }[];
+		defense: number;
+	},
+	opponent: {
+		// State of the opponent at the beginning of this round
+		mana: number;
+		defense: number;
+	},
+	opponentLastRound: {
+		// State of the opponent at the end of the last round
+		monsters: { strength: 1 | 2 | 3 }[];
+		mushrooms: { strength: 1 | 2 }[];
+		defense: number;
 	},
 ) => "mana" | "attack" | "defense");
 
@@ -32,7 +41,7 @@ export const manaStrategy: Strategy = () => {
 };
 manaStrategy.strategy = "Mana   ";
 
-const defenseStrategy: Strategy = () => {
+export const defenseStrategy: Strategy = () => {
 	if (Math.random() < 0.8) {
 		return "defense";
 	} else if (Math.random() < 0.5) {
@@ -43,7 +52,7 @@ const defenseStrategy: Strategy = () => {
 };
 defenseStrategy.strategy = "Defense";
 
-const randomStrategy: Strategy = () => {
+export const randomStrategy: Strategy = () => {
 	if (Math.random() < 1 / 3) {
 		return "defense";
 	} else if (Math.random() < 0.5) {
@@ -54,43 +63,63 @@ const randomStrategy: Strategy = () => {
 };
 randomStrategy.strategy = "Random ";
 
-export const smartStrategy: Strategy = (buys, opponentBuys, items) => {
-	if (
-		opponentBuys.attack >= opponentBuys.mana + 1 &&
-		opponentBuys.attack >= opponentBuys.defense + 1
-	) {
-		return defenseStrategy(buys, opponentBuys, items);
+export const smartStrategy: Strategy = (
+	player,
+	opponent,
+	opponentLastRound,
+) => {
+	const opponentStrength = opponent.defense;
+	const strength =
+		player.defense +
+		player.monsters.reduce((acc, m) => acc + m.strength, 0);
+	if (opponentStrength > strength) {
+		if (player.defense == 16) {
+			return attackStrategy(player, opponent, opponentLastRound);
+		}
+		return defenseStrategy(player, opponent, opponentLastRound);
 	}
-	if (
-		opponentBuys.mana >= opponentBuys.attack + 1 &&
-		opponentBuys.mana >= opponentBuys.defense + 1
-	) {
-		return attackStrategy(buys, opponentBuys, items);
+
+	const attack = opponentLastRound.monsters.length;
+	const mushrooms = opponentLastRound.mushrooms.length;
+	const defense = opponentLastRound.defense - attack - mushrooms - 6;
+
+	if (attack >= mushrooms + 1 && attack >= defense + 1) {
+		return defenseStrategy(player, opponent, opponentLastRound);
 	}
-	return manaStrategy(buys, opponentBuys, items);
+	if (mushrooms >= attack + 1 && mushrooms >= defense + 1) {
+		return attackStrategy(player, opponent, opponentLastRound);
+	}
+	return manaStrategy(player, opponent, opponentLastRound);
 };
 smartStrategy.strategy = "Smart  ";
 
-const smart2Strategy: Strategy = (buys, opponentBuys, items) => {
-	if (items.runes.length < 4) {
-		return defenseStrategy(buys, opponentBuys, items);
-	} else {
-		return smartStrategy(buys, opponentBuys, items);
-	}
-};
-smart2Strategy.strategy = "Smart2 ";
+// export const smart2Strategy: Strategy = (
+// 	player,
+// 	opponent,
+// 	opponentLastRound,
+// ) => {
+// 	if (player.defense < 4) {
+// 		return defenseStrategy(playerStart, player, opponent, opponentLastRound);
+// 	} else {
+// 		return smartStrategy(playerStart, player, opponent, opponentLastRound);
+// 	}
+// };
+// smart2Strategy.strategy = "Smart2 ";
 
-const naturalStrategy: Strategy = (buys, opponentBuys, items) => {
-	// console.log(JSON.stringify(buys));
-	if (buys.attack >= buys.mana + 1 && buys.attack >= buys.defense + 1) {
-		return attackStrategy(buys, opponentBuys, items);
-	}
-	if (buys.mana >= buys.attack + 1 && buys.mana >= buys.defense + 1) {
-		return manaStrategy(buys, opponentBuys, items);
-	}
-	if (buys.defense >= buys.attack + 1 && buys.defense >= buys.mana + 1) {
-		return defenseStrategy(buys, opponentBuys, items);
-	}
-	return randomStrategy(buys, opponentBuys, items);
-};
-naturalStrategy.strategy = "Natural";
+// const naturalStrategy: Strategy = (player, opponent, opponentLastRound) => {
+// 	const attack = player.monsters.length;
+// 	const mushrooms = player.mushrooms.length;
+// 	const defense = player.defense - attack - mushrooms;
+
+// 	if (attack >= mushrooms + 1 && attack >= defense + 1) {
+// 		return attackStrategy(player, opponent, opponentLastRound);
+// 	}
+// 	if (mushrooms >= attack + 1 && mushrooms >= defense + 1) {
+// 		return manaStrategy(player, opponent, opponentLastRound);
+// 	}
+// 	if (defense >= attack + 1 && defense >= mushrooms + 1) {
+// 		return defenseStrategy(player, opponent, opponentLastRound);
+// 	}
+// 	return randomStrategy(player, opponent, opponentLastRound);
+// };
+// naturalStrategy.strategy = "Natural";

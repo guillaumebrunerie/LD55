@@ -19,9 +19,6 @@ const player = {
 			}),
 		}),
 	),
-	boughtThisRound: v.object({
-		defense: v.number(),
-	}),
 };
 
 export default defineSchema({
