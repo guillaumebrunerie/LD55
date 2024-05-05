@@ -4,6 +4,9 @@
 - Handle players disconnecting
 - Show current mana points of opponent when playing online
 - Buying back the shield does not show the mana point going there
+- WizardIdle not in global time?
+- Wizard waiting animations
+- New sounds
 
 Need animations:
 - When creating new game, show posting and no wizard/runes, start all animations
