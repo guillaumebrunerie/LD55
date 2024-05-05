@@ -1,4 +1,4 @@
-/** Generated on Sat May  4 01:08:38 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sun May  5 20:31:42 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -17,6 +17,8 @@ import Cloud2_ from "../gfx/Cloud2.png?texture";
 import Cloud3_ from "../gfx/Cloud3.png?texture";
 import ConnectionOff_ from "../gfx/ConnectionOff.png?texture";
 import ConnectionOn_ from "../gfx/ConnectionOn.png?texture";
+import ExitOff_ from "../gfx/ExitOff.png?texture";
+import ExitOn_ from "../gfx/ExitOn.png?texture";
 import InactiveSide_ from "../gfx/InactiveSide.png?texture";
 import InactiveSideWhite_ from "../gfx/InactiveSideWhite.png?texture";
 import LinkGenerated_ from "../gfx/LinkGenerated.png?texture";
@@ -26,6 +28,7 @@ import Mana2_ from "../gfx/Mana2.png?texture";
 import ManaPoint_ from "../gfx/ManaPoint.png?texture";
 import ManaPointBlurred_ from "../gfx/ManaPointBlurred.png?texture";
 import Moon_ from "../gfx/Moon.png?texture";
+import PlayerQuitPost_ from "../gfx/PlayerQuitPost.png?texture";
 import RestartBtnDefault_ from "../gfx/RestartBtnDefault.png?texture";
 import RestartBtnOn_ from "../gfx/RestartBtnOn.png?texture";
 import ShieldLoop_ from "../gfx/ShieldLoop.png?texture";
@@ -37,6 +40,7 @@ import StartVsComputerDefault_ from "../gfx/StartVsComputerDefault.png?texture";
 import StartVsHumanOffDefault_ from "../gfx/StartVsHumanOffDefault.png?texture";
 import StartVsHumanOnDefault_ from "../gfx/StartVsHumanOnDefault.png?texture";
 import TextBox_ from "../gfx/TextBox.png?texture";
+import WaitingPost_ from "../gfx/WaitingPost.png?texture";
 import WizzyWizzy_Mocup_Buttons_ from "../gfx/WizzyWizzy_Mocup_Buttons.jpg?texture";
 
 /** Spritesheets */
@@ -53,7 +57,9 @@ import Monster3Die_ from "../gfx/Monster3Die.png?spritesheet";
 import Monster3Dies_ from "../gfx/Monster3Dies.png?spritesheet";
 import Monster3Idle_ from "../gfx/Monster3Idle.png?spritesheet";
 import Runes_ from "../gfx/Runes.png?spritesheet";
+import ShieldEnd_ from "../gfx/ShieldEnd.png?spritesheet";
 import ShieldHit_ from "../gfx/ShieldHit.png?spritesheet";
+import ShieldStart_ from "../gfx/ShieldStart.png?spritesheet";
 import Spawn_ from "../gfx/Spawn.png?spritesheet";
 import StartVsHumanBtnIdle_ from "../gfx/StartVsHumanBtnIdle.png?spritesheet";
 import StartVsHumanBtnMatch_ from "../gfx/StartVsHumanBtnMatch.png?spritesheet";
@@ -95,6 +101,8 @@ export const [
 	Cloud3,
 	ConnectionOff,
 	ConnectionOn,
+	ExitOff,
+	ExitOn,
 	InactiveSide,
 	InactiveSideWhite,
 	LinkGenerated,
@@ -104,6 +112,7 @@ export const [
 	ManaPoint,
 	ManaPointBlurred,
 	Moon,
+	PlayerQuitPost,
 	RestartBtnDefault,
 	RestartBtnOn,
 	ShieldLoop,
@@ -115,6 +124,7 @@ export const [
 	StartVsHumanOffDefault,
 	StartVsHumanOnDefault,
 	TextBox,
+	WaitingPost,
 	WizzyWizzy_Mocup_Buttons,
 	FontSheet,
 	{ animations: { Font } },
@@ -142,8 +152,12 @@ export const [
 	{ animations: { Monster3Idle } },
 	RunesSheet,
 	{ animations: { Runes } },
+	ShieldEndSheet,
+	{ animations: { ShieldEnd } },
 	ShieldHitSheet,
 	{ animations: { ShieldHit } },
+	ShieldStartSheet,
+	{ animations: { ShieldStart } },
 	SpawnSheet,
 	{ animations: { Spawn } },
 	StartVsHumanBtnIdleSheet,
@@ -192,6 +206,8 @@ export const [
 	Cloud3_,
 	ConnectionOff_,
 	ConnectionOn_,
+	ExitOff_,
+	ExitOn_,
 	InactiveSide_,
 	InactiveSideWhite_,
 	LinkGenerated_,
@@ -201,6 +217,7 @@ export const [
 	ManaPoint_,
 	ManaPointBlurred_,
 	Moon_,
+	PlayerQuitPost_,
 	RestartBtnDefault_,
 	RestartBtnOn_,
 	ShieldLoop_,
@@ -212,6 +229,7 @@ export const [
 	StartVsHumanOffDefault_,
 	StartVsHumanOnDefault_,
 	TextBox_,
+	WaitingPost_,
 	WizzyWizzy_Mocup_Buttons_,
 	Font_,
 	Font_,
@@ -239,8 +257,12 @@ export const [
 	Monster3Idle_,
 	Runes_,
 	Runes_,
+	ShieldEnd_,
+	ShieldEnd_,
 	ShieldHit_,
 	ShieldHit_,
+	ShieldStart_,
+	ShieldStart_,
 	Spawn_,
 	Spawn_,
 	StartVsHumanBtnIdle_,

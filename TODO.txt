@@ -2,9 +2,10 @@
 - Handle restarting a new game, no animations currently
 - Make initial mana points appear at the same time as mushrooms (?)
 - Handle players disconnecting
+- Show current mana points of opponent when playing online
+- Buying back the shield does not show the mana point going there
 
 Need animations:
-- Implement shield disappear/appear animations
 - When creating new game, show posting and no wizard/runes, start all animations
   when other player joins
 - Lobby: Join selects a player, Play starts the game

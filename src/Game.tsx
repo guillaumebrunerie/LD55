@@ -34,6 +34,8 @@ import {
 	Monster2Die,
 	Monster3Die,
 	WizardWin,
+	ShieldStart,
+	ShieldEnd,
 } from "./assets";
 import { BLEND_MODES, ColorMatrixFilter } from "pixi.js";
 import { getFrame, getNtFrame } from "./Animation";
@@ -537,6 +539,48 @@ const RuneC = ({ item, i }: { item: Rune; i: number }) => {
 
 const Shield = ({ shield }: { shield: Shield }) => {
 	switch (shield.state) {
+		case "appearing":
+			return (
+				<>
+					<Sprite
+						texture={RunesSheet.animations.Rune[0]}
+						anchor={0}
+						rotation={0}
+						scale={1}
+						alpha={shield.nt}
+						blendMode={BLEND_MODES.NORMAL}
+						position={[-14, 613]}
+					/>
+					<Sprite
+						texture={getNtFrame(ShieldStart, shield.nt)}
+						blendMode={BLEND_MODES.ADD}
+						position={[-270, -149]}
+						anchor={0}
+						scale={2}
+					/>
+				</>
+			);
+		case "disappearing":
+			return (
+				<>
+					<Sprite
+						texture={RunesSheet.animations.Rune[0]}
+						anchor={0}
+						rotation={0}
+						scale={1}
+						alpha={1 - shield.nt}
+						blendMode={BLEND_MODES.NORMAL}
+						position={[-14, 613]}
+					/>
+					<Sprite
+						texture={getNtFrame(ShieldEnd, shield.nt)}
+						blendMode={BLEND_MODES.ADD}
+						position={[-270, -149]}
+						anchor={0}
+						scale={2}
+					/>
+				</>
+			);
 		case "visible":
 			return (
 				<>

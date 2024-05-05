@@ -8,6 +8,8 @@ import {
 	Music,
 	ShieldDefends,
 	ShieldDown,
+	ShieldEnd,
+	ShieldStart,
 	WinMusic,
 	WizardHit,
 	WizardStart,
@@ -72,6 +74,7 @@ import {
 	pickMushroomData,
 	type PlayerData,
 } from "./rules";
+import { getDuration } from "./Animation";
 
 export type Point = {
 	x: number;
@@ -87,7 +90,12 @@ export type Mana = Entity<ManaState> & {
 	previousItem?: Mushroom;
 };
 
-type ShieldState = "visible" | "hidden" | "fighting";
+type ShieldState =
+	| "appearing"
+	| "visible"
+	| "disappearing"
+	| "hidden"
+	| "fighting";
 export type Shield = Entity<ShieldState> & {
 	position: Point;
 	tmpPosition?: Point;
@@ -431,13 +439,41 @@ export const startGame = (game: GameT) => {
 
 	for (let i = 0; i < initialDefense; i++) {
 		if (i == 0) {
-			idleState(game.player.items.shield, "visible");
-			idleState(game.opponent.items.shield, "visible");
+			appearShield(game.player);
+			appearShield(game.opponent);
 		} else {
 			appearRune(game.player);
 			appearRune(game.opponent);
 		}
 	}
+};
+
+const appearShield = (player: Player) => {
+	changeState(
+		player.items.shield,
+		"appearing",
+		getDuration(ShieldStart, 20),
+		(shield) => {
+			idleState(shield, "visible");
+		},
+	);
+};
+
+const disappearShield = (player: Player) => {
+	changeState(
+		player.items.shield,
+		"disappearing",
+		getDuration(ShieldEnd, 20),
+		(shield) => {
+			idleState(shield, "hidden");
+		},
+	);
+};
+
+const hasShield = (player: Player) => {
+	return ["visible", "appearing", "fighting"].includes(
+		player.items.shield.state,
+	);
 };
 
 const appearRune = (player: Player) => {
@@ -588,7 +624,7 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 				const { strength } = result;
 
 				const add = () => {
-					if (game.opponent.items.shield.state == "hidden") {
+					if (!hasShield(game.opponent)) {
 						idleState(game.opponent.items.shield, "visible");
 					} else {
 						addRune(game.opponent.items.runes);
@@ -924,8 +960,7 @@ const pickDefensePair = (game: GameT) => {
 		(r) => r.state == "visible",
 	).length;
 	const shield = defender.items.shield;
-	const hasShield = shield.state != "hidden";
-	if (!hasShield) {
+	if (!hasShield(defender)) {
 		// Attack the player
 		const destination = pickPosition(defender.items.runes, chestBounds, 0);
 		destination.x = 1920 - destination.x;
@@ -947,9 +982,7 @@ const pickDefensePair = (game: GameT) => {
 		changeState(fighter, "approach", attackApproachDuration, () => {
 			fighter.position = { ...destination };
 			removeMonster(attacker, fighter);
-			changeState(shield, "fighting", fightDuration, () => {
-				idleState(shield, "hidden");
-			});
+			disappearShield(defender);
 			void ShieldDown.play();
 		});
 	} else {
@@ -1028,9 +1061,9 @@ const updateButtons = (game: GameT) => {
 	const canBuy = player.manaPoints.some((p) => p.state == "visible");
 	const canBuyDefense =
 		player.items.runes.length +
-			(player.items.shield.state == "hidden" ? 1 : 0) +
+			(hasShield(player) ? 1 : 0) +
 			player.manaPoints.filter((p) => p.state == "anticipating").length <
-		15;
+		16;
 	if (canBuy && canBuyDefense && game.state == "buildUp") {
 		fadeButtonOn(game.defenseButton);
 		fadeButtonOn(game.manaButton);
@@ -1111,9 +1144,7 @@ const getPlayerData = (player: Player): PlayerData => {
 		mushrooms: player.items.mushrooms.map((mushroom) => ({
 			strength: mushroom.strength,
 		})),
-		defense:
-			player.items.runes.length +
-			(player.items.shield.state == "visible" ? 1 : 0),
+		defense: player.items.runes.length + (hasShield(player) ? 1 : 0),
 	};
 };
 
@@ -1161,11 +1192,11 @@ export const buyDefense = async (
 		const { strength } = result;
 		spendManaPoint(player, manaPoint);
 		const add = (hidden: boolean) => {
-			if (player.items.shield.state == "hidden") {
+			if (!hasShield(player)) {
 				if (!hidden) {
 					void ClickDefense.play({ volume: 0.7 });
 				}
-				idleState(player.items.shield, "visible");
+				appearShield(player);
 			} else {
 				if (player == game.player) {
 					spawnRune(
