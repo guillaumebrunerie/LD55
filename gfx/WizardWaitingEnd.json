@@ -1,0 +1,79 @@
+{"frames": {
+
+"WizardWaitingEnd_039.png":
+{
+	"frame": {"x":279,"y":395,"w":285,"h":365},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":85,"y":85,"w":285,"h":365},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardWaitingEnd_040.png":
+{
+	"frame": {"x":581,"y":1,"w":289,"h":371},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":90,"y":79,"w":289,"h":371},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardWaitingEnd_041.png":
+{
+	"frame": {"x":289,"y":1,"w":290,"h":381},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":103,"y":69,"w":290,"h":381},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardWaitingEnd_042.png":
+{
+	"frame": {"x":1,"y":1,"w":286,"h":392},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":119,"y":58,"w":286,"h":392},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardWaitingEnd_043.png":
+{
+	"frame": {"x":1,"y":395,"w":276,"h":401},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":136,"y":49,"w":276,"h":401},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardWaitingEnd_044.png":
+{
+	"frame": {"x":566,"y":384,"w":258,"h":409},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":154,"y":41,"w":258,"h":409},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardWaitingEnd_045.png":
+{
+	"frame": {"x":420,"y":762,"w":241,"h":414},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":36,"w":241,"h":414},
+	"sourceSize": {"w":500,"h":500}
+},
+"WizardWaitingEnd_046.png":
+{
+	"frame": {"x":1,"y":798,"w":224,"h":417},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":162,"y":33,"w":224,"h":417},
+	"sourceSize": {"w":500,"h":500}
+}},
+"animations": {
+	"WizardWaitingEnd": ["WizardWaitingEnd_039.png","WizardWaitingEnd_040.png","WizardWaitingEnd_041.png","WizardWaitingEnd_042.png","WizardWaitingEnd_043.png","WizardWaitingEnd_044.png","WizardWaitingEnd_045.png","WizardWaitingEnd_046.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "WizardWaitingEnd.png",
+	"format": "RGBA8888",
+	"size": {"w":976,"h":1023},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:1c4275ee29802cbcaa99f78af7052e12:bac0f140c7408c54046635469fc80e54:f3d8ac700d1faea1866796c3be32218a$"
+}
+}
