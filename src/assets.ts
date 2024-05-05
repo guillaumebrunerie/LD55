@@ -1,4 +1,4 @@
-/** Generated on Sun May  5 20:31:42 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Mon May  6 00:03:45 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -69,6 +69,9 @@ import WizardIdle_ from "../gfx/WizardIdle.png?spritesheet";
 import WizardMagicEnd_ from "../gfx/WizardMagicEnd.png?spritesheet";
 import WizardMagicLoop_ from "../gfx/WizardMagicLoop.png?spritesheet";
 import WizardMagicStart_ from "../gfx/WizardMagicStart.png?spritesheet";
+import WizardWaitingEnd_ from "../gfx/WizardWaitingEnd.png?spritesheet";
+import WizardWaitingLoop_ from "../gfx/WizardWaitingLoop.png?spritesheet";
+import WizardWaitingStart_ from "../gfx/WizardWaitingStart.png?spritesheet";
 import WizardWin_ from "../gfx/WizardWin.png?spritesheet";
 
 /** Sounds */
@@ -78,7 +81,10 @@ import ClickMana_ from "../audio/ClickMana.mp3?sound";
 import ClickStart_ from "../audio/ClickStart.mp3?sound";
 import Connect_ from "../audio/Connect.mp3?sound";
 import ManaCreated_ from "../audio/ManaCreated.mp3?sound";
+import ManaCreated2_ from "../audio/ManaCreated2.mp3?sound";
 import MonsterAttacks_ from "../audio/MonsterAttacks.mp3?sound";
+import MonsterSwoosh_ from "../audio/MonsterSwoosh.mp3?sound";
+import MonstersClash_ from "../audio/MonstersClash.mp3?sound";
 import Music_ from "../audio/Music.mp3?sound";
 import ShieldDefends_ from "../audio/ShieldDefends.mp3?sound";
 import ShieldDown_ from "../audio/ShieldDown.mp3?sound";
@@ -176,6 +182,12 @@ export const [
 	{ animations: { WizardMagicLoop } },
 	WizardMagicStartSheet,
 	{ animations: { WizardMagicStart } },
+	WizardWaitingEndSheet,
+	{ animations: { WizardWaitingEnd } },
+	WizardWaitingLoopSheet,
+	{ animations: { WizardWaitingLoop } },
+	WizardWaitingStartSheet,
+	{ animations: { WizardWaitingStart } },
 	WizardWinSheet,
 	{ animations: { WizardWin } },
 	ClickAttack,
@@ -184,7 +196,10 @@ export const [
 	ClickStart,
 	Connect,
 	ManaCreated,
+	ManaCreated2,
 	MonsterAttacks,
+	MonsterSwoosh,
+	MonstersClash,
 	Music,
 	ShieldDefends,
 	ShieldDown,
@@ -281,6 +296,12 @@ export const [
 	WizardMagicLoop_,
 	WizardMagicStart_,
 	WizardMagicStart_,
+	WizardWaitingEnd_,
+	WizardWaitingEnd_,
+	WizardWaitingLoop_,
+	WizardWaitingLoop_,
+	WizardWaitingStart_,
+	WizardWaitingStart_,
 	WizardWin_,
 	WizardWin_,
 	ClickAttack_,
@@ -289,7 +310,10 @@ export const [
 	ClickStart_,
 	Connect_,
 	ManaCreated_,
+	ManaCreated2_,
 	MonsterAttacks_,
+	MonsterSwoosh_,
+	MonstersClash_,
 	Music_,
 	ShieldDefends_,
 	ShieldDown_,

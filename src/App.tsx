@@ -34,9 +34,12 @@ import {
 	StartVsHumanOffDefault,
 	TextBox,
 	TextBoxAppear,
+	WizardMagicEnd,
+	WizardMagicStart,
+	WizardWaitingLoop,
 } from "./assets";
 import { buyMonster, buyDefense, buyMushroom, type GameT } from "./gameLogic";
-import { Game } from "./Game";
+import { Game, Wizard, WizardDark } from "./Game";
 import { wave } from "./ease";
 import { appearButton, disappearButton, type ButtonT } from "./button";
 import { GlobalTimeContext } from "./globalTimeContext";
@@ -45,6 +48,8 @@ import { api } from "../convex/_generated/api";
 import { CustomText } from "./CustomText";
 import type { Id } from "../convex/_generated/dataModel";
 import { Rectangle as Box } from "./Rectangle";
+import { getFrame, getNtFrame } from "./Animation";
+import { darkFilter } from "./filters";
 
 const left = 420;
 const top = 170;
@@ -411,31 +416,6 @@ const LogoMoon = ({
 
 const mod = (a: number, b: number) => (b + (a % b)) % b;
 
-const filter2 = new ColorMatrixFilter();
-filter2.brightness(1000, true);
-filter2.matrix = [
-	0,
-	0,
-	0,
-	0,
-	0x41 / 256,
-	0,
-	0,
-	0,
-	0,
-	0x29 / 256,
-	0,
-	0,
-	0,
-	0,
-	0x56 / 256,
-	0,
-	0,
-	0,
-	1,
-	0,
-];
-
 export const App = () => {
 	const [app] = useState(() => observable(newApp()));
 	const { game } = app;
@@ -496,7 +476,7 @@ export const App = () => {
 	};
 
 	const [filter, setFilter] = useState<Filter>();
-	const filters = filter ? [filter, filter2] : [];
+	const filters = filter ? [filter, darkFilter] : [];
 
 	return (
 		<GlobalTimeContext.Provider value={app.gt}>
@@ -555,6 +535,9 @@ export const App = () => {
 					filters={filters}
 					alpha={screenAlpha}
 				/>
+				<Container scale={[-1, 1]} x={1920}>
+					<WizardDark game={game} />
+				</Container>
 				<LogoMoon app={app} filters={filters} alpha={screenAlpha} />
 				<UIButtons game={game} />
 				<StartButton

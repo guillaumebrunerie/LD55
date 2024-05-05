@@ -36,6 +36,9 @@ import {
 	WizardWin,
 	ShieldStart,
 	ShieldEnd,
+	WizardWaitingStart,
+	WizardWaitingEnd,
+	WizardWaitingLoop,
 } from "./assets";
 import { BLEND_MODES, ColorMatrixFilter } from "pixi.js";
 import { getFrame, getNtFrame } from "./Animation";
@@ -46,6 +49,7 @@ import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { useEffect } from "react";
 import { runInAction } from "mobx";
+import { darkFilter, opponentFilter } from "./filters";
 
 const SyncLastFight = ({ game }: { game: GameT }) => {
 	const lastFight = useQuery(api.functions.lastFight, {
@@ -84,10 +88,38 @@ export const Game = ({ game }: { game: GameT }) => {
 	);
 };
 
-const filter = new ColorMatrixFilter();
-filter.hue(70, false);
+export const WizardDark = ({ game }: { game: GameT }) => {
+	if (game.curtain.state == "hidden") {
+		return null;
+	}
+	let screenAlpha;
+	let wizardTexture;
+	switch (game.curtain.state) {
+		case "appearing":
+			screenAlpha = wave(game.curtain.nt);
+			wizardTexture = getNtFrame(WizardWaitingStart, game.curtain.nt);
+			break;
+		case "disappearing":
+			screenAlpha = wave(1 - game.curtain.nt);
+			wizardTexture = getNtFrame(WizardWaitingEnd, game.curtain.nt);
+			break;
+		case "idle":
+			screenAlpha = 1;
+			wizardTexture = getFrame(WizardWaitingLoop, 20, game.curtain.lt);
+			break;
+	}
+	return (
+		<Sprite
+			texture={wizardTexture}
+			x={-15}
+			y={230}
+			alpha={screenAlpha}
+			filters={[darkFilter]}
+		/>
+	);
+};
 
-const Wizard = ({
+export const Wizard = ({
 	game,
 	player,
 	wizard,
@@ -97,6 +129,34 @@ const Wizard = ({
 	wizard: WizardT;
 }) => {
 	const gt = useGlobalTime();
+
+	if (player == game.opponent && game.curtain.state !== "hidden") {
+		let wizardTexture;
+		switch (game.curtain.state) {
+			case "appearing":
+				wizardTexture = getNtFrame(WizardWaitingStart, game.curtain.nt);
+				break;
+			case "disappearing":
+				wizardTexture = getNtFrame(WizardWaitingEnd, game.curtain.nt);
+				break;
+			case "idle":
+				wizardTexture = getFrame(
+					WizardWaitingLoop,
+					20,
+					game.curtain.lt,
+				);
+				break;
+		}
+		return (
+			<Sprite
+				texture={wizardTexture}
+				x={-15}
+				y={230}
+				filters={[opponentFilter]}
+			/>
+		);
+	}
+
 	switch (wizard.state) {
 		case "idle":
 			return (
@@ -104,7 +164,7 @@ const Wizard = ({
 					texture={getFrame(WizardIdle, 10, gt)}
 					x={-15}
 					y={230}
-					filters={player == game.opponent ? [filter] : []}
+					filters={player == game.opponent ? [opponentFilter] : []}
 				/>
 			);
 		case "winning":
@@ -113,7 +173,7 @@ const Wizard = ({
 					texture={getFrame(WizardWin, 20, gt)}
 					x={-15}
 					y={230}
-					filters={player == game.opponent ? [filter] : []}
+					filters={player == game.opponent ? [opponentFilter] : []}
 				/>
 			);
 		case "magicStart":
@@ -122,7 +182,7 @@ const Wizard = ({
 					texture={getNtFrame(WizardMagicStart, wizard.nt)}
 					x={-15}
 					y={230}
-					filters={player == game.opponent ? [filter] : []}
+					filters={player == game.opponent ? [opponentFilter] : []}
 				/>
 			);
 		case "magicLoop":
@@ -131,7 +191,7 @@ const Wizard = ({
 					texture={getFrame(WizardMagicLoop, 20, wizard.lt)}
 					x={-15}
 					y={230}
-					filters={player == game.opponent ? [filter] : []}
+					filters={player == game.opponent ? [opponentFilter] : []}
 				/>
 			);
 		case "magicEnd":
@@ -140,7 +200,7 @@ const Wizard = ({
 					texture={getNtFrame(WizardMagicEnd, wizard.nt)}
 					x={-15}
 					y={230}
-					filters={player == game.opponent ? [filter] : []}
+					filters={player == game.opponent ? [opponentFilter] : []}
 				/>
 			);
 		case "appearing":
@@ -149,7 +209,7 @@ const Wizard = ({
 					texture={getNtFrame(WizardAppear, wizard.nt)}
 					x={-15}
 					y={230}
-					filters={player == game.opponent ? [filter] : []}
+					filters={player == game.opponent ? [opponentFilter] : []}
 				/>
 			);
 		case "die":
@@ -158,7 +218,7 @@ const Wizard = ({
 					texture={getNtFrame(WizardDie, wizard.nt)}
 					x={-80}
 					y={170}
-					filters={player == game.opponent ? [filter] : []}
+					filters={player == game.opponent ? [opponentFilter] : []}
 				/>
 			);
 		case "hidden":
