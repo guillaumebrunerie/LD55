@@ -1,7 +1,11 @@
 import type { Bounds } from "./configuration";
-import type { Point } from "./gameLogic";
 
 const ITERATION_COUNT = 100;
+
+export type Point = {
+	x: number;
+	y: number;
+};
 
 export const pickPosition = (
 	array: { position: Point }[],

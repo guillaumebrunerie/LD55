@@ -7,8 +7,14 @@ import {
 	Texture,
 } from "pixi.js";
 import { Container, Sprite } from "@pixi/react";
-import { newApp, startApp, startNewGame, type AppT } from "./appLogic";
-import { observable, action } from "mobx";
+import {
+	newApp,
+	startApp,
+	startNewGameAgainstPlayer,
+	startNewGameAgainstComputer,
+	type AppT,
+} from "./appLogic";
+import { observable, action, runInAction } from "mobx";
 import { sound } from "@pixi/sound";
 import {
 	Bg,
@@ -54,21 +60,52 @@ const hitBoxAlpha = 0.01;
 const hitBoxHeight = lineHeight * 0.8;
 const hitBoxWidth = 1100;
 
-const Lobby = ({ app, onClick }: { app: AppT; onClick: () => void }) => {
-	const joinGameMutation = useMutation(api.functions.joinGame);
-	const createNewGameMutation = useMutation(api.functions.createNewGame);
-	const availableGames = useQuery(api.functions.availableGames, {
-		playerId: app.game.playerId,
-	});
-	// const [availableGames, setAvailableGames] =
-	// 	useState<typeof availableGamesQueryResult>();
-	// if (
-	// 	availableGamesQueryResult &&
-	// 	availableGamesQueryResult !== availableGames
-	// ) {
-	// 	setAvailableGames(availableGamesQueryResult);
-	// }
-	// console.log({ availableGames });
+const Lobby = ({ app }: { app: AppT }) => {
+	const createNewPlayer = useMutation(api.lobby.createNewPlayer);
+	useEffect(() => {
+		if (!app.game.playerId) {
+			createNewPlayer()
+				.then(({ id, token }) => {
+					runInAction(() => {
+						app.game.playerId = id;
+						app.game.token = token;
+					});
+				})
+				.catch(() => {
+					console.error("Could not create new player");
+				});
+		}
+	}, [app, createNewPlayer]);
+
+	const { playerId, token, opponentId } = app.game;
+
+	const gameId = useQuery(api.player.currentGameId, { playerId });
+	useEffect(() => {
+		if (gameId) {
+			runInAction(() => {
+				startNewGameAgainstPlayer(app, gameId);
+			});
+		}
+	}, [gameId, app]);
+
+	const availablePlayers = useQuery(api.lobby.availablePlayers);
+	const requestPlay = useMutation(api.lobby.requestPlay);
+	const players =
+		(playerId &&
+			availablePlayers
+				?.filter(({ id }) => id !== app.game.playerId)
+				.map(({ id, name, opponentId: theirOpponentId }) => {
+					return {
+						id,
+						name,
+						type:
+							id == opponentId ? ("waiting" as const)
+							: theirOpponentId == playerId ?
+								("requested" as const)
+							:	("default" as const),
+					};
+				})) ||
+		[];
 	return (
 		<Container position={{ x: 0, y: -(1 - app.game.lobby.alpha) * 1000 }}>
 			<Sprite
@@ -77,42 +114,36 @@ const Lobby = ({ app, onClick }: { app: AppT; onClick: () => void }) => {
 				anchor={0.5}
 				eventMode="static"
 			/>
-			<CustomText
-				text="New game"
-				anchor={[0, 0.5]}
-				position={{
-					x: left,
-					y: top,
-				}}
-			/>
-			<Box
-				x={left}
-				y={top - hitBoxHeight / 2}
-				width={hitBoxWidth}
-				height={hitBoxHeight}
-				alpha={hitBoxAlpha}
-				cursor="pointer"
-				eventMode="static"
-				pointerdown={action(() => {
-					void ClickStart.play();
-					onClick();
-					void startNewGame(app, false, createNewGameMutation);
-				})}
-			/>
-			{!availableGames && (
+			{!availablePlayers && (
 				<CustomText
 					text="Loading…"
 					anchor={[0, 0.5]}
 					position={{ x: left, y: top + lineHeight }}
 				/>
 			)}
-			{availableGames?.map(({ gameId, playerName }, i) => (
-				<Fragment key={gameId}>
+			{players.map(({ id, name, type }, i) => (
+				<Fragment key={id}>
 					<CustomText
-						key={gameId}
-						text={"Join " + playerName}
+						text={
+							name +
+							{
+								waiting: " (waiting)",
+								requested: " (wants to play)",
+								default: "",
+							}[type]
+						}
 						anchor={[0, 0.5]}
-						position={{ x: left, y: top + (i + 1) * lineHeight }}
+						position={{
+							x: left,
+							y: top + (i + 1) * lineHeight,
+						}}
+						color={
+							{
+								waiting: "white",
+								requested: "lightblue",
+								default: "grey",
+							}[type]
+						}
 					/>
 					<Box
 						x={left}
@@ -124,10 +155,19 @@ const Lobby = ({ app, onClick }: { app: AppT; onClick: () => void }) => {
 						eventMode="static"
 						pointerdown={action(() => {
 							void ClickStart.play();
-							onClick();
-							void startNewGame(app, false, async () =>
-								joinGameMutation({ gameId }),
-							);
+							if (!playerId || !token) {
+								return;
+							}
+							if (app.game.opponentId == id) {
+								app.game.opponentId = undefined;
+							} else {
+								app.game.opponentId = id;
+							}
+							void requestPlay({
+								playerId,
+								token,
+								opponentId: id,
+							});
 						})}
 					/>
 				</Fragment>
@@ -147,6 +187,8 @@ const StartButton = ({
 }) => {
 	const inLobby = app.game.lobby.alpha > 0.01;
 
+	const disconnect = useMutation(api.lobby.disconnect);
+
 	if (button.alpha < 0.01) {
 		return null;
 	}
@@ -164,6 +206,14 @@ const StartButton = ({
 					eventMode="static"
 					pointerdown={action(() => {
 						disappearButton(app.game.lobby);
+						const { playerId, token } = app.game;
+						if (playerId && token) {
+							void disconnect({ playerId, token });
+							console.log("DISCONNECTING");
+							app.game.playerId = undefined;
+							app.game.token = undefined;
+							app.game.opponentId = undefined;
+						}
 						void ClickStart.play();
 						void TextBoxAppear.play();
 					})}
@@ -187,9 +237,7 @@ const StartButton = ({
 				pointerdown={action(() => {
 					disappearButton(app.game.lobby);
 					void ClickStart.play();
-					void startNewGame(app, true, () => {
-						throw new Error("Should not be called");
-					});
+					startNewGameAgainstComputer(app);
 				})}
 			/>
 			<Sprite
@@ -213,12 +261,7 @@ const StartButton = ({
 					appearButton(app.game.lobby);
 				})}
 			/>
-			{inLobby && (
-				<Lobby
-					app={app}
-					onClick={action(() => disappearButton(app.game.lobby))}
-				/>
-			)}
+			{inLobby && <Lobby app={app} />}
 		</>
 	);
 };
@@ -301,9 +344,9 @@ const UIButton = ({
 };
 
 const UIButtons = ({ game }: { game: GameT }) => {
-	const buyDefenseMutation = useMutation(api.functions.buyDefense);
-	const buyMushroomMutation = useMutation(api.functions.buyMushroom);
-	const buyMonsterMutation = useMutation(api.functions.buyMonster);
+	const buyDefenseMutation = useMutation(api.player.buyDefense);
+	const buyMushroomMutation = useMutation(api.player.buyMushroom);
+	const buyMonsterMutation = useMutation(api.player.buyMonster);
 	return (
 		<>
 			<UIButton
@@ -340,26 +383,29 @@ const UIButtons = ({ game }: { game: GameT }) => {
 	);
 };
 
-const PlayerNames = ({ playerId }: { playerId: Id<"players"> }) => {
-	const playerName = useQuery(api.functions.playerName, { playerId });
-	const opponentName = useQuery(api.functions.opponentName, { playerId });
+const PlayerName = ({ playerId }: { playerId: Id<"players"> }) => {
+	const playerName = useQuery(api.player.playerName, { playerId });
 	return (
-		<>
-			{playerName && (
-				<CustomText
-					text={playerName}
-					position={{ x: 20, y: 1080 - 11 }}
-					anchor={[0, 1]}
-				/>
-			)}
-			{opponentName && (
-				<CustomText
-					text={opponentName}
-					position={{ x: 1920 - 20, y: 1080 - 11 }}
-					anchor={[1, 1]}
-				/>
-			)}
-		</>
+		playerName && (
+			<CustomText
+				text={playerName}
+				position={{ x: 20, y: 1080 - 11 }}
+				anchor={[0, 1]}
+			/>
+		)
+	);
+};
+
+const OpponentName = ({ playerId }: { playerId: Id<"players"> }) => {
+	const playerName = useQuery(api.player.playerName, { playerId });
+	return (
+		playerName && (
+			<CustomText
+				text={playerName}
+				position={{ x: 1920 - 20, y: 1080 - 11 }}
+				anchor={[1, 1]}
+			/>
+		)
 	);
 };
 
@@ -549,7 +595,8 @@ export const App = () => {
 					button={game.startButton}
 					position={[1920 / 2, 730]}
 				/>
-				{game.playerId && <PlayerNames playerId={game.playerId} />}
+				{game.playerId && <PlayerName playerId={game.playerId} />}
+				{game.opponentId && <OpponentName playerId={game.opponentId} />}
 				<SoundButton />
 				{/* <PolygonShape polygon={manaBounds.polygon} alpha={0.4} /> */}
 			</Container>

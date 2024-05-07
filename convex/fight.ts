@@ -1,28 +1,22 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
-import { pickName } from "./names";
+import { query } from "./_generated/server";
 import type { DataModel, Doc, Id } from "./_generated/dataModel";
-import {
-	pickFighter,
-	initialDefense,
-	initialMana,
-	maxDefense,
-	pickMushroomData,
-	pickDefenseData,
-	type PlayerData,
-	pickMonsterData,
-} from "../src/rules";
+import { pickFighter, initialMana, maxDefense } from "../src/rules";
 import type { GenericMutationCtx, GenericQueryCtx } from "convex/server";
 
 export const lastFight = query({
 	args: {
 		playerId: v.optional(v.id("players")),
+		token: v.optional(v.string()),
 	},
-	handler: async (ctx, { playerId }) => {
-		if (!playerId) {
+	handler: async (ctx, { playerId, token }) => {
+		if (!playerId || !token) {
 			return null;
 		}
 		const player = await getPlayer(ctx, playerId);
+		if (player.token !== token || !player.gameId) {
+			return null;
+		}
 		const game = await getGame(ctx, player.gameId);
 		const roundCount = game.rounds.length;
 		const round = game.rounds[roundCount - 1];
@@ -32,174 +26,6 @@ export const lastFight = query({
 		const otherPlayer =
 			game.playerId == playerId ? round.opponent : round.player;
 		return { round: roundCount, opponent: otherPlayer };
-	},
-});
-
-export const playerName = query({
-	args: {
-		playerId: v.id("players"),
-	},
-	handler: async (ctx, { playerId }) => {
-		const player = await getPlayer(ctx, playerId);
-		return player.name;
-	},
-});
-
-export const opponentName = query({
-	args: {
-		playerId: v.id("players"),
-	},
-	handler: async (ctx, { playerId }) => {
-		const player = await getPlayer(ctx, playerId);
-		const game = await getGame(ctx, player.gameId);
-		if (!game) {
-			return;
-		}
-		const opponentId =
-			game.playerId == playerId ? game.opponentId : game.playerId;
-		if (!opponentId) {
-			return;
-		}
-		const opponent = await ctx.db.get(opponentId);
-		if (!opponent) {
-			return;
-		}
-		return opponent.name;
-	},
-});
-
-export const availableGames = query({
-	args: {
-		playerId: v.optional(v.id("players")),
-	},
-	handler: async (ctx, { playerId }) => {
-		const games = await ctx.db
-			.query("games")
-			.filter((q) => q.eq(q.field("opponentId"), undefined))
-			.filter((q) => q.neq(q.field("playerId"), playerId))
-			.collect();
-		return Promise.all(
-			games.map(async (game) => ({
-				gameId: game._id,
-				playerName:
-					(game.playerId &&
-						(await ctx.db.get(game.playerId))?.name) ||
-					"",
-			})),
-		);
-	},
-});
-
-const newPlayer = (gameId?: Id<"games">) => ({
-	gameId,
-	name: pickName(),
-	mana: initialMana,
-	defense: initialDefense,
-	mushrooms: [],
-	monsters: [],
-	boughtThisRound: {
-		defense: 0,
-	},
-});
-
-export const createNewGame = mutation({
-	handler: async (ctx) => {
-		// Create a new player
-		const playerId = await ctx.db.insert("players", newPlayer());
-
-		// Create a new game
-		const gameId = await ctx.db.insert("games", { playerId, rounds: [] });
-
-		// Attach the game to the player and return the player
-		await ctx.db.patch(playerId, { gameId });
-		return await ctx.db.get(playerId);
-	},
-});
-
-export const joinGame = mutation({
-	args: {
-		gameId: v.id("games"),
-	},
-	handler: async (ctx, { gameId }) => {
-		// Check if the game is still available
-		const game = await ctx.db.get(gameId);
-		if (!game) {
-			return null;
-		}
-		if (game.opponentId) {
-			return null;
-		}
-		// Create a new player
-		const playerId = await ctx.db.insert("players", newPlayer(gameId));
-		// Join the game
-		await ctx.db.patch(gameId, { opponentId: playerId });
-
-		return await ctx.db.get(playerId);
-	},
-});
-
-const getPlayerData = (player: Doc<"players">): PlayerData => ({
-	mana: player.mana,
-	monsters: player.monsters,
-	mushrooms: player.mushrooms,
-	defense: player.defense,
-});
-
-export const buyMushroom = mutation({
-	args: { playerId: v.id("players") },
-	handler: async (ctx, { playerId }) => {
-		const player = await getPlayer(ctx, playerId);
-		if (player.mana == 0) {
-			return null;
-		}
-		const { strength } = pickMushroomData(getPlayerData(player));
-		await ctx.db.patch(playerId, {
-			mana: player.mana - 1,
-			mushrooms: [...player.mushrooms, { strength }],
-		});
-		await maybeFight(ctx, player);
-		return { strength };
-	},
-});
-
-export const buyDefense = mutation({
-	args: { playerId: v.id("players") },
-	handler: async (ctx, { playerId }) => {
-		const player = await getPlayer(ctx, playerId);
-		const data = pickDefenseData(getPlayerData(player));
-		if (!data) {
-			return null;
-		}
-		const { strength } = data;
-
-		await ctx.db.patch(playerId, {
-			mana: player.mana - 1,
-			defense: player.defense + strength,
-		});
-		await maybeFight(ctx, player);
-		return { strength };
-	},
-});
-
-export const buyMonster = mutation({
-	args: { playerId: v.id("players") },
-	handler: async (ctx, { playerId }) => {
-		const player = await getPlayer(ctx, playerId);
-		if (player.mana == 0) {
-			return null;
-		}
-
-		const { position, strength } = pickMonsterData(getPlayerData(player));
-
-		await ctx.db.patch(playerId, {
-			mana: player.mana - 1,
-			monsters: [
-				...player.monsters,
-				{ position, strength, hp: strength },
-			],
-		});
-		await maybeFight(ctx, player);
-		return { position, strength };
 	},
 });
 

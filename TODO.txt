@@ -5,6 +5,7 @@
 
 - Hamburger menu
 - New sounds
+- Restart buttons
 
 - Handle restarting a new game, no animations currently
 - Make initial mana points appear at the same time as mushrooms (?)

@@ -1,6 +1,5 @@
 import { attackBounds } from "./configuration";
-import type { Point } from "./gameLogic";
-import { pickPosition } from "./utils";
+import { pickPosition, type Point } from "./utils";
 
 export const initialMana = 5;
 export const initialDefense = 8;

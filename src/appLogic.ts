@@ -1,10 +1,9 @@
-import { action, runInAction } from "mobx";
+import { action } from "mobx";
 import { Ticker } from "pixi.js";
 import { sound } from "@pixi/sound";
 import { newGame, startGame, tickGame, type GameT } from "./gameLogic";
 import { wave } from "./ease";
-import type { api } from "../convex/_generated/api";
-import type { ReactMutation } from "convex/react";
+import type { Id } from "../convex/_generated/dataModel";
 
 export type AppT = {
 	speed: number;
@@ -51,24 +50,30 @@ export const startApp = (app: AppT) => {
 	};
 };
 
-export const startNewGame = async (
-	app: AppT,
-	playVsComputer: boolean,
-	createNewGameMutation: () => ReturnType<
-		ReactMutation<typeof api.functions.createNewGame>
-	>,
-) => {
-	const player = playVsComputer ? undefined : await createNewGameMutation();
-	runInAction(() => {
-		if (app.state == "intro") {
-			app.state = "transition";
-		}
-		app.lt = 0;
-		app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
-		app.game.gameId = player?.gameId;
-		app.game.playerId = player?._id;
-		startGame(app.game);
-	});
+export const startNewGameAgainstComputer = (app: AppT) => {
+	if (app.state == "intro") {
+		app.state = "transition";
+	}
+	app.lt = 0;
+	app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
+	app.game.gameId = undefined;
+	app.game.playerId = undefined;
+	console.log("START AGAINST COMPUTER");
+	startGame(app.game);
+};
+
+export const startNewGameAgainstPlayer = (app: AppT, gameId: Id<"games">) => {
+	if (app.state == "intro") {
+		app.state = "transition";
+	}
+	app.lt = 0;
+	const { playerId, token, opponentId } = app.game;
+	app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
+	app.game.gameId = gameId;
+	app.game.playerId = playerId;
+	app.game.token = token;
+	app.game.opponentId = opponentId;
+	startGame(app.game);
 };
 
 const transitionDuration = 0.5;

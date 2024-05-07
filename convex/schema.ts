@@ -23,13 +23,15 @@ const player = {
 
 export default defineSchema({
 	players: defineTable({
+		token: v.string(),
 		gameId: v.optional(v.id("games")),
+		opponentId: v.optional(v.id("players")),
 		name: v.string(),
 		...player,
 	}),
 	games: defineTable({
-		playerId: v.optional(v.id("players")),
-		opponentId: v.optional(v.id("players")),
+		playerId: v.id("players"),
+		opponentId: v.id("players"),
 		rounds: v.array(
 			v.object({
 				player: v.object(player),

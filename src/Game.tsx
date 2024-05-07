@@ -52,8 +52,9 @@ import { runInAction } from "mobx";
 import { opponentFilter } from "./filters";
 
 const SyncLastFight = ({ game }: { game: GameT }) => {
-	const lastFight = useQuery(api.functions.lastFight, {
+	const lastFight = useQuery(api.fight.lastFight, {
 		playerId: game.playerId,
+		token: game.token,
 	});
 	useEffect(() => {
 		runInAction(() => {

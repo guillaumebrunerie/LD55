@@ -65,7 +65,7 @@ import {
 	type WizardT,
 } from "./wizard";
 import type { Id } from "../convex/_generated/dataModel";
-import { pickPosition } from "./utils";
+import { pickPosition, type Point } from "./utils";
 import type { api } from "../convex/_generated/api";
 import type { ReactMutation } from "convex/react";
 import {
@@ -78,11 +78,6 @@ import {
 	type PlayerData,
 } from "./rules";
 import { getDuration } from "./Animation";
-
-export type Point = {
-	x: number;
-	y: number;
-};
 
 type ManaState = "visible" | "anticipating" | "spawning";
 export type Mana = Entity<ManaState> & {
@@ -391,6 +386,8 @@ type GameState =
 export type GameT = Entity<GameState> & {
 	gameId?: Id<"games">;
 	playerId?: Id<"players">;
+	token?: string;
+	opponentId?: Id<"players">;
 	round: number;
 	player: Player;
 	opponent: Player;
@@ -1122,14 +1119,15 @@ const spendManaPoint = (player: Player, manaPoint: Mana | undefined) => {
 export const buyMushroom = async (
 	game: GameT,
 	player: Player,
-	buyMushroomMutation: ReactMutation<typeof api.functions.buyMushroom>,
+	buyMushroomMutation: ReactMutation<typeof api.player.buyMushroom>,
 ) => {
 	const manaPoint = lockManaPoint(player);
-	const playerId = game.playerId;
+	const { playerId, token } = game;
 	const result =
 		playerId ?
 			await buyMushroomMutation({
 				playerId,
+				token,
 			})
 		:	pickMushroomData(getPlayerData(player));
 	if (!result) {
@@ -1169,13 +1167,13 @@ const getPlayerData = (player: Player): PlayerData => {
 export const buyMonster = async (
 	game: GameT,
 	player: Player,
-	buyMonsterMutation: ReactMutation<typeof api.functions.buyMonster>,
+	buyMonsterMutation: ReactMutation<typeof api.player.buyMonster>,
 ) => {
 	const manaPoint = lockManaPoint(player);
-	const playerId = game.playerId;
+	const { playerId, token } = game;
 	const result =
 		playerId ?
-			await buyMonsterMutation({ playerId })
+			await buyMonsterMutation({ playerId, token })
 		:	pickMonsterData(getPlayerData(player));
 	if (!result) {
 		return;
@@ -1190,17 +1188,17 @@ export const buyMonster = async (
 export const buyDefense = async (
 	game: GameT,
 	player: Player,
-	buyDefenseMutation: ReactMutation<typeof api.functions.buyDefense>,
+	buyDefenseMutation: ReactMutation<typeof api.player.buyDefense>,
 ) => {
 	const manaPoint = lockManaPoint(player);
 	if (!manaPoint) {
 		console.error("No mana point");
 		return;
 	}
-	const playerId = game.playerId;
+	const { playerId, token } = game;
 	const result =
 		playerId ?
-			await buyDefenseMutation({ playerId })
+			await buyDefenseMutation({ playerId, token })
 		:	pickDefenseData(getPlayerData(player));
 	runInAction(() => {
 		if (!result) {
