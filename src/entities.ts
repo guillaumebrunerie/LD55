@@ -24,12 +24,10 @@ export const newEntity = <State extends string>(
 export const idleState = <State extends string>(
 	entity: Entity<State>,
 	state: NoInfer<State>,
-	transitions: Transition[] = [],
 ) => {
 	entity.state = state;
 	entity.lt = 0;
 	entity.nt = 0;
-	entity.transitions = transitions;
 };
 
 export const changeState = <E extends Entity<string>>(
@@ -76,6 +74,17 @@ export const schedule = <State extends string, T extends Entity<State>>(
 ) => {
 	entity.transitions.push({
 		duration: entity.lt + delay,
+		callback,
+	});
+};
+
+export const schedule2 = <E extends Entity<string>>(
+	entity: E,
+	duration: number,
+	callback: (entity: E) => void,
+) => {
+	entity.transitions.push({
+		duration: entity.lt + duration,
 		callback,
 	});
 };

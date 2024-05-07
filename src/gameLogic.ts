@@ -5,6 +5,7 @@ import {
 	ClickMana,
 	ManaCreated,
 	MonsterAttacks,
+	MonstersClash,
 	Music,
 	ShieldDefends,
 	ShieldDown,
@@ -58,6 +59,8 @@ import {
 	newWizard,
 	startWizardMagic,
 	tickWizard,
+	waitingEndWizard,
+	waitingStartWizard,
 	winWizard,
 	type WizardT,
 } from "./wizard";
@@ -379,7 +382,6 @@ type GameState =
 	| "transition"
 	| "buildUp"
 	| "waiting"
-	| "toAttack"
 	| "attack"
 	| "defense"
 	| "rebuild"
@@ -426,6 +428,7 @@ export const startGame = (game: GameT) => {
 	appearWizard(game.opponent.wizard);
 	appearWizard(game.player.wizard);
 	schedule(showCurtain, game.curtain, 0.7);
+	schedule(waitingStartWizard, game.opponent.wizard, 0);
 	schedule(appearButton, game.manaButton, 1.2);
 	schedule(appearButton, game.attackButton, 1.2);
 	schedule(appearButton, game.defenseButton, 1.2);
@@ -500,6 +503,7 @@ const restartGame = (game: GameT) => {
 		}
 	}
 	schedule(showCurtain, game.curtain, 0.7);
+	schedule(waitingStartWizard, game.opponent.wizard, 0);
 	schedule(appearButton, game.manaButton, 1.2);
 	schedule(appearButton, game.attackButton, 1.2);
 	schedule(appearButton, game.defenseButton, 1.2);
@@ -572,10 +576,11 @@ export const setupFight = (game: GameT, lastFight: LastFight) => {
 	game.round = lastFight.round;
 
 	// Start the fight
-	hideCurtain(game.curtain);
-	changeState(game, "toAttack", toAttackDuration, () => {
-		idleState(game, "attack");
-		pickAttackOrDefensePair(game);
+	idleState(game, "attack");
+	waitingEndWizard(game.opponent.wizard, () => {
+		hideCurtain(game.curtain, () => {
+			pickAttackOrDefensePair(game);
+		});
 	});
 };
 
@@ -654,7 +659,6 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 	game.opponent.previousEndData = getPlayerData(game.opponent);
 };
 
-const toAttackDuration = 0.5;
 const rebuildDuration = 0.1;
 
 export const tickGame = makeTick<GameState, GameT>(
@@ -701,17 +705,18 @@ export const tickGame = makeTick<GameState, GameT>(
 			},
 			waiting: () => {
 				if (!game.gameId && game.opponent.manaPoints.length == 0) {
-					hideCurtain(game.curtain);
-					changeState(game, "toAttack", toAttackDuration, () => {
-						idleState(game, "attack");
-						pickAttackOrDefensePair(game);
+					idleState(game, "attack");
+					waitingEndWizard(game.opponent.wizard, () => {
+						hideCurtain(game.curtain, () => {
+							pickAttackOrDefensePair(game);
+						});
 					});
 				}
 			},
 			attack: () => {
-				if (areAllItemsVisible(game.player)) {
-					pickAttackOrDefensePair(game);
-				}
+				// if (areAllItemsVisible(game.player)) {
+				// 	pickAttackOrDefensePair(game);
+				// }
 			},
 		};
 	},
@@ -851,6 +856,7 @@ const pickAttackOrDefensePair = (game: GameT) => {
 	if (playerMonsters == 0 && opponentMonsters == 0) {
 		// No monsters, we move to the next round
 		showCurtain(game.curtain);
+		schedule(waitingStartWizard, game.opponent.wizard, 0.5);
 		rebuildOne(game);
 		return;
 	}
@@ -881,9 +887,11 @@ const pickAttackPair = (game: GameT) => {
 	playerAttacker.destination = destination;
 	opponentAttacker.destination = destination2;
 
-	void MonsterAttacks.play({ volume: 0.7 });
+	void MonsterAttacks.play({ volume: 0.5 });
 
+	let count = 2;
 	changeState(playerAttacker, "approach", attackApproachDuration, () => {
+		void MonstersClash.play({ volume: 1 });
 		playerAttacker.position = { ...destination };
 		changeState(playerAttacker, "fighting", fightDuration, () => {
 			if (playerAttacker.hp == 0) {
@@ -892,6 +900,10 @@ const pickAttackPair = (game: GameT) => {
 				);
 			} else {
 				idleState(playerAttacker, "visible");
+			}
+			count--;
+			if (count == 0) {
+				pickAttackOrDefensePair(game);
 			}
 		});
 	});
@@ -906,6 +918,10 @@ const pickAttackPair = (game: GameT) => {
 					);
 			} else {
 				idleState(opponentAttacker, "visible");
+			}
+			count--;
+			if (count == 0) {
+				pickAttackOrDefensePair(game);
 			}
 		});
 	});
@@ -960,6 +976,7 @@ const pickDefensePair = (game: GameT) => {
 		(r) => r.state == "visible",
 	).length;
 	const shield = defender.items.shield;
+	void MonsterAttacks.play({ volume: 0.5 });
 	if (!hasShield(defender)) {
 		// Attack the player
 		const destination = pickPosition(defender.items.runes, chestBounds, 0);
@@ -970,6 +987,7 @@ const pickDefensePair = (game: GameT) => {
 			removeMonster(attacker, fighter);
 			doWin(game, attacker, defender);
 		});
+		return; // Do not continue the fight
 	} else if (runes == 0) {
 		// Destroy shield
 		const destination = pickPosition(

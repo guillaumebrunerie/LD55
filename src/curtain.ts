@@ -18,8 +18,9 @@ export const showCurtain = (curtain: Curtain) => {
 	});
 };
 
-export const hideCurtain = (curtain: Curtain) => {
+export const hideCurtain = (curtain: Curtain, callback?: () => void) => {
 	changeState(curtain, "disappearing", 0.5, () => {
 		idleState(curtain, "hidden");
+		callback?.();
 	});
 };

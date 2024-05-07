@@ -35,7 +35,7 @@ export const setTesting = (value: boolean) => {
 };
 
 export const pickMushroomData = (player: PlayerData): MushroomData => {
-	const threshold = 0.5; // - player.monsters.length * 0.01 - player.defense * 0.01;
+	const threshold = Math.min(0.75, 0.3 + player.mushrooms.length * 0.02);
 
 	let strength: 1 | 2 = 1;
 	if (Math.random() < threshold) {
@@ -56,15 +56,12 @@ const pickMonsterPosition = (player: PlayerData) => {
 };
 
 const pickMonsterStrength = (player: PlayerData) => {
-	const threshold = 0.5 - player.mushrooms.length * 0.1;
+	const threshold = Math.min(0.75, 0.3 + player.monsters.length * 0.02);
 
 	let strength: 1 | 2 | 3 = 1;
 	if (Math.random() < threshold) {
 		strength = 2;
-		if (
-			Math.random() < threshold // &&
-			// player.mushrooms.length < 2 // || player.defense < 8)
-		) {
+		if (Math.random() < threshold) {
 			strength = 3;
 		}
 	}
@@ -92,7 +89,8 @@ export const pickDefenseData = (player: PlayerData) => {
 	// 	return { strength: 16 - player.defense };
 	// }
 
-	const threshold = 0.5; //  -
+	const threshold = Math.min(0.75, 0.3 + player.defense * 0.02);
+	// const threshold = 0.5; //  -
 	// player.monsters.length * 0.02 -
 	// player.mushrooms.length * 0.02 +
 	// (player.defense - 8) * 0.03;

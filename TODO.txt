@@ -1,15 +1,15 @@
-- Add a confirmation when leaving the page
-- Handle restarting a new game, no animations currently
-- Make initial mana points appear at the same time as mushrooms (?)
-- Handle players disconnecting
+- New lobby architecture
 - Show current mana points of opponent when playing online
+- Add a confirmation when leaving the page + handle players disconnecting
 - Buying back the shield does not show the mana point going there
-- WizardIdle not in global time?
-- Wizard waiting animations
+
+- Hamburger menu
 - New sounds
 
-Need animations:
-- When creating new game, show posting and no wizard/runes, start all animations
-  when other player joins
-- Lobby: Join selects a player, Play starts the game
-- Hamburger menu
+- Handle restarting a new game, no animations currently
+- Make initial mana points appear at the same time as mushrooms (?)
+- WizardIdle not in global time?
+- Add close button to lobby
+- ShieldHit then ShieldEnd
+- Monsters on top of wizard
+- Faster fight/mushrooms depending on amount?

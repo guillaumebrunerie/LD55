@@ -1,11 +1,21 @@
 import { getDuration } from "./Animation";
-import { WizardAppear, WizardDie } from "./assets";
+import {
+	WizardAppear,
+	WizardDie,
+	WizardMagicEnd,
+	WizardMagicLoop,
+	WizardMagicStart,
+	WizardWaitingEnd,
+	WizardWaitingLoop,
+	WizardWaitingStart,
+} from "./assets";
 import {
 	idleState,
 	newEntity,
 	makeTick,
 	type Entity,
 	changeState,
+	schedule2,
 } from "./entities";
 import type { Player } from "./gameLogic";
 
@@ -17,6 +27,9 @@ type WizardState =
 	| "magicLoop"
 	| "magicEnd"
 	| "winning"
+	| "waitingStart"
+	| "waitingLoop"
+	| "waitingEnd"
 	| "die";
 
 export type WizardT = Entity<WizardState>;
@@ -32,14 +45,47 @@ export const appearWizard = (wizard: WizardT) => {
 };
 
 export const magicStartWizard = (wizard: WizardT) => {
-	changeState(wizard, "magicStart", 0.5, () => {
+	changeState(wizard, "magicStart", getDuration(WizardMagicStart, 20), () => {
 		idleState(wizard, "magicLoop");
 	});
 };
 
 export const magicEndWizard = (wizard: WizardT) => {
-	changeState(wizard, "magicEnd", 0.5, () => {
-		idleState(wizard, "idle");
+	const loopDuration = getDuration(WizardMagicLoop, 20);
+	const loops = Math.ceil(wizard.lt / loopDuration);
+
+	schedule2(wizard, loops * loopDuration - wizard.lt, () => {
+		changeState(wizard, "magicEnd", getDuration(WizardMagicEnd, 20), () => {
+			idleState(wizard, "idle");
+		});
+	});
+};
+
+export const waitingStartWizard = (wizard: WizardT) => {
+	changeState(
+		wizard,
+		"waitingStart",
+		getDuration(WizardWaitingStart, 20),
+		() => {
+			idleState(wizard, "waitingLoop");
+		},
+	);
+};
+
+export const waitingEndWizard = (wizard: WizardT, callback: () => void) => {
+	const loopDuration = getDuration(WizardWaitingLoop, 20);
+	const loops = Math.ceil(wizard.lt / loopDuration);
+
+	schedule2(wizard, loops * loopDuration - wizard.lt, () => {
+		changeState(
+			wizard,
+			"waitingEnd",
+			getDuration(WizardWaitingEnd, 20),
+			() => {
+				idleState(wizard, "idle");
+				callback();
+			},
+		);
 	});
 };
 

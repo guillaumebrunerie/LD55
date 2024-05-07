@@ -1,6 +1,5 @@
 import { useState, useEffect, useReducer, Fragment } from "react";
 import {
-	ColorMatrixFilter,
 	FederatedPointerEvent,
 	Filter,
 	SpriteMaskFilter,
@@ -34,12 +33,9 @@ import {
 	StartVsHumanOffDefault,
 	TextBox,
 	TextBoxAppear,
-	WizardMagicEnd,
-	WizardMagicStart,
-	WizardWaitingLoop,
 } from "./assets";
 import { buyMonster, buyDefense, buyMushroom, type GameT } from "./gameLogic";
-import { Game, Wizard, WizardDark } from "./Game";
+import { Game, Wizard } from "./Game";
 import { wave } from "./ease";
 import { appearButton, disappearButton, type ButtonT } from "./button";
 import { GlobalTimeContext } from "./globalTimeContext";
@@ -48,7 +44,6 @@ import { api } from "../convex/_generated/api";
 import { CustomText } from "./CustomText";
 import type { Id } from "../convex/_generated/dataModel";
 import { Rectangle as Box } from "./Rectangle";
-import { getFrame, getNtFrame } from "./Animation";
 import { darkFilter } from "./filters";
 
 const left = 420;
@@ -535,8 +530,17 @@ export const App = () => {
 					filters={filters}
 					alpha={screenAlpha}
 				/>
-				<Container scale={[-1, 1]} x={1920}>
-					<WizardDark game={game} />
+				<Container
+					scale={[-1, 1]}
+					x={1920}
+					filters={[darkFilter]}
+					alpha={screenAlpha}
+				>
+					<Wizard
+						game={game}
+						player={game.opponent}
+						wizard={game.opponent.wizard}
+					/>
 				</Container>
 				<LogoMoon app={app} filters={filters} alpha={screenAlpha} />
 				<UIButtons game={game} />

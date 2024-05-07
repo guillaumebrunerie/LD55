@@ -161,11 +161,11 @@ export const testStrategiesOnce = (
 			}
 		}
 	};
-	const printPlayer = (player: Player, label: string) => {
-		console.log(label, "mushrooms", player.current.mushrooms.length);
-		console.log(label, "runes", player.current.defense);
-		console.log(label, "ghosts", player.current.monsters.length);
-	};
+	// const printPlayer = (player: Player, label: string) => {
+	// 	console.log(label, "mushrooms", player.current.mushrooms.length);
+	// 	console.log(label, "runes", player.current.defense);
+	// 	console.log(label, "ghosts", player.current.monsters.length);
+	// };
 
 	const game = newGame();
 	let round = 1;
@@ -222,13 +222,13 @@ const testStrategies = (strategy1: Strategy, strategy2: Strategy) => {
 };
 
 const main = () => {
-	// console.log("");
-	// testStrategies(defenseStrategy, attackStrategy);
-	// testStrategies(attackStrategy, manaStrategy);
-	// testStrategies(manaStrategy, defenseStrategy);
-	// testStrategies(attackStrategy, randomStrategy);
-	// testStrategies(defenseStrategy, randomStrategy);
-	// testStrategies(manaStrategy, randomStrategy);
+	console.log("");
+	testStrategies(defenseStrategy, attackStrategy);
+	testStrategies(attackStrategy, manaStrategy);
+	testStrategies(manaStrategy, defenseStrategy);
+	testStrategies(attackStrategy, randomStrategy);
+	testStrategies(defenseStrategy, randomStrategy);
+	testStrategies(manaStrategy, randomStrategy);
 	console.log("");
 	testStrategies(smartStrategy, randomStrategy);
 	testStrategies(smartStrategy, defenseStrategy);

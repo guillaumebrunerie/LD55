@@ -40,7 +40,7 @@ import {
 	WizardWaitingEnd,
 	WizardWaitingLoop,
 } from "./assets";
-import { BLEND_MODES, ColorMatrixFilter } from "pixi.js";
+import { BLEND_MODES, Texture } from "pixi.js";
 import { getFrame, getNtFrame } from "./Animation";
 import type { WizardT } from "./wizard";
 import { useGlobalTime } from "./useGlobalTime";
@@ -49,7 +49,7 @@ import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { useEffect } from "react";
 import { runInAction } from "mobx";
-import { darkFilter, opponentFilter } from "./filters";
+import { opponentFilter } from "./filters";
 
 const SyncLastFight = ({ game }: { game: GameT }) => {
 	const lastFight = useQuery(api.functions.lastFight, {
@@ -88,37 +88,6 @@ export const Game = ({ game }: { game: GameT }) => {
 	);
 };
 
-export const WizardDark = ({ game }: { game: GameT }) => {
-	if (game.curtain.state == "hidden") {
-		return null;
-	}
-	let screenAlpha;
-	let wizardTexture;
-	switch (game.curtain.state) {
-		case "appearing":
-			screenAlpha = wave(game.curtain.nt);
-			wizardTexture = getNtFrame(WizardWaitingStart, game.curtain.nt);
-			break;
-		case "disappearing":
-			screenAlpha = wave(1 - game.curtain.nt);
-			wizardTexture = getNtFrame(WizardWaitingEnd, game.curtain.nt);
-			break;
-		case "idle":
-			screenAlpha = 1;
-			wizardTexture = getFrame(WizardWaitingLoop, 20, game.curtain.lt);
-			break;
-	}
-	return (
-		<Sprite
-			texture={wizardTexture}
-			x={-15}
-			y={230}
-			alpha={screenAlpha}
-			filters={[darkFilter]}
-		/>
-	);
-};
-
 export const Wizard = ({
 	game,
 	player,
@@ -130,97 +99,46 @@ export const Wizard = ({
 }) => {
 	const gt = useGlobalTime();
 
-	if (player == game.opponent && game.curtain.state !== "hidden") {
-		let wizardTexture;
-		switch (game.curtain.state) {
-			case "appearing":
-				wizardTexture = getNtFrame(WizardWaitingStart, game.curtain.nt);
-				break;
-			case "disappearing":
-				wizardTexture = getNtFrame(WizardWaitingEnd, game.curtain.nt);
-				break;
-			case "idle":
-				wizardTexture = getFrame(
-					WizardWaitingLoop,
-					20,
-					game.curtain.lt,
-				);
-				break;
-		}
+	const props = {
+		x: -15,
+		y: 230,
+		filters: player == game.opponent ? [opponentFilter] : [],
+	};
+
+	const transition = (animation: Texture[], props2 = {}) => {
 		return (
 			<Sprite
-				texture={wizardTexture}
-				x={-15}
-				y={230}
-				filters={[opponentFilter]}
+				texture={getNtFrame(animation, wizard.nt)}
+				{...props}
+				{...props2}
 			/>
 		);
-	}
+	};
+	const looping = (animation: Texture[], fps = 20, time = gt) => {
+		return <Sprite texture={getFrame(animation, fps, time)} {...props} />;
+	};
 
 	switch (wizard.state) {
 		case "idle":
-			return (
-				<Sprite
-					texture={getFrame(WizardIdle, 10, gt)}
-					x={-15}
-					y={230}
-					filters={player == game.opponent ? [opponentFilter] : []}
-				/>
-			);
+			return looping(WizardIdle, 10);
 		case "winning":
-			return (
-				<Sprite
-					texture={getFrame(WizardWin, 20, gt)}
-					x={-15}
-					y={230}
-					filters={player == game.opponent ? [opponentFilter] : []}
-				/>
-			);
+			return looping(WizardWin, 20);
 		case "magicStart":
-			return (
-				<Sprite
-					texture={getNtFrame(WizardMagicStart, wizard.nt)}
-					x={-15}
-					y={230}
-					filters={player == game.opponent ? [opponentFilter] : []}
-				/>
-			);
+			return transition(WizardMagicStart);
 		case "magicLoop":
-			return (
-				<Sprite
-					texture={getFrame(WizardMagicLoop, 20, wizard.lt)}
-					x={-15}
-					y={230}
-					filters={player == game.opponent ? [opponentFilter] : []}
-				/>
-			);
+			return looping(WizardMagicLoop, 20, wizard.lt);
 		case "magicEnd":
-			return (
-				<Sprite
-					texture={getNtFrame(WizardMagicEnd, wizard.nt)}
-					x={-15}
-					y={230}
-					filters={player == game.opponent ? [opponentFilter] : []}
-				/>
-			);
+			return transition(WizardMagicEnd);
+		case "waitingStart":
+			return transition(WizardWaitingStart);
+		case "waitingLoop":
+			return looping(WizardWaitingLoop, 20, wizard.lt);
+		case "waitingEnd":
+			return transition(WizardWaitingEnd);
 		case "appearing":
-			return (
-				<Sprite
-					texture={getNtFrame(WizardAppear, wizard.nt)}
-					x={-15}
-					y={230}
-					filters={player == game.opponent ? [opponentFilter] : []}
-				/>
-			);
+			return transition(WizardAppear);
 		case "die":
-			return (
-				<Sprite
-					texture={getNtFrame(WizardDie, wizard.nt)}
-					x={-80}
-					y={170}
-					filters={player == game.opponent ? [opponentFilter] : []}
-				/>
-			);
+			return transition(WizardDie, { x: -80, y: 170 });
 		case "hidden":
 			break;
 		default:
