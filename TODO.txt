@@ -2,6 +2,7 @@
 - Show current mana points of opponent when playing online
 - Add a confirmation when leaving the page + handle players disconnecting
 - Buying back the shield does not show the mana point going there
+- Fix glitches with global time and Idle and MagicEnd
 
 - Hamburger menu
 - New sounds
