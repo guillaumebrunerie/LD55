@@ -67,6 +67,27 @@ export const makeTick =
 		stateCallbacks[entity.state]?.();
 	};
 
+export const makeTick2 =
+	<T extends Entity<any>>(
+		callback: (entity: T, delta: number) => void = () => {},
+	) =>
+	(entity: T, delta: number) => {
+		callback(entity, delta);
+		entity.lt += delta;
+		let executedTransition = false;
+		for (const transition of entity.transitions) {
+			if (entity.lt > transition.duration) {
+				transition.callback(entity);
+				executedTransition = true;
+			}
+		}
+		if (executedTransition) {
+			entity.transitions = entity.transitions.filter(
+				(t) => t.duration >= entity.lt,
+			);
+		}
+	};
+
 export const schedule = <State extends string, T extends Entity<State>>(
 	callback: (v: T) => void,
 	entity: T,

@@ -3,7 +3,7 @@ import { mutation, query } from "./_generated/server";
 import { pickName } from "./names";
 import type { Doc } from "./_generated/dataModel";
 import { initialDefense, initialMana } from "../src/rules";
-import { WithoutSystemFields } from "convex/server";
+import type { WithoutSystemFields } from "convex/server";
 
 const pickToken = () => {
 	return Math.random().toString(36).slice(2);
@@ -21,8 +21,8 @@ const newPlayer = (): WithoutSystemFields<Doc<"players">> => ({
 export const createNewPlayer = mutation({
 	handler: async (ctx) => {
 		const player = newPlayer();
-		const id = await ctx.db.insert("players", player);
-		return { id, token: player.token };
+		const playerId = await ctx.db.insert("players", player);
+		return { playerId, token: player.token };
 	},
 });
 
@@ -32,6 +32,7 @@ export const disconnect = mutation({
 		token: v.string(),
 	},
 	handler: async (ctx, { playerId, token }) => {
+		console.log("DISCONNECT");
 		const player = await ctx.db.get(playerId);
 		if (!player || player.token != token) {
 			return;

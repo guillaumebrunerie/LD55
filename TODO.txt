@@ -1,17 +1,13 @@
-- New lobby architecture
-- Show current mana points of opponent when playing online
-- Add a confirmation when leaving the page + handle players disconnecting
-- Buying back the shield does not show the mana point going there
-- Fix glitches with global time and Idle and MagicEnd
-
 - Hamburger menu
-- New sounds
-- Restart buttons
-
-- Handle restarting a new game, no animations currently
-- Make initial mana points appear at the same time as mushrooms (?)
-- WizardIdle not in global time?
-- Add close button to lobby
-- ShieldHit then ShieldEnd
+- Buying back the shield does not show the mana point going there
+- Mana/mushroom sounds
 - Monsters on top of wizard
+- Restart buttons
+- New lobby architecture (waiting for assets)
+
+- Add close button to lobby
 - Faster fight/mushrooms depending on amount?
+- Make initial mana points appear at the same time as mushrooms
+- Show current mana points of opponent when playing online
+- ShieldHit then ShieldEnd
+- Fix glitches with global time and Idle and MagicEnd

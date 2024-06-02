@@ -45,21 +45,47 @@ import { getFrame, getNtFrame } from "./Animation";
 import type { WizardT } from "./wizard";
 import { useGlobalTime } from "./useGlobalTime";
 import { wave } from "./ease";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import { useEffect } from "react";
 import { runInAction } from "mobx";
 import { opponentFilter } from "./filters";
 
+const DisconnectOnClose = ({ game }: { game: GameT }) => {
+	// Warn before closing
+	useEffect(() => {
+		const listener = (event: BeforeUnloadEvent) => {
+			event.preventDefault();
+		};
+		window.addEventListener("beforeunload", listener);
+		return () => {
+			window.removeEventListener("beforeunload", listener);
+		};
+	}, []);
+	// Disconnect on close
+	const disconnect = useMutation(api.lobby.disconnect);
+	useEffect(() => {
+		const listener = () => {
+			const { credentials } = game;
+			if (credentials) {
+				void disconnect(credentials);
+			} else {
+				console.error("No credentials");
+			}
+		};
+		window.addEventListener("pagehide", listener);
+		return () => {
+			window.removeEventListener("pagehide", listener);
+		};
+	}, [disconnect, game]);
+	return null;
+};
+
 const SyncLastFight = ({ game }: { game: GameT }) => {
-	const lastFight = useQuery(api.fight.lastFight, {
-		playerId: game.playerId,
-		token: game.token,
-	});
+	const lastFight = useQuery(api.fight.lastFight, game.credentials || {});
 	useEffect(() => {
 		runInAction(() => {
 			if (lastFight) {
-				console.log("Fight:", lastFight);
 				setupFight(game, lastFight);
 			}
 		});
@@ -70,7 +96,8 @@ const SyncLastFight = ({ game }: { game: GameT }) => {
 export const Game = ({ game }: { game: GameT }) => {
 	return (
 		<Container>
-			{game.playerId && <SyncLastFight game={game} />}
+			{game.credentials && <DisconnectOnClose game={game} />}
+			{game.credentials && <SyncLastFight game={game} />}
 			<Container scale={[-1, 1]} x={1920}>
 				<Player
 					game={game}
@@ -168,7 +195,7 @@ const Player = ({
 	);
 };
 
-const ManaPoints = ({ items }: { items: Mana[] }) => {
+export const ManaPoints = ({ items }: { items: Mana[] }) => {
 	return items.map((item, i) => <ManaPointC key={i} item={item} />);
 };
 
@@ -423,6 +450,20 @@ const Mushroom = ({ item }: { item: Mushroom }) => {
 						position={item.position}
 					/>
 				</>
+			);
+		case "disappearing":
+			return (
+				<Sprite
+					anchor={0.5}
+					scale={1}
+					rotation={0}
+					blendMode={BLEND_MODES.NORMAL}
+					texture={getNtFrame(
+						manaEndAnimations[item.strength],
+						item.nt,
+					)}
+					position={item.position}
+				/>
 			);
 	}
 	return null;

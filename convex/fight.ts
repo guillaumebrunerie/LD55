@@ -4,6 +4,27 @@ import type { DataModel, Doc, Id } from "./_generated/dataModel";
 import { pickFighter, initialMana, maxDefense } from "../src/rules";
 import type { GenericMutationCtx, GenericQueryCtx } from "convex/server";
 
+export const opponentManaPoints = query({
+	args: {
+		playerId: v.optional(v.id("players")),
+		token: v.optional(v.string()),
+	},
+	handler: async (ctx, { playerId, token }) => {
+		if (!playerId) {
+			return null;
+		}
+		const player = await getPlayer(ctx, playerId);
+		if (player.token !== token || !player.gameId) {
+			return null;
+		}
+		const game = await getGame(ctx, player.gameId);
+		const opponentId =
+			game.playerId == playerId ? game.opponentId : game.playerId;
+		const opponent = await getPlayer(ctx, opponentId);
+		return opponent.mana;
+	},
+});
+
 export const lastFight = query({
 	args: {
 		playerId: v.optional(v.id("players")),

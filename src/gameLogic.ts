@@ -50,6 +50,8 @@ import {
 	makeTick,
 	type Entity,
 	changeState,
+	schedule2,
+	makeTick2,
 } from "./entities";
 import { smartStrategy, type Strategy } from "./strategies";
 import {
@@ -115,8 +117,9 @@ export type Rune = Entity<RuneState> & {
 	hidden?: boolean;
 };
 
-type MushroomState = "visible" | "preSpawning" | "spawning";
+type MushroomState = "visible" | "preSpawning" | "spawning" | "disappearing";
 export type Mushroom = Entity<MushroomState> & {
+	id: string;
 	position: Point;
 	tmpPosition?: Point;
 	previousItem?: Mana;
@@ -152,10 +155,9 @@ export type Player = Entity<PlayerState> & {
 	previousEndData: PlayerData;
 };
 
-const tickPlayer = makeTick<"idle" | "fight", Player>((player, delta) => {
+const tickPlayer = makeTick2((player: Player, delta) => {
 	tickWizard(player.wizard, delta);
 	tickItems(player, delta);
-	return {};
 });
 
 const delta = 150;
@@ -197,6 +199,7 @@ const spawnMushroom = (
 	const position = pickPosition(array, bounds, delta);
 	const mushroom: Mushroom = {
 		...newEntity("preSpawning"),
+		id: generateId(),
 		position,
 		strength,
 		tmpPosition: manaPoint?.position,
@@ -269,6 +272,7 @@ const addRune = (array: Rune[], props?: Partial<Rune>) => {
 const addMushroom = (array: Mushroom[], bounds: Bounds, strength: 1 | 2) => {
 	const position = pickPosition(array, bounds, delta);
 	array.push({
+		id: generateId(),
 		lt: 0,
 		nt: 0,
 		position,
@@ -312,6 +316,7 @@ const spawnManaPoint = (
 	player: Player,
 	previousItem: Mushroom | undefined = undefined,
 	silent = false,
+	callback?: () => void,
 ) => {
 	const position = pickPosition(player.manaPoints, manaPointsBounds, delta);
 
@@ -327,6 +332,7 @@ const spawnManaPoint = (
 	}
 	changeState(manaPoint, "spawning", manaSpawnDuration, (manaPoint) => {
 		idleState(manaPoint, "visible");
+		callback?.();
 	});
 
 	player.manaPoints.push(manaPoint);
@@ -334,20 +340,6 @@ const spawnManaPoint = (
 
 const spawnManaPointSilent = (player: Player) => {
 	spawnManaPoint(player, undefined, true);
-};
-
-const rebuildManaPoint = (player: Player) => {
-	if (player.manaPoints.length < initialMana) {
-		spawnManaPoint(player);
-		return;
-	}
-	const item = player.items.mushrooms.pop();
-	if (item) {
-		void ManaCreated.play({ volume: 0.5 });
-		for (let i = 0; i < item.strength; i++) {
-			spawnManaPoint(player, item);
-		}
-	}
 };
 
 const addManaPoints = (player: Player) => {
@@ -385,8 +377,10 @@ type GameState =
 
 export type GameT = Entity<GameState> & {
 	gameId?: Id<"games">;
-	playerId?: Id<"players">;
-	token?: string;
+	credentials?: {
+		playerId: Id<"players">;
+		token: string;
+	};
 	opponentId?: Id<"players">;
 	round: number;
 	player: Player;
@@ -424,17 +418,17 @@ export const startGame = (game: GameT) => {
 	void WizardStart.play();
 	appearWizard(game.opponent.wizard);
 	appearWizard(game.player.wizard);
-	schedule(showCurtain, game.curtain, 0.7);
-	schedule(waitingStartWizard, game.opponent.wizard, 0);
-	schedule(appearButton, game.manaButton, 1.2);
-	schedule(appearButton, game.attackButton, 1.2);
-	schedule(appearButton, game.defenseButton, 1.2);
+	schedule2(game.curtain, 0.7, showCurtain);
+	schedule2(game.opponent.wizard, 0, waitingStartWizard);
+	schedule2(game.manaButton, 1.2, appearButton);
+	schedule2(game.attackButton, 1.2, appearButton);
+	schedule2(game.defenseButton, 1.2, appearButton);
 
 	let t = 1;
 	for (let i = 0; i < initialMana; i++) {
 		t += 0.1;
-		schedule(spawnManaPoint, game.player, i == 0 ? 1.1 : 0.1);
-		schedule(spawnManaPointSilent, game.opponent, i == 0 ? 1.1 : 0.1);
+		schedule2(game.player, t, spawnManaPoint);
+		schedule2(game.opponent, t, spawnManaPointSilent);
 	}
 
 	for (let i = 0; i < initialDefense; i++) {
@@ -558,6 +552,7 @@ export const setupFight = (game: GameT, lastFight: LastFight) => {
 		const { strength } = mushroomData;
 		const mushroom: Mushroom = {
 			...newEntity("visible"),
+			id: generateId(),
 			position: pickPosition(
 				game.opponent.items.mushrooms,
 				manaBounds,
@@ -594,6 +589,7 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 				const { strength } = pickMushroomData(getPlayerData(opponent));
 				const mushroom: Mushroom = {
 					...newEntity("visible"),
+					id: generateId(),
 					position: pickPosition(
 						game.opponent.items.mushrooms,
 						manaBounds,
@@ -656,7 +652,7 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 	game.opponent.previousEndData = getPlayerData(game.opponent);
 };
 
-const rebuildDuration = 0.1;
+const rebuildDuration = 0.2;
 
 export const tickGame = makeTick<GameState, GameT>(
 	(game: GameT, delta: number) => {
@@ -718,16 +714,6 @@ export const tickGame = makeTick<GameState, GameT>(
 		};
 	},
 );
-
-const rebuildOne = (game: GameT) => {
-	if (hasManaToSpawn(game.player)) {
-		rebuildManaPoint(game.player);
-		changeState(game, "rebuild", rebuildDuration, () => rebuildOne(game));
-	} else {
-		idleState(game, "buildUp");
-		nextRound(game);
-	}
-};
 
 const tickItems = (player: Player, delta: number) => {
 	for (const item of player.items.monsters) {
@@ -843,6 +829,113 @@ const tickManaPoint = makeTick<ManaState, Mana>((item) => {
 	};
 });
 
+const rebuildManaPoint = (player: Player) => {
+	if (player.manaPoints.length < initialMana) {
+		spawnManaPoint(player);
+		return;
+	}
+	const item = player.items.mushrooms.pop();
+	if (item) {
+		void ManaCreated.play({ volume: 0.5 });
+		for (let i = 0; i < item.strength; i++) {
+			spawnManaPoint(player, item);
+		}
+	}
+};
+
+const rebuildOne = (game: GameT) => {
+	if (hasManaToSpawn(game.player)) {
+		rebuildManaPoint(game.player);
+		changeState(game, "rebuild", rebuildDuration, () => rebuildOne(game));
+	} else {
+		idleState(game, "buildUp");
+		nextRound(game);
+	}
+};
+
+// const newFlow = () => {
+// 	let count = 0;
+// 	let callback: (() => void) | null = null;
+// 	let hasRun = false;
+// 	const maybeRunCallback = () => {
+// 		if (count <= 0) {
+// 			if (callback == null) {
+// 				console.error("Scheduler: no callback");
+// 			} else if (hasRun) {
+// 				console.error("Scheduler: callback has already run");
+// 			} else {
+// 				hasRun = true;
+// 				callback();
+// 			}
+// 		}
+// 	};
+// 	return {
+// 		callback: () => {
+// 			count++;
+// 			return () => {
+// 				count--;
+// 				maybeRunCallback();
+// 			};
+// 		},
+// 		onDone: (cb: () => void) => {
+// 			callback = cb;
+// 			maybeRunCallback();
+// 		},
+// 	};
+// };
+
+// const withScheduler = <T extends unknown, R>(
+// 	f: (arg: T, s: ReturnType<typeof newScheduler>) => R,
+// ) => {
+// 	return (arg: T, cb: () => void) => {
+// 		const s = newScheduler();
+// 		f(arg, s);
+// 		s.onDone(cb);
+// 	};
+// };
+
+const rebuildPlayerMana = (player: Player) => {
+	let time = 0;
+	for (let i = 0; i < initialMana; i++) {
+		schedule2(player, i * rebuildDuration, (player) => {
+			spawnManaPoint(player, undefined, undefined);
+		});
+		time = Math.max(time, i * rebuildDuration + manaSpawnDuration);
+	}
+	player.items.mushrooms.forEach((mushroom, i) => {
+		// void ManaCreated.play({ volume: 0.5 });
+		for (let j = 0; j < mushroom.strength; j++) {
+			schedule2(
+				player,
+				i * rebuildDuration + 4 * rebuildDuration,
+				(player) => {
+					player.items.mushrooms = player.items.mushrooms.filter(
+						(m) => m.id !== mushroom.id,
+					);
+					spawnManaPoint(player, mushroom, undefined);
+				},
+			);
+			time = Math.max(
+				time,
+				i * rebuildDuration + 4 * rebuildDuration + manaSpawnDuration,
+			);
+		}
+	});
+	return time;
+};
+
+const rebuildMana = (game: GameT, callback: () => void) => {
+	idleState(game, "rebuild");
+	showCurtain(game.curtain);
+	schedule(waitingStartWizard, game.opponent.wizard, 0.5);
+
+	let time = 0;
+	time = Math.max(time, rebuildPlayerMana(game.player));
+	// time = Math.max(time, rebuildPlayerMana(game.opponent));
+	schedule2(game, time + 0.05, callback);
+	// rebuildOne(game);
+};
+
 const pickAttackOrDefensePair = (game: GameT) => {
 	const playerMonsters = game.player.items.monsters.filter(
 		(m) => m.state == "visible",
@@ -852,9 +945,11 @@ const pickAttackOrDefensePair = (game: GameT) => {
 	).length;
 	if (playerMonsters == 0 && opponentMonsters == 0) {
 		// No monsters, we move to the next round
-		showCurtain(game.curtain);
-		schedule(waitingStartWizard, game.opponent.wizard, 0.5);
-		rebuildOne(game);
+		rebuildMana(game, () => {
+			console.log("FINISHED");
+			idleState(game, "buildUp");
+			nextRound(game);
+		});
 		return;
 	}
 	if (playerMonsters > 0 && opponentMonsters > 0) {
@@ -941,6 +1036,20 @@ const doWin = (game: GameT, winner: Player, loser: Player) => {
 			});
 		}
 	}
+	for (const item of winner.items.mushrooms) {
+		if (item.state == "visible") {
+			changeState(item, "visible", fightDuration * 2, () => {
+				removeMushroom(winner, item);
+			});
+		}
+	}
+	for (const item of loser.items.mushrooms) {
+		if (item.state == "visible") {
+			changeState(item, "visible", fightDuration * 2, () => {
+				removeMushroom(loser, item);
+			});
+		}
+	}
 	idleState(game, "gameover");
 	schedule(appearButton, game.startButton, 1);
 };
@@ -956,6 +1065,14 @@ const removeMonster = (player: Player, monster: Monster) => {
 	changeState(monster, "fighting", fightDuration, (monster) => {
 		player.items.monsters = player.items.monsters.filter(
 			(item) => item.id != monster.id,
+		);
+	});
+};
+
+const removeMushroom = (player: Player, mushroom: Mushroom) => {
+	changeState(mushroom, "disappearing", fightDuration, (mushroom) => {
+		player.items.mushrooms = player.items.mushrooms.filter(
+			(item) => item.id != mushroom.id,
 		);
 	});
 };
@@ -1122,13 +1239,10 @@ export const buyMushroom = async (
 	buyMushroomMutation: ReactMutation<typeof api.player.buyMushroom>,
 ) => {
 	const manaPoint = lockManaPoint(player);
-	const { playerId, token } = game;
+	const { credentials } = game;
 	const result =
-		playerId ?
-			await buyMushroomMutation({
-				playerId,
-				token,
-			})
+		credentials ?
+			await buyMushroomMutation(credentials)
 		:	pickMushroomData(getPlayerData(player));
 	if (!result) {
 		return;
@@ -1170,10 +1284,10 @@ export const buyMonster = async (
 	buyMonsterMutation: ReactMutation<typeof api.player.buyMonster>,
 ) => {
 	const manaPoint = lockManaPoint(player);
-	const { playerId, token } = game;
+	const { credentials } = game;
 	const result =
-		playerId ?
-			await buyMonsterMutation({ playerId, token })
+		credentials ?
+			await buyMonsterMutation(credentials)
 		:	pickMonsterData(getPlayerData(player));
 	if (!result) {
 		return;
@@ -1195,10 +1309,10 @@ export const buyDefense = async (
 		console.error("No mana point");
 		return;
 	}
-	const { playerId, token } = game;
+	const { credentials } = game;
 	const result =
-		playerId ?
-			await buyDefenseMutation({ playerId, token })
+		credentials ?
+			await buyDefenseMutation(credentials)
 		:	pickDefenseData(getPlayerData(player));
 	runInAction(() => {
 		if (!result) {

@@ -1,6 +1,6 @@
 import { Text, type _ReactPixi } from "@pixi/react";
-import type { Point } from "./gameLogic";
 import { TextStyle } from "pixi.js";
+import type { Point } from "./utils";
 
 export const CustomText = ({
 	text,

@@ -57,7 +57,7 @@ export const startNewGameAgainstComputer = (app: AppT) => {
 	app.lt = 0;
 	app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
 	app.game.gameId = undefined;
-	app.game.playerId = undefined;
+	delete app.game.credentials;
 	console.log("START AGAINST COMPUTER");
 	startGame(app.game);
 };
@@ -67,11 +67,10 @@ export const startNewGameAgainstPlayer = (app: AppT, gameId: Id<"games">) => {
 		app.state = "transition";
 	}
 	app.lt = 0;
-	const { playerId, token, opponentId } = app.game;
+	const { credentials, opponentId } = app.game;
 	app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
 	app.game.gameId = gameId;
-	app.game.playerId = playerId;
-	app.game.token = token;
+	app.game.credentials = credentials;
 	app.game.opponentId = opponentId;
 	startGame(app.game);
 };

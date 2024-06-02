@@ -63,12 +63,11 @@ const hitBoxWidth = 1100;
 const Lobby = ({ app }: { app: AppT }) => {
 	const createNewPlayer = useMutation(api.lobby.createNewPlayer);
 	useEffect(() => {
-		if (!app.game.playerId) {
+		if (!app.game.credentials) {
 			createNewPlayer()
-				.then(({ id, token }) => {
+				.then((credentials) => {
 					runInAction(() => {
-						app.game.playerId = id;
-						app.game.token = token;
+						app.game.credentials = credentials;
 					});
 				})
 				.catch(() => {
@@ -77,9 +76,11 @@ const Lobby = ({ app }: { app: AppT }) => {
 		}
 	}, [app, createNewPlayer]);
 
-	const { playerId, token, opponentId } = app.game;
+	const { credentials, opponentId } = app.game;
 
-	const gameId = useQuery(api.player.currentGameId, { playerId });
+	const gameId = useQuery(api.player.currentGameId, {
+		playerId: credentials?.playerId,
+	});
 	useEffect(() => {
 		if (gameId) {
 			runInAction(() => {
@@ -91,16 +92,16 @@ const Lobby = ({ app }: { app: AppT }) => {
 	const availablePlayers = useQuery(api.lobby.availablePlayers);
 	const requestPlay = useMutation(api.lobby.requestPlay);
 	const players =
-		(playerId &&
+		(credentials &&
 			availablePlayers
-				?.filter(({ id }) => id !== app.game.playerId)
+				?.filter(({ id }) => id !== credentials.playerId)
 				.map(({ id, name, opponentId: theirOpponentId }) => {
 					return {
 						id,
 						name,
 						type:
 							id == opponentId ? ("waiting" as const)
-							: theirOpponentId == playerId ?
+							: theirOpponentId == credentials.playerId ?
 								("requested" as const)
 							:	("default" as const),
 					};
@@ -155,7 +156,7 @@ const Lobby = ({ app }: { app: AppT }) => {
 						eventMode="static"
 						pointerdown={action(() => {
 							void ClickStart.play();
-							if (!playerId || !token) {
+							if (!credentials) {
 								return;
 							}
 							if (app.game.opponentId == id) {
@@ -164,8 +165,7 @@ const Lobby = ({ app }: { app: AppT }) => {
 								app.game.opponentId = id;
 							}
 							void requestPlay({
-								playerId,
-								token,
+								...credentials,
 								opponentId: id,
 							});
 						})}
@@ -206,12 +206,11 @@ const StartButton = ({
 					eventMode="static"
 					pointerdown={action(() => {
 						disappearButton(app.game.lobby);
-						const { playerId, token } = app.game;
-						if (playerId && token) {
-							void disconnect({ playerId, token });
+						const { credentials } = app.game;
+						if (credentials) {
+							void disconnect(credentials);
 							console.log("DISCONNECTING");
-							app.game.playerId = undefined;
-							app.game.token = undefined;
+							delete app.game.credentials;
 							app.game.opponentId = undefined;
 						}
 						void ClickStart.play();
@@ -588,6 +587,14 @@ export const App = () => {
 						wizard={game.opponent.wizard}
 					/>
 				</Container>
+				{/* <Container */}
+				{/* 	scale={[-1, 1]} */}
+				{/* 	x={1920} */}
+				{/* 	filters={[]} */}
+				{/* 	alpha={screenAlpha * 0.4} */}
+				{/* > */}
+				{/* 	<ManaPoints items={game.opponent.manaPoints} /> */}
+				{/* </Container> */}
 				<LogoMoon app={app} filters={filters} alpha={screenAlpha} />
 				<UIButtons game={game} />
 				<StartButton
@@ -595,7 +602,9 @@ export const App = () => {
 					button={game.startButton}
 					position={[1920 / 2, 730]}
 				/>
-				{game.playerId && <PlayerName playerId={game.playerId} />}
+				{game.credentials && (
+					<PlayerName playerId={game.credentials.playerId} />
+				)}
 				{game.opponentId && <OpponentName playerId={game.opponentId} />}
 				<SoundButton />
 				{/* <PolygonShape polygon={manaBounds.polygon} alpha={0.4} /> */}
