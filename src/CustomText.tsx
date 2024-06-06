@@ -20,9 +20,9 @@ export const CustomText = ({
 			anchor={anchor}
 			style={
 				new TextStyle({
-					fontFamily: "monospace",
+					fontFamily: "futura",
 					fontSize: 50,
-					fontWeight: "bold",
+					fontWeight: "normal",
 					fill: color || "#FFFFFF",
 				})
 			}
