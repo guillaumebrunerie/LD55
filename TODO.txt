@@ -1,7 +1,13 @@
+# Prio 1
+
 - Hamburger menu
-- Buying back the shield does not show the mana point going there
-- Restart button
+- Restart buttons/flow
+- Posting when opponent disconnected
 - Icons in lobby
+- Buying back the shield does not show the mana point going there
+
+# Prio 2
+
 - Monsters on top of wizard
 - Add close button to lobby
 - Fix glitches with global time and Idle and MagicEnd

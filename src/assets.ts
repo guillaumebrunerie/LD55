@@ -1,4 +1,4 @@
-/** Generated on Thu Jun  6 22:06:41 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Thu Jun  6 23:00:35 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -31,7 +31,7 @@ import Moon_ from "../gfx/Moon.png?texture";
 import PlayerQuitPost_ from "../gfx/PlayerQuitPost.png?texture";
 import RestartBtnDefault_ from "../gfx/RestartBtnDefault.png?texture";
 import RestartBtnOn_ from "../gfx/RestartBtnOn.png?texture";
-import SettingsBoxDedault_ from "../gfx/SettingsBoxDedault.png?texture";
+import SettingsBoxDefault_ from "../gfx/SettingsBoxDefault.png?texture";
 import SettingsDefault_ from "../gfx/SettingsDefault.png?texture";
 import SettingsOn_ from "../gfx/SettingsOn.png?texture";
 import ShieldLoop_ from "../gfx/ShieldLoop.png?texture";
@@ -129,7 +129,7 @@ export const [
 	PlayerQuitPost,
 	RestartBtnDefault,
 	RestartBtnOn,
-	SettingsBoxDedault,
+	SettingsBoxDefault,
 	SettingsDefault,
 	SettingsOn,
 	ShieldLoop,
@@ -251,7 +251,7 @@ export const [
 	PlayerQuitPost_,
 	RestartBtnDefault_,
 	RestartBtnOn_,
-	SettingsBoxDedault_,
+	SettingsBoxDefault_,
 	SettingsDefault_,
 	SettingsOn_,
 	ShieldLoop_,

@@ -6,7 +6,7 @@ import {
 	Rectangle,
 	Texture,
 } from "pixi.js";
-import { Container, Sprite } from "@pixi/react";
+import { Container, NineSlicePlane, Sprite } from "@pixi/react";
 import {
 	newApp,
 	startApp,
@@ -33,6 +33,9 @@ import {
 	InactiveSideWhite,
 	Logo,
 	Moon,
+	SettingsBoxDefault,
+	SettingsDefault,
+	SettingsOn,
 	SoundOff,
 	SoundOn,
 	StartVsComputerDefault,
@@ -201,7 +204,7 @@ const StartButton = ({
 					y={0}
 					width={1920}
 					height={1080}
-					alpha={hitBoxAlpha}
+					alpha={app.game.lobby.alpha * 0.5}
 					cursor="pointer"
 					eventMode="static"
 					pointerdown={action(() => {
@@ -294,6 +297,57 @@ const SoundButton = () => {
 			eventMode="static"
 			pointerdown={toggleSound}
 		/>
+	);
+};
+
+const Menu = ({ button }: { button: ButtonT }) => {
+	return (
+		<Container>
+			{button.alpha > 0.1 && (
+				<Box
+					x={0}
+					y={0}
+					width={1920}
+					height={1080}
+					alpha={button.alpha * 0.5}
+					eventMode="static"
+					pointerdown={action(() => {
+						disappearButton(button);
+					})}
+				/>
+			)}
+			<Sprite
+				texture={SettingsDefault}
+				anchor={[1, 0]}
+				x={1920 - 30}
+				y={30}
+			/>
+			<Sprite
+				texture={SettingsOn}
+				x={1920 - 30}
+				y={30}
+				anchor={[1, 0]}
+				alpha={button.alpha}
+				cursor="pointer"
+				eventMode="static"
+				pointerdown={action(() => {
+					if (button.targetAlpha == 1) {
+						disappearButton(button);
+					} else {
+						appearButton(button);
+					}
+				})}
+			/>
+			<NineSlicePlane
+				texture={SettingsBoxDefault}
+				x={1920 - 30 - 200 * button.alpha * 1.5}
+				y={30}
+				width={200 * button.alpha}
+				height={250 * button.alpha}
+				scale={1.5}
+				alpha={button.alpha}
+			/>
+		</Container>
 	);
 };
 
@@ -606,7 +660,8 @@ export const App = () => {
 					<PlayerName playerId={game.credentials.playerId} />
 				)}
 				{game.opponentId && <OpponentName playerId={game.opponentId} />}
-				<SoundButton />
+				<Menu button={game.menuButton} />
+				{/* <SoundButton /> */}
 				{/* <PolygonShape polygon={manaBounds.polygon} alpha={0.4} /> */}
 			</Container>
 		</GlobalTimeContext.Provider>
