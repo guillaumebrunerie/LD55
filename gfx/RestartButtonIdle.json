@@ -1,0 +1,175 @@
+{"frames": {
+
+"RestartButtonIdle_000.png":
+{
+	"frame": {"x":811,"y":1,"w":272,"h":165},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":116,"y":166,"w":272,"h":165},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_001.png":
+{
+	"frame": {"x":1085,"y":1,"w":272,"h":165},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":116,"y":166,"w":272,"h":165},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_002.png":
+{
+	"frame": {"x":1359,"y":1,"w":270,"h":165},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":117,"y":166,"w":270,"h":165},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_003.png":
+{
+	"frame": {"x":1,"y":1,"w":268,"h":163},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":118,"y":167,"w":268,"h":163},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_004.png":
+{
+	"frame": {"x":271,"y":1,"w":268,"h":163},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":118,"y":167,"w":268,"h":163},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_005.png":
+{
+	"frame": {"x":541,"y":1,"w":268,"h":163},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":118,"y":167,"w":268,"h":163},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_006.png":
+{
+	"frame": {"x":1631,"y":1,"w":270,"h":165},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":117,"y":166,"w":270,"h":165},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_007.png":
+{
+	"frame": {"x":1,"y":166,"w":272,"h":165},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":116,"y":166,"w":272,"h":165},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_008.png":
+{
+	"frame": {"x":275,"y":166,"w":274,"h":167},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":115,"y":165,"w":274,"h":167},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_009.png":
+{
+	"frame": {"x":551,"y":168,"w":274,"h":167},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":115,"y":165,"w":274,"h":167},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_010.png":
+{
+	"frame": {"x":827,"y":168,"w":276,"h":167},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":114,"y":165,"w":276,"h":167},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_011.png":
+{
+	"frame": {"x":555,"y":337,"w":278,"h":169},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":113,"y":164,"w":278,"h":169},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_012.png":
+{
+	"frame": {"x":835,"y":337,"w":278,"h":169},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":113,"y":164,"w":278,"h":169},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_013.png":
+{
+	"frame": {"x":1115,"y":337,"w":278,"h":169},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":113,"y":164,"w":278,"h":169},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_014.png":
+{
+	"frame": {"x":1395,"y":337,"w":278,"h":169},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":113,"y":164,"w":278,"h":169},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_015.png":
+{
+	"frame": {"x":277,"y":337,"w":276,"h":168},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":114,"y":164,"w":276,"h":168},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_016.png":
+{
+	"frame": {"x":1105,"y":168,"w":276,"h":167},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":114,"y":165,"w":276,"h":167},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_017.png":
+{
+	"frame": {"x":1383,"y":168,"w":274,"h":167},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":115,"y":165,"w":274,"h":167},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_018.png":
+{
+	"frame": {"x":1659,"y":168,"w":274,"h":167},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":115,"y":165,"w":274,"h":167},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonIdle_019.png":
+{
+	"frame": {"x":1,"y":335,"w":274,"h":167},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":115,"y":165,"w":274,"h":167},
+	"sourceSize": {"w":500,"h":500}
+}},
+"animations": {
+	"RestartButtonIdle": ["RestartButtonIdle_000.png","RestartButtonIdle_001.png","RestartButtonIdle_002.png","RestartButtonIdle_003.png","RestartButtonIdle_004.png","RestartButtonIdle_005.png","RestartButtonIdle_006.png","RestartButtonIdle_007.png","RestartButtonIdle_008.png","RestartButtonIdle_009.png","RestartButtonIdle_010.png","RestartButtonIdle_011.png","RestartButtonIdle_012.png","RestartButtonIdle_013.png","RestartButtonIdle_014.png","RestartButtonIdle_015.png","RestartButtonIdle_016.png","RestartButtonIdle_017.png","RestartButtonIdle_018.png","RestartButtonIdle_019.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "RestartButtonIdle.png",
+	"format": "RGBA8888",
+	"size": {"w":1934,"h":507},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:9172e016a542d301134b14e7c10b3c89:21dd8ad09dd88bc9e44a28b6eea93f30:4bf3564581ab942b6169b6fffb1f072a$"
+}
+}
