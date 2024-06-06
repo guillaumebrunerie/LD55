@@ -1,4 +1,4 @@
-/** Generated on Mon May  6 00:03:45 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Thu Jun  6 22:06:41 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -31,6 +31,9 @@ import Moon_ from "../gfx/Moon.png?texture";
 import PlayerQuitPost_ from "../gfx/PlayerQuitPost.png?texture";
 import RestartBtnDefault_ from "../gfx/RestartBtnDefault.png?texture";
 import RestartBtnOn_ from "../gfx/RestartBtnOn.png?texture";
+import SettingsBoxDedault_ from "../gfx/SettingsBoxDedault.png?texture";
+import SettingsDefault_ from "../gfx/SettingsDefault.png?texture";
+import SettingsOn_ from "../gfx/SettingsOn.png?texture";
 import ShieldLoop_ from "../gfx/ShieldLoop.png?texture";
 import SoundOff_ from "../gfx/SoundOff.png?texture";
 import SoundOn_ from "../gfx/SoundOn.png?texture";
@@ -80,6 +83,11 @@ import ClickDefense_ from "../audio/ClickDefense.mp3?sound";
 import ClickMana_ from "../audio/ClickMana.mp3?sound";
 import ClickStart_ from "../audio/ClickStart.mp3?sound";
 import Connect_ from "../audio/Connect.mp3?sound";
+import Flower1Mana_ from "../audio/Flower1Mana.mp3?sound";
+import Flower2Mana_ from "../audio/Flower2Mana.mp3?sound";
+import Flower3Mana_ from "../audio/Flower3Mana.mp3?sound";
+import Flower4Mana_ from "../audio/Flower4Mana.mp3?sound";
+import Flower5Mana_ from "../audio/Flower5Mana.mp3?sound";
 import ManaCreated_ from "../audio/ManaCreated.mp3?sound";
 import ManaCreated2_ from "../audio/ManaCreated2.mp3?sound";
 import MonsterAttacks_ from "../audio/MonsterAttacks.mp3?sound";
@@ -121,6 +129,9 @@ export const [
 	PlayerQuitPost,
 	RestartBtnDefault,
 	RestartBtnOn,
+	SettingsBoxDedault,
+	SettingsDefault,
+	SettingsOn,
 	ShieldLoop,
 	SoundOff,
 	SoundOn,
@@ -195,6 +206,11 @@ export const [
 	ClickMana,
 	ClickStart,
 	Connect,
+	Flower1Mana,
+	Flower2Mana,
+	Flower3Mana,
+	Flower4Mana,
+	Flower5Mana,
 	ManaCreated,
 	ManaCreated2,
 	MonsterAttacks,
@@ -235,6 +251,9 @@ export const [
 	PlayerQuitPost_,
 	RestartBtnDefault_,
 	RestartBtnOn_,
+	SettingsBoxDedault_,
+	SettingsDefault_,
+	SettingsOn_,
 	ShieldLoop_,
 	SoundOff_,
 	SoundOn_,
@@ -309,6 +328,11 @@ export const [
 	ClickMana_,
 	ClickStart_,
 	Connect_,
+	Flower1Mana_,
+	Flower2Mana_,
+	Flower3Mana_,
+	Flower4Mana_,
+	Flower5Mana_,
 	ManaCreated_,
 	ManaCreated2_,
 	MonsterAttacks_,

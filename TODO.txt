@@ -1,13 +1,9 @@
 - Hamburger menu
 - Buying back the shield does not show the mana point going there
-- Mana/mushroom sounds
+- Restart button
+- Icons in lobby
 - Monsters on top of wizard
-- Restart buttons
-- New lobby architecture (waiting for assets)
-
 - Add close button to lobby
-- Faster fight/mushrooms depending on amount?
-- Make initial mana points appear at the same time as mushrooms
+- Fix glitches with global time and Idle and MagicEnd
 - Show current mana points of opponent when playing online
 - ShieldHit then ShieldEnd
-- Fix glitches with global time and Idle and MagicEnd

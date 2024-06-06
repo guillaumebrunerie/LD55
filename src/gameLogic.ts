@@ -3,6 +3,7 @@ import {
 	ClickAttack,
 	ClickDefense,
 	ClickMana,
+	Flower5Mana,
 	ManaCreated,
 	MonsterAttacks,
 	MonstersClash,
@@ -327,10 +328,17 @@ const spawnManaPoint = (
 		offset: Math.random() * 2 * Math.PI,
 		previousItem,
 	};
-	if (!previousItem && !silent) {
-		void ManaCreated.play({ volume: 0.5 });
+	if (!silent) {
+		if (previousItem) {
+			void Flower5Mana.play({ volume: 0.5 });
+		} else {
+			void ManaCreated.play({ volume: 0.5 });
+		}
 	}
 	changeState(manaPoint, "spawning", manaSpawnDuration, (manaPoint) => {
+		if (!silent && previousItem) {
+			void ManaCreated.play({ volume: 0.5 });
+		}
 		idleState(manaPoint, "visible");
 		callback?.();
 	});
@@ -426,7 +434,7 @@ export const startGame = (game: GameT) => {
 
 	let t = 1;
 	for (let i = 0; i < initialMana; i++) {
-		t += 0.1;
+		t += 0.2;
 		schedule2(game.player, t, spawnManaPoint);
 		schedule2(game.opponent, t, spawnManaPointSilent);
 	}
@@ -912,7 +920,7 @@ const rebuildPlayerMana = (player: Player) => {
 					player.items.mushrooms = player.items.mushrooms.filter(
 						(m) => m.id !== mushroom.id,
 					);
-					spawnManaPoint(player, mushroom, undefined);
+					spawnManaPoint(player, mushroom, j != 0);
 				},
 			);
 			time = Math.max(
