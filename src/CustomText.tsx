@@ -22,7 +22,7 @@ export const CustomText = ({
 				new TextStyle({
 					fontFamily: "roboto condensed",
 					fontSize: 50,
-					fontWeight: "normal",
+					fontWeight: "400",
 					fill: color || "#FFFFFF",
 				})
 			}
