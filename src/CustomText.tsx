@@ -20,7 +20,7 @@ export const CustomText = ({
 			anchor={anchor}
 			style={
 				new TextStyle({
-					fontFamily: "futura",
+					fontFamily: "roboto condensed",
 					fontSize: 50,
 					fontWeight: "normal",
 					fill: color || "#FFFFFF",
