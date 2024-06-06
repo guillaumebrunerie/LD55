@@ -335,9 +335,6 @@ const SoundButton = () => {
 	return (
 		<Sprite
 			texture={sound.volumeAll === 1 ? SoundOn : SoundOff}
-			anchor={[1, 0]}
-			x={1920 - 20}
-			y={20}
 			cursor="pointer"
 			eventMode="static"
 			pointerdown={toggleSound}
@@ -392,6 +389,16 @@ const Menu = ({ button }: { button: ButtonT }) => {
 				scale={1.5}
 				alpha={button.alpha}
 			/>
+			<Container
+				x={1920 - 30}
+				y={30}
+				scale={button.alpha}
+				alpha={button.alpha}
+			>
+				<Container x={-100} y={50}>
+					<SoundButton />
+				</Container>
+			</Container>
 		</Container>
 	);
 };
