@@ -1,4 +1,4 @@
-/** Generated on Thu Jun  6 23:00:35 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Thu Jun  6 23:25:40 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -21,6 +21,10 @@ import ExitOff_ from "../gfx/ExitOff.png?texture";
 import ExitOn_ from "../gfx/ExitOn.png?texture";
 import InactiveSide_ from "../gfx/InactiveSide.png?texture";
 import InactiveSideWhite_ from "../gfx/InactiveSideWhite.png?texture";
+import InviteButtonAccept_ from "../gfx/InviteButtonAccept.png?texture";
+import InviteButtonDefault_ from "../gfx/InviteButtonDefault.png?texture";
+import InviteButtonMatch_ from "../gfx/InviteButtonMatch.png?texture";
+import InviteButtonOn_ from "../gfx/InviteButtonOn.png?texture";
 import LinkGenerated_ from "../gfx/LinkGenerated.png?texture";
 import Logo_ from "../gfx/Logo.png?texture";
 import Mana1_ from "../gfx/Mana1.png?texture";
@@ -30,6 +34,9 @@ import ManaPointBlurred_ from "../gfx/ManaPointBlurred.png?texture";
 import Moon_ from "../gfx/Moon.png?texture";
 import PlayerQuitPost_ from "../gfx/PlayerQuitPost.png?texture";
 import RestartBtnDefault_ from "../gfx/RestartBtnDefault.png?texture";
+import RestartBtnDefaultBG_ from "../gfx/RestartBtnDefaultBG.png?texture";
+import RestartBtnDefaultFront1_ from "../gfx/RestartBtnDefaultFront1.png?texture";
+import RestartBtnDefaultFront2_ from "../gfx/RestartBtnDefaultFront2.png?texture";
 import RestartBtnOn_ from "../gfx/RestartBtnOn.png?texture";
 import SettingsBoxDefault_ from "../gfx/SettingsBoxDefault.png?texture";
 import SettingsDefault_ from "../gfx/SettingsDefault.png?texture";
@@ -43,6 +50,7 @@ import StartVsComputerDefault_ from "../gfx/StartVsComputerDefault.png?texture";
 import StartVsHumanOffDefault_ from "../gfx/StartVsHumanOffDefault.png?texture";
 import StartVsHumanOnDefault_ from "../gfx/StartVsHumanOnDefault.png?texture";
 import TextBox_ from "../gfx/TextBox.png?texture";
+import WaitingDot_ from "../gfx/WaitingDot.png?texture";
 import WaitingPost_ from "../gfx/WaitingPost.png?texture";
 import WizzyWizzy_Mocup_Buttons_ from "../gfx/WizzyWizzy_Mocup_Buttons.jpg?texture";
 
@@ -59,6 +67,7 @@ import Monster2Idle_ from "../gfx/Monster2Idle.png?spritesheet";
 import Monster3Die_ from "../gfx/Monster3Die.png?spritesheet";
 import Monster3Dies_ from "../gfx/Monster3Dies.png?spritesheet";
 import Monster3Idle_ from "../gfx/Monster3Idle.png?spritesheet";
+import RestartButtonIdle_ from "../gfx/RestartButtonIdle.png?spritesheet";
 import Runes_ from "../gfx/Runes.png?spritesheet";
 import ShieldEnd_ from "../gfx/ShieldEnd.png?spritesheet";
 import ShieldHit_ from "../gfx/ShieldHit.png?spritesheet";
@@ -119,6 +128,10 @@ export const [
 	ExitOn,
 	InactiveSide,
 	InactiveSideWhite,
+	InviteButtonAccept,
+	InviteButtonDefault,
+	InviteButtonMatch,
+	InviteButtonOn,
 	LinkGenerated,
 	Logo,
 	Mana1,
@@ -128,6 +141,9 @@ export const [
 	Moon,
 	PlayerQuitPost,
 	RestartBtnDefault,
+	RestartBtnDefaultBG,
+	RestartBtnDefaultFront1,
+	RestartBtnDefaultFront2,
 	RestartBtnOn,
 	SettingsBoxDefault,
 	SettingsDefault,
@@ -141,6 +157,7 @@ export const [
 	StartVsHumanOffDefault,
 	StartVsHumanOnDefault,
 	TextBox,
+	WaitingDot,
 	WaitingPost,
 	WizzyWizzy_Mocup_Buttons,
 	FontSheet,
@@ -167,6 +184,8 @@ export const [
 	{ animations: { Monster3Dies } },
 	Monster3IdleSheet,
 	{ animations: { Monster3Idle } },
+	RestartButtonIdleSheet,
+	{ animations: { RestartButtonIdle } },
 	RunesSheet,
 	{ animations: { Runes } },
 	ShieldEndSheet,
@@ -241,6 +260,10 @@ export const [
 	ExitOn_,
 	InactiveSide_,
 	InactiveSideWhite_,
+	InviteButtonAccept_,
+	InviteButtonDefault_,
+	InviteButtonMatch_,
+	InviteButtonOn_,
 	LinkGenerated_,
 	Logo_,
 	Mana1_,
@@ -250,6 +273,9 @@ export const [
 	Moon_,
 	PlayerQuitPost_,
 	RestartBtnDefault_,
+	RestartBtnDefaultBG_,
+	RestartBtnDefaultFront1_,
+	RestartBtnDefaultFront2_,
 	RestartBtnOn_,
 	SettingsBoxDefault_,
 	SettingsDefault_,
@@ -263,6 +289,7 @@ export const [
 	StartVsHumanOffDefault_,
 	StartVsHumanOnDefault_,
 	TextBox_,
+	WaitingDot_,
 	WaitingPost_,
 	WizzyWizzy_Mocup_Buttons_,
 	Font_,
@@ -289,6 +316,8 @@ export const [
 	Monster3Dies_,
 	Monster3Idle_,
 	Monster3Idle_,
+	RestartButtonIdle_,
+	RestartButtonIdle_,
 	Runes_,
 	Runes_,
 	ShieldEnd_,

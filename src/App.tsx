@@ -31,6 +31,9 @@ import {
 	Cloud3,
 	InactiveSide,
 	InactiveSideWhite,
+	InviteButtonAccept,
+	InviteButtonDefault,
+	InviteButtonOn,
 	Logo,
 	Moon,
 	SettingsBoxDefault,
@@ -42,6 +45,7 @@ import {
 	StartVsHumanOffDefault,
 	TextBox,
 	TextBoxAppear,
+	WaitingDot,
 } from "./assets";
 import { buyMonster, buyDefense, buyMushroom, type GameT } from "./gameLogic";
 import { Game, Wizard } from "./Game";
@@ -62,6 +66,88 @@ const lineHeight = 80;
 const hitBoxAlpha = 0.01;
 const hitBoxHeight = lineHeight * 0.8;
 const hitBoxWidth = 1100;
+
+const WaitingDots = ({ lt }: { lt: number }) => {
+	const delay = 0.4;
+	const dotsCount = Math.round(lt / delay) % 4;
+	return Array(dotsCount)
+		.fill(true)
+		.map((_, i) => {
+			return (
+				<Sprite key={i} texture={WaitingDot} x={-25 + i * 25} y={5} />
+			);
+		});
+};
+
+const PlayerLine = ({
+	game,
+	id,
+	name,
+	type,
+}: {
+	game: GameT;
+	id: string;
+	name: string;
+	type: "waiting" | "requested" | "default";
+}) => {
+	const requestPlay = useMutation(api.lobby.requestPlay);
+	const [x, setX] = useState(0);
+	const { credentials, opponentId } = game;
+	const icon = {
+		default: InviteButtonDefault,
+		waiting: InviteButtonOn,
+		requested: InviteButtonAccept,
+	}[type];
+	return (
+		<>
+			<CustomText
+				myRef={(node) => {
+					if (node) {
+						setX(node.width);
+					}
+				}}
+				text={name}
+				anchor={[0, 0.5]}
+				color={
+					{
+						waiting: "white",
+						requested: "white",
+						default: "grey",
+					}[type]
+				}
+			/>
+			<Container x={x + icon.width / 2 + 15}>
+				<Sprite
+					texture={icon}
+					scale={
+						type === "requested" ?
+							1 + Math.sin(game.lt * 6) * 0.02
+						:	1
+					}
+					anchor={[0.5, 0.5]}
+					cursor="pointer"
+					eventMode="static"
+					pointerdown={action(() => {
+						void ClickStart.play();
+						if (!credentials) {
+							return;
+						}
+						if (game.opponentId == id) {
+							game.opponentId = undefined;
+						} else {
+							game.opponentId = id;
+						}
+						void requestPlay({
+							...credentials,
+							opponentId: id,
+						});
+					})}
+				/>
+				{type === "waiting" && <WaitingDots lt={game.lt} />}
+			</Container>
+		</>
+	);
+};
 
 const Lobby = ({ app }: { app: AppT }) => {
 	const createNewPlayer = useMutation(api.lobby.createNewPlayer);
@@ -93,7 +179,6 @@ const Lobby = ({ app }: { app: AppT }) => {
 	}, [gameId, app]);
 
 	const availablePlayers = useQuery(api.lobby.availablePlayers);
-	const requestPlay = useMutation(api.lobby.requestPlay);
 	const players =
 		(credentials &&
 			availablePlayers
@@ -126,54 +211,14 @@ const Lobby = ({ app }: { app: AppT }) => {
 				/>
 			)}
 			{players.map(({ id, name, type }, i) => (
-				<Fragment key={id}>
-					<CustomText
-						text={
-							name +
-							{
-								waiting: " (waiting)",
-								requested: " (wants to play)",
-								default: "",
-							}[type]
-						}
-						anchor={[0, 0.5]}
-						position={{
-							x: left,
-							y: top + (i + 1) * lineHeight,
-						}}
-						color={
-							{
-								waiting: "white",
-								requested: "lightblue",
-								default: "grey",
-							}[type]
-						}
+				<Container key={id} x={left} y={top + (i + 1) * lineHeight}>
+					<PlayerLine
+						game={app.game}
+						id={id}
+						name={name}
+						type={type}
 					/>
-					<Box
-						x={left}
-						y={top + (i + 1) * lineHeight - hitBoxHeight / 2}
-						width={hitBoxWidth}
-						height={hitBoxHeight}
-						alpha={hitBoxAlpha}
-						cursor="pointer"
-						eventMode="static"
-						pointerdown={action(() => {
-							void ClickStart.play();
-							if (!credentials) {
-								return;
-							}
-							if (app.game.opponentId == id) {
-								app.game.opponentId = undefined;
-							} else {
-								app.game.opponentId = id;
-							}
-							void requestPlay({
-								...credentials,
-								opponentId: id,
-							});
-						})}
-					/>
-				</Fragment>
+				</Container>
 			))}
 		</Container>
 	);
