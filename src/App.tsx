@@ -1,4 +1,4 @@
-import { useState, useEffect, useReducer, Fragment } from "react";
+import { useState, useEffect, useReducer } from "react";
 import {
 	FederatedPointerEvent,
 	Filter,
@@ -41,6 +41,7 @@ import {
 	SettingsOn,
 	SoundOff,
 	SoundOn,
+	StartButtonDefault,
 	StartVsComputerDefault,
 	StartVsHumanOffDefault,
 	TextBox,
@@ -60,12 +61,8 @@ import { Rectangle as Box } from "./Rectangle";
 import { darkFilter } from "./filters";
 
 const left = 420;
-const top = 170;
+const top = 105;
 const lineHeight = 80;
-
-const hitBoxAlpha = 0.01;
-const hitBoxHeight = lineHeight * 0.8;
-const hitBoxWidth = 1100;
 
 const WaitingDots = ({ lt }: { lt: number }) => {
 	const delay = 0.4;
@@ -74,7 +71,7 @@ const WaitingDots = ({ lt }: { lt: number }) => {
 		.fill(true)
 		.map((_, i) => {
 			return (
-				<Sprite key={i} texture={WaitingDot} x={-25 + i * 25} y={5} />
+				<Sprite key={i} texture={WaitingDot} x={-25 + i * 25} y={2} />
 			);
 		});
 };
@@ -86,13 +83,13 @@ const PlayerLine = ({
 	type,
 }: {
 	game: GameT;
-	id: string;
+	id: Id<"players">;
 	name: string;
 	type: "waiting" | "requested" | "default";
 }) => {
 	const requestPlay = useMutation(api.lobby.requestPlay);
 	const [x, setX] = useState(0);
-	const { credentials, opponentId } = game;
+	const { credentials } = game;
 	const icon = {
 		default: InviteButtonDefault,
 		waiting: InviteButtonOn,
@@ -116,15 +113,15 @@ const PlayerLine = ({
 					}[type]
 				}
 			/>
-			<Container x={x + icon.width / 2 + 15}>
+			<Container x={x + (icon.width * 0.75) / 2 + 15}>
 				<Sprite
 					texture={icon}
 					scale={
 						type === "requested" ?
-							1 + Math.sin(game.lt * 6) * 0.02
-						:	1
+							0.75 + Math.sin(game.lt * 6) * 0.02
+						:	0.75
 					}
-					anchor={[0.5, 0.5]}
+					anchor={0.5}
 					cursor="pointer"
 					eventMode="static"
 					pointerdown={action(() => {
@@ -195,6 +192,26 @@ const Lobby = ({ app }: { app: AppT }) => {
 					};
 				})) ||
 		[];
+	// Put players that requested to play at the top, but creates layout shifts.
+	// players.sort((a, b) => {
+	// 	if (a.type == "requested" && b.type !== "requested") {
+	// 		return -1;
+	// 	} else if (a.type !== "requested" && b.type == "requested") {
+	// 		return 1;
+	// 	} else {
+	// 		return 0;
+	// 	}
+	// });
+
+	const PLAYERS_PER_PAGE = 10;
+	const [page, setPage] = useState(0);
+	const visiblePlayers = players.slice(
+		page * PLAYERS_PER_PAGE,
+		(page + 1) * PLAYERS_PER_PAGE,
+	);
+	const hasPrevPage = page > 0;
+	const hasNextPage = players.length > (page + 1) * PLAYERS_PER_PAGE;
+
 	return (
 		<Container position={{ x: 0, y: -(1 - app.game.lobby.alpha) * 1000 }}>
 			<Sprite
@@ -210,7 +227,7 @@ const Lobby = ({ app }: { app: AppT }) => {
 					position={{ x: left, y: top + lineHeight }}
 				/>
 			)}
-			{players.map(({ id, name, type }, i) => (
+			{visiblePlayers.map(({ id, name, type }, i) => (
 				<Container key={id} x={left} y={top + (i + 1) * lineHeight}>
 					<PlayerLine
 						game={app.game}
@@ -220,6 +237,32 @@ const Lobby = ({ app }: { app: AppT }) => {
 					/>
 				</Container>
 			))}
+			{hasPrevPage && (
+				<Sprite
+					texture={StartButtonDefault}
+					x={1400}
+					y={250}
+					anchor={0.5}
+					scale={0.5}
+					angle={-90}
+					cursor="pointer"
+					eventMode="static"
+					pointerdown={() => setPage((page) => page - 1)}
+				/>
+			)}
+			{hasNextPage && (
+				<Sprite
+					texture={StartButtonDefault}
+					x={1400}
+					y={820}
+					anchor={0.5}
+					scale={0.5}
+					angle={90}
+					cursor="pointer"
+					eventMode="static"
+					pointerdown={() => setPage((page) => page + 1)}
+				/>
+			)}
 		</Container>
 	);
 };
