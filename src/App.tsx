@@ -29,6 +29,7 @@ import {
 	Cloud1,
 	Cloud2,
 	Cloud3,
+	ExitGameBtn,
 	InactiveSide,
 	InactiveSideWhite,
 	InviteButtonAccept,
@@ -39,8 +40,8 @@ import {
 	SettingsBoxDefault,
 	SettingsDefault,
 	SettingsOn,
-	SoundOff,
-	SoundOn,
+	SoundOffTxt,
+	SoundOnTxt,
 	StartButtonDefault,
 	StartVsComputerDefault,
 	StartVsHumanOffDefault,
@@ -369,7 +370,9 @@ const useSetVolumeAll = () => {
 	};
 };
 
-const SoundButton = () => {
+type SpriteProps = Parameters<typeof Sprite>[0];
+
+const SoundButton = (props: SpriteProps) => {
 	const setVolumeAll = useSetVolumeAll();
 	const toggleSound = () => {
 		setVolumeAll((volume) => 1 - volume);
@@ -377,10 +380,28 @@ const SoundButton = () => {
 
 	return (
 		<Sprite
-			texture={sound.volumeAll === 1 ? SoundOn : SoundOff}
+			{...props}
+			texture={sound.volumeAll === 1 ? SoundOnTxt : SoundOffTxt}
 			cursor="pointer"
 			eventMode="static"
 			pointerdown={toggleSound}
+		/>
+	);
+};
+
+const ExitButton = (props: SpriteProps) => {
+	// const setVolumeAll = useSetVolumeAll();
+	// const toggleSound = () => {
+	// 	setVolumeAll((volume) => 1 - volume);
+	// };
+
+	return (
+		<Sprite
+			{...props}
+			texture={ExitGameBtn}
+			cursor="pointer"
+			eventMode="static"
+			pointerdown={() => {}}
 		/>
 	);
 };
@@ -425,10 +446,10 @@ const Menu = ({ button }: { button: ButtonT }) => {
 			/>
 			<NineSlicePlane
 				texture={SettingsBoxDefault}
-				x={1920 - 30 - 200 * button.alpha * 1.5}
+				x={1920 - 30 - 225 * button.alpha * 1.5}
 				y={30}
-				width={200 * button.alpha}
-				height={250 * button.alpha}
+				width={225 * button.alpha}
+				height={150 * button.alpha}
 				scale={1.5}
 				alpha={button.alpha}
 			/>
@@ -438,9 +459,8 @@ const Menu = ({ button }: { button: ButtonT }) => {
 				scale={button.alpha}
 				alpha={button.alpha}
 			>
-				<Container x={-100} y={50}>
-					<SoundButton />
-				</Container>
+				<SoundButton x={-310} y={30} />
+				<ExitButton x={-310} y={110} />
 			</Container>
 		</Container>
 	);

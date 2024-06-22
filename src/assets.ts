@@ -1,4 +1,4 @@
-/** Generated on Thu Jun  6 23:25:40 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sat Jun 22 18:57:19 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -17,6 +17,8 @@ import Cloud2_ from "../gfx/Cloud2.png?texture";
 import Cloud3_ from "../gfx/Cloud3.png?texture";
 import ConnectionOff_ from "../gfx/ConnectionOff.png?texture";
 import ConnectionOn_ from "../gfx/ConnectionOn.png?texture";
+import ExitGame_ from "../gfx/ExitGame.png?texture";
+import ExitGameBtn_ from "../gfx/ExitGameBtn.png?texture";
 import ExitOff_ from "../gfx/ExitOff.png?texture";
 import ExitOn_ from "../gfx/ExitOn.png?texture";
 import InactiveSide_ from "../gfx/InactiveSide.png?texture";
@@ -38,12 +40,15 @@ import RestartBtnDefaultBG_ from "../gfx/RestartBtnDefaultBG.png?texture";
 import RestartBtnDefaultFront1_ from "../gfx/RestartBtnDefaultFront1.png?texture";
 import RestartBtnDefaultFront2_ from "../gfx/RestartBtnDefaultFront2.png?texture";
 import RestartBtnOn_ from "../gfx/RestartBtnOn.png?texture";
+import SettingsBoxDedault_ from "../gfx/SettingsBoxDedault.png?texture";
 import SettingsBoxDefault_ from "../gfx/SettingsBoxDefault.png?texture";
 import SettingsDefault_ from "../gfx/SettingsDefault.png?texture";
 import SettingsOn_ from "../gfx/SettingsOn.png?texture";
 import ShieldLoop_ from "../gfx/ShieldLoop.png?texture";
 import SoundOff_ from "../gfx/SoundOff.png?texture";
+import SoundOffTxt_ from "../gfx/SoundOffTxt.png?texture";
 import SoundOn_ from "../gfx/SoundOn.png?texture";
+import SoundOnTxt_ from "../gfx/SoundOnTxt.png?texture";
 import StartButtonDefault_ from "../gfx/StartButtonDefault.png?texture";
 import StartButtonPressed_ from "../gfx/StartButtonPressed.png?texture";
 import StartVsComputerDefault_ from "../gfx/StartVsComputerDefault.png?texture";
@@ -103,6 +108,7 @@ import MonsterAttacks_ from "../audio/MonsterAttacks.mp3?sound";
 import MonsterSwoosh_ from "../audio/MonsterSwoosh.mp3?sound";
 import MonstersClash_ from "../audio/MonstersClash.mp3?sound";
 import Music_ from "../audio/Music.mp3?sound";
+import Notification_ from "../audio/Notification.mp3?sound";
 import ShieldDefends_ from "../audio/ShieldDefends.mp3?sound";
 import ShieldDown_ from "../audio/ShieldDown.mp3?sound";
 import TextBoxAppear_ from "../audio/TextBoxAppear.mp3?sound";
@@ -124,6 +130,8 @@ export const [
 	Cloud3,
 	ConnectionOff,
 	ConnectionOn,
+	ExitGame,
+	ExitGameBtn,
 	ExitOff,
 	ExitOn,
 	InactiveSide,
@@ -145,12 +153,15 @@ export const [
 	RestartBtnDefaultFront1,
 	RestartBtnDefaultFront2,
 	RestartBtnOn,
+	SettingsBoxDedault,
 	SettingsBoxDefault,
 	SettingsDefault,
 	SettingsOn,
 	ShieldLoop,
 	SoundOff,
+	SoundOffTxt,
 	SoundOn,
+	SoundOnTxt,
 	StartButtonDefault,
 	StartButtonPressed,
 	StartVsComputerDefault,
@@ -236,6 +247,7 @@ export const [
 	MonsterSwoosh,
 	MonstersClash,
 	Music,
+	Notification,
 	ShieldDefends,
 	ShieldDown,
 	TextBoxAppear,
@@ -256,6 +268,8 @@ export const [
 	Cloud3_,
 	ConnectionOff_,
 	ConnectionOn_,
+	ExitGame_,
+	ExitGameBtn_,
 	ExitOff_,
 	ExitOn_,
 	InactiveSide_,
@@ -277,12 +291,15 @@ export const [
 	RestartBtnDefaultFront1_,
 	RestartBtnDefaultFront2_,
 	RestartBtnOn_,
+	SettingsBoxDedault_,
 	SettingsBoxDefault_,
 	SettingsDefault_,
 	SettingsOn_,
 	ShieldLoop_,
 	SoundOff_,
+	SoundOffTxt_,
 	SoundOn_,
+	SoundOnTxt_,
 	StartButtonDefault_,
 	StartButtonPressed_,
 	StartVsComputerDefault_,
@@ -368,6 +385,7 @@ export const [
 	MonsterSwoosh_,
 	MonstersClash_,
 	Music_,
+	Notification_,
 	ShieldDefends_,
 	ShieldDown_,
 	TextBoxAppear_,
