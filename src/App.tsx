@@ -17,6 +17,8 @@ import {
 import { observable, action, runInAction } from "mobx";
 import { sound } from "@pixi/sound";
 import {
+	ArrowDown,
+	ArrowUp,
 	Bg,
 	BgFront,
 	BtnAttack,
@@ -42,7 +44,6 @@ import {
 	SettingsOn,
 	SoundOffTxt,
 	SoundOnTxt,
-	StartButtonDefault,
 	StartVsComputerDefault,
 	StartVsHumanOffDefault,
 	TextBox,
@@ -240,12 +241,10 @@ const Lobby = ({ app }: { app: AppT }) => {
 			))}
 			{hasPrevPage && (
 				<Sprite
-					texture={StartButtonDefault}
-					x={1400}
-					y={250}
+					texture={ArrowUp}
+					x={1440}
+					y={210}
 					anchor={0.5}
-					scale={0.5}
-					angle={-90}
 					cursor="pointer"
 					eventMode="static"
 					pointerdown={() => setPage((page) => page - 1)}
@@ -253,12 +252,10 @@ const Lobby = ({ app }: { app: AppT }) => {
 			)}
 			{hasNextPage && (
 				<Sprite
-					texture={StartButtonDefault}
-					x={1400}
-					y={820}
+					texture={ArrowDown}
+					x={1440}
+					y={870}
 					anchor={0.5}
-					scale={0.5}
-					angle={90}
 					cursor="pointer"
 					eventMode="static"
 					pointerdown={() => setPage((page) => page + 1)}

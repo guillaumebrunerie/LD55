@@ -1,9 +1,13 @@
-/** Generated on Sat Jun 22 18:57:19 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sat Jun 22 19:59:32 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
 
 /** Textures */
+import ArrowDown_ from "../gfx/ArrowDown.png?texture";
+import ArrowDownOn_ from "../gfx/ArrowDownOn.png?texture";
+import ArrowUp_ from "../gfx/ArrowUp.png?texture";
+import ArrowUpOn_ from "../gfx/ArrowUpOn.png?texture";
 import Bg_ from "../gfx/Bg.jpg?texture";
 import BgFront_ from "../gfx/BgFront.png?texture";
 import BtnAttack_ from "../gfx/BtnAttack.png?texture";
@@ -117,6 +121,10 @@ import WizardHit_ from "../audio/WizardHit.mp3?sound";
 import WizardStart_ from "../audio/WizardStart.mp3?sound";
 
 export const [
+	ArrowDown,
+	ArrowDownOn,
+	ArrowUp,
+	ArrowUpOn,
 	Bg,
 	BgFront,
 	BtnAttack,
@@ -255,6 +263,10 @@ export const [
 	WizardHit,
 	WizardStart,
 ] = await Promise.all([
+	ArrowDown_,
+	ArrowDownOn_,
+	ArrowUp_,
+	ArrowUpOn_,
 	Bg_,
 	BgFront_,
 	BtnAttack_,
