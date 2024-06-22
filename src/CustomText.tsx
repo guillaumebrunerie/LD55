@@ -4,16 +4,16 @@ import type { Point } from "./utils";
 import type { Ref } from "react";
 
 export const CustomText = ({
-	myRef,
 	text,
+	myRef,
 	position,
 	anchor,
 	color,
 }: {
-	myRef: Ref<TextT>;
 	text: string;
-	position: Point;
-	anchor: [number, number];
+	myRef?: Ref<TextT>;
+	position?: Point;
+	anchor?: [number, number];
 	color?: string;
 }) => {
 	return (
