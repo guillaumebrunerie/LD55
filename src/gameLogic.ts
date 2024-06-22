@@ -957,7 +957,6 @@ const pickAttackOrDefensePair = (game: GameT) => {
 	if (playerMonsters == 0 && opponentMonsters == 0) {
 		// No monsters, we move to the next round
 		rebuildMana(game, () => {
-			console.log("FINISHED");
 			idleState(game, "buildUp");
 			nextRound(game);
 		});

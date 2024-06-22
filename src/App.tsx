@@ -298,7 +298,6 @@ const StartButton = ({
 						const { credentials } = app.game;
 						if (credentials) {
 							void disconnect(credentials);
-							console.log("DISCONNECTING");
 							delete app.game.credentials;
 							app.game.opponentId = undefined;
 						}
@@ -456,8 +455,18 @@ const Menu = ({ button }: { button: ButtonT }) => {
 				scale={button.alpha}
 				alpha={button.alpha}
 			>
-				<SoundButton x={-310} y={30} />
-				<ExitButton x={-310} y={110} />
+				<SoundButton
+					x={-310 + 282 / 2}
+					y={30 + 85 / 2}
+					anchor={0.5}
+					scale={0.85}
+				/>
+				<ExitButton
+					x={-310 + 282 / 2}
+					y={110 + 85 / 2}
+					anchor={0.5}
+					scale={0.85}
+				/>
 			</Container>
 		</Container>
 	);

@@ -58,7 +58,6 @@ export const startNewGameAgainstComputer = (app: AppT) => {
 	app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
 	app.game.gameId = undefined;
 	delete app.game.credentials;
-	console.log("START AGAINST COMPUTER");
 	startGame(app.game);
 };
 

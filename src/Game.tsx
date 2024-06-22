@@ -358,7 +358,6 @@ const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 		}
 		case "preSpawning": {
 			if (!item.previousItem) {
-				console.log("No previous item");
 				break;
 			}
 			const dx = item.previousItem.position.x - item.position.x;
