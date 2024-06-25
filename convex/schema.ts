@@ -2,6 +2,7 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 const player = {
+	lastPing: v.number(),
 	mana: v.number(),
 	defense: v.number(),
 	mushrooms: v.array(

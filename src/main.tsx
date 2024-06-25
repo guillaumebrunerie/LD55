@@ -11,7 +11,7 @@ const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 const app = new Application({
 	width: 1920,
 	height: 1080,
-	backgroundColor: 0x10bb99,
+	backgroundColor: 0x2d293f,
 	view: document.getElementById("canvas") as HTMLCanvasElement,
 });
 

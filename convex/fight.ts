@@ -105,6 +105,7 @@ const getPlayer = async (
 };
 
 const clonePlayer = (player: Doc<"players">) => ({
+	lastPing: player.lastPing,
 	mana: player.mana,
 	defense: player.defense,
 	mushrooms: player.mushrooms.map((mushroom) => ({ ...mushroom })),

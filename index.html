@@ -8,10 +8,14 @@
 		/>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap"
-			rel="stylesheet"
-		/>
+		<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+		<script>
+			WebFont.load({
+				google: {
+					families: ["Roboto Condensed"],
+				},
+			});
+		</script>
 		<title>Wizzy Wizzy</title>
 	</head>
 	<style type="text/css">
@@ -19,6 +23,7 @@
 		body {
 			height: 100%;
 			margin: 0;
+			font-family: roboto condensed;
 		}
 		body {
 			display: flex;

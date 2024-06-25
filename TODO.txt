@@ -4,7 +4,7 @@
 - Posting when opponent disconnected
 - Buying back the shield does not show the mana point going there
 - Restart buttons/flow
-- Hamburger menu (need mockup)
+- Exit game
 
 # Prio 2
 

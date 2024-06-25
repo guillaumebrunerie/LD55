@@ -11,6 +11,11 @@ export type AppT = {
 	gt: number;
 	lt: number;
 	nt: number;
+	credentials?: {
+		playerId: Id<"players">;
+		token: string;
+	};
+	opponentId?: Id<"players">;
 	game: GameT;
 };
 
@@ -56,8 +61,6 @@ export const startNewGameAgainstComputer = (app: AppT) => {
 	}
 	app.lt = 0;
 	app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
-	app.game.gameId = undefined;
-	delete app.game.credentials;
 	startGame(app.game);
 };
 
@@ -66,11 +69,8 @@ export const startNewGameAgainstPlayer = (app: AppT, gameId: Id<"games">) => {
 		app.state = "transition";
 	}
 	app.lt = 0;
-	const { credentials, opponentId } = app.game;
 	app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
 	app.game.gameId = gameId;
-	app.game.credentials = credentials;
-	app.game.opponentId = opponentId;
 	startGame(app.game);
 };
 

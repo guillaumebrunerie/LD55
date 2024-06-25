@@ -81,6 +81,7 @@ import {
 	type PlayerData,
 } from "./rules";
 import { getDuration } from "./Animation";
+import type { AppT } from "./appLogic";
 
 type ManaState = "visible" | "anticipating" | "spawning";
 export type Mana = Entity<ManaState> & {
@@ -385,11 +386,6 @@ type GameState =
 
 export type GameT = Entity<GameState> & {
 	gameId?: Id<"games">;
-	credentials?: {
-		playerId: Id<"players">;
-		token: string;
-	};
-	opponentId?: Id<"players">;
 	round: number;
 	player: Player;
 	opponent: Player;
@@ -1244,14 +1240,17 @@ const spendManaPoint = (player: Player, manaPoint: Mana | undefined) => {
 };
 
 export const buyMushroom = async (
-	game: GameT,
+	app: AppT,
 	player: Player,
 	buyMushroomMutation: ReactMutation<typeof api.player.buyMushroom>,
 ) => {
 	const manaPoint = lockManaPoint(player);
-	const { credentials } = game;
+	const {
+		credentials,
+		game: { gameId },
+	} = app;
 	const result =
-		credentials ?
+		gameId && credentials ?
 			await buyMushroomMutation(credentials)
 		:	pickMushroomData(getPlayerData(player));
 	if (!result) {
@@ -1260,7 +1259,7 @@ export const buyMushroom = async (
 	const strength = result.strength;
 	runInAction(() => {
 		spendManaPoint(player, manaPoint);
-		if (player == game.player) {
+		if (player == app.game.player) {
 			spawnMushroom(
 				player.items.mushrooms,
 				manaBounds,
@@ -1289,14 +1288,17 @@ const getPlayerData = (player: Player): PlayerData => {
 };
 
 export const buyMonster = async (
-	game: GameT,
+	app: AppT,
 	player: Player,
 	buyMonsterMutation: ReactMutation<typeof api.player.buyMonster>,
 ) => {
 	const manaPoint = lockManaPoint(player);
-	const { credentials } = game;
+	const {
+		credentials,
+		game: { gameId },
+	} = app;
 	const result =
-		credentials ?
+		gameId && credentials ?
 			await buyMonsterMutation(credentials)
 		:	pickMonsterData(getPlayerData(player));
 	if (!result) {
@@ -1310,7 +1312,7 @@ export const buyMonster = async (
 };
 
 export const buyDefense = async (
-	game: GameT,
+	app: AppT,
 	player: Player,
 	buyDefenseMutation: ReactMutation<typeof api.player.buyDefense>,
 ) => {
@@ -1319,14 +1321,17 @@ export const buyDefense = async (
 		console.error("No mana point");
 		return;
 	}
-	const { credentials } = game;
+	const {
+		credentials,
+		game: { gameId },
+	} = app;
 	const result =
-		credentials ?
+		gameId && credentials ?
 			await buyDefenseMutation(credentials)
 		:	pickDefenseData(getPlayerData(player));
 	runInAction(() => {
 		if (!result) {
-			unlockManaPoint(game, manaPoint);
+			unlockManaPoint(app.game, manaPoint);
 			return;
 		}
 		const { strength } = result;
@@ -1338,7 +1343,7 @@ export const buyDefense = async (
 				}
 				appearShield(player);
 			} else {
-				if (player == game.player) {
+				if (player == app.game.player) {
 					spawnRune(
 						player.items.runes,
 						feetBounds,

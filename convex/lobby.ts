@@ -10,6 +10,7 @@ const pickToken = () => {
 };
 
 const newPlayer = (): WithoutSystemFields<Doc<"players">> => ({
+	lastPing: 0,
 	token: pickToken(),
 	name: pickName(),
 	mana: initialMana,
@@ -26,31 +27,51 @@ export const createNewPlayer = mutation({
 	},
 });
 
-export const disconnect = mutation({
+export const ping = mutation({
 	args: {
 		playerId: v.id("players"),
 		token: v.string(),
 	},
 	handler: async (ctx, { playerId, token }) => {
-		console.log("DISCONNECT");
 		const player = await ctx.db.get(playerId);
 		if (!player || player.token != token) {
 			return;
 		}
-		await ctx.db.delete(playerId);
+		await ctx.db.patch(playerId, { lastPing: Date.now() });
 	},
 });
+
+// export const disconnect = mutation({
+// 	args: {
+// 		playerId: v.id("players"),
+// 		token: v.string(),
+// 	},
+// 	handler: async (ctx, { playerId, token }) => {
+// 		console.log("DISCONNECT");
+// 		const player = await ctx.db.get(playerId);
+// 		if (!player || player.token != token) {
+// 			return;
+// 		}
+// 		await ctx.db.delete(playerId);
+// 	},
+// });
 
 export const availablePlayers = query({
 	handler: async (ctx) => {
 		const players = await ctx.db
 			.query("players")
-			.filter((q) => q.eq(q.field("gameId"), undefined))
+			.filter((q) =>
+				q.and(
+					q.eq(q.field("gameId"), undefined),
+					q.gt(q.add(q.field("lastPing"), 30_000), Date.now()),
+				),
+			)
 			.collect();
 		return players.map((player) => ({
 			id: player._id,
 			name: player.name,
 			opponentId: player.opponentId,
+			lastPing: player.lastPing,
 		}));
 	},
 });

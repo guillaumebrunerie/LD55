@@ -50,7 +50,7 @@ import {
 	TextBoxAppear,
 	WaitingDot,
 } from "./assets";
-import { buyMonster, buyDefense, buyMushroom, type GameT } from "./gameLogic";
+import { buyMonster, buyDefense, buyMushroom, setupFight } from "./gameLogic";
 import { Game, Wizard } from "./Game";
 import { wave } from "./ease";
 import { appearButton, disappearButton, type ButtonT } from "./button";
@@ -61,6 +61,8 @@ import { CustomText } from "./CustomText";
 import type { Id } from "../convex/_generated/dataModel";
 import { Rectangle as Box } from "./Rectangle";
 import { darkFilter } from "./filters";
+import { useInterval } from "usehooks-ts";
+import { Circle } from "./Circle";
 
 const left = 420;
 const top = 105;
@@ -79,24 +81,27 @@ const WaitingDots = ({ lt }: { lt: number }) => {
 };
 
 const PlayerLine = ({
-	game,
+	app,
 	id,
 	name,
 	type,
+	timeSinceLastPing,
 }: {
-	game: GameT;
+	app: AppT;
 	id: Id<"players">;
 	name: string;
 	type: "waiting" | "requested" | "default";
+	timeSinceLastPing: number;
 }) => {
 	const requestPlay = useMutation(api.lobby.requestPlay);
 	const [x, setX] = useState(0);
-	const { credentials } = game;
+	const { credentials } = app;
 	const icon = {
 		default: InviteButtonDefault,
 		waiting: InviteButtonOn,
 		requested: InviteButtonAccept,
 	}[type];
+	const color = timeSinceLastPing < 5_000 ? 0x00ff00 : 0xffff00;
 	return (
 		<>
 			<CustomText
@@ -115,12 +120,13 @@ const PlayerLine = ({
 					}[type]
 				}
 			/>
+			<Circle x={-20} y={0} radius={8} color={color} />
 			<Container x={x + (icon.width * 0.75) / 2 + 15}>
 				<Sprite
 					texture={icon}
 					scale={
 						type === "requested" ?
-							0.75 + Math.sin(game.lt * 6) * 0.02
+							0.75 + Math.sin(app.lt * 6) * 0.02
 						:	0.75
 					}
 					anchor={0.5}
@@ -131,10 +137,10 @@ const PlayerLine = ({
 						if (!credentials) {
 							return;
 						}
-						if (game.opponentId == id) {
-							game.opponentId = undefined;
+						if (app.opponentId == id) {
+							app.opponentId = undefined;
 						} else {
-							game.opponentId = id;
+							app.opponentId = id;
 						}
 						void requestPlay({
 							...credentials,
@@ -142,29 +148,14 @@ const PlayerLine = ({
 						});
 					})}
 				/>
-				{type === "waiting" && <WaitingDots lt={game.lt} />}
+				{type === "waiting" && <WaitingDots lt={app.lt} />}
 			</Container>
 		</>
 	);
 };
 
 const Lobby = ({ app }: { app: AppT }) => {
-	const createNewPlayer = useMutation(api.lobby.createNewPlayer);
-	useEffect(() => {
-		if (!app.game.credentials) {
-			createNewPlayer()
-				.then((credentials) => {
-					runInAction(() => {
-						app.game.credentials = credentials;
-					});
-				})
-				.catch(() => {
-					console.error("Could not create new player");
-				});
-		}
-	}, [app, createNewPlayer]);
-
-	const { credentials, opponentId } = app.game;
+	const { credentials, opponentId } = app;
 
 	const gameId = useQuery(api.player.currentGameId, {
 		playerId: credentials?.playerId,
@@ -182,7 +173,7 @@ const Lobby = ({ app }: { app: AppT }) => {
 		(credentials &&
 			availablePlayers
 				?.filter(({ id }) => id !== credentials.playerId)
-				.map(({ id, name, opponentId: theirOpponentId }) => {
+				.map(({ id, name, opponentId: theirOpponentId, lastPing }) => {
 					return {
 						id,
 						name,
@@ -191,6 +182,7 @@ const Lobby = ({ app }: { app: AppT }) => {
 							: theirOpponentId == credentials.playerId ?
 								("requested" as const)
 							:	("default" as const),
+						timeSinceLastPing: Date.now() - lastPing,
 					};
 				})) ||
 		[];
@@ -229,13 +221,14 @@ const Lobby = ({ app }: { app: AppT }) => {
 					position={{ x: left, y: top + lineHeight }}
 				/>
 			)}
-			{visiblePlayers.map(({ id, name, type }, i) => (
+			{visiblePlayers.map(({ id, name, type, timeSinceLastPing }, i) => (
 				<Container key={id} x={left} y={top + (i + 1) * lineHeight}>
 					<PlayerLine
-						game={app.game}
+						app={app}
 						id={id}
 						name={name}
 						type={type}
+						timeSinceLastPing={timeSinceLastPing}
 					/>
 				</Container>
 			))}
@@ -276,7 +269,7 @@ const StartButton = ({
 }) => {
 	const inLobby = app.game.lobby.alpha > 0.01;
 
-	const disconnect = useMutation(api.lobby.disconnect);
+	// const disconnect = useMutation(api.lobby.disconnect);
 
 	if (button.alpha < 0.01) {
 		return null;
@@ -295,11 +288,11 @@ const StartButton = ({
 					eventMode="static"
 					pointerdown={action(() => {
 						disappearButton(app.game.lobby);
-						const { credentials } = app.game;
+						const { credentials } = app;
 						if (credentials) {
-							void disconnect(credentials);
-							delete app.game.credentials;
-							app.game.opponentId = undefined;
+							// void disconnect(credentials);
+							// delete app.game.credentials;
+							// app.game.opponentId = undefined;
 						}
 						void ClickStart.play();
 						void TextBoxAppear.play();
@@ -517,10 +510,11 @@ const UIButton = ({
 	);
 };
 
-const UIButtons = ({ game }: { game: GameT }) => {
+const UIButtons = ({ app }: { app: AppT }) => {
 	const buyDefenseMutation = useMutation(api.player.buyDefense);
 	const buyMushroomMutation = useMutation(api.player.buyMushroom);
 	const buyMonsterMutation = useMutation(api.player.buyMonster);
+	const { game } = app;
 	return (
 		<>
 			<UIButton
@@ -530,7 +524,7 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				x={600}
 				onClick={action(() => {
 					void ClickStart.play();
-					void buyDefense(game, game.player, buyDefenseMutation);
+					void buyDefense(app, game.player, buyDefenseMutation);
 				})}
 			/>
 			<UIButton
@@ -540,7 +534,7 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				x={960}
 				onClick={action(() => {
 					void ClickStart.play();
-					void buyMushroom(game, game.player, buyMushroomMutation);
+					void buyMushroom(app, game.player, buyMushroomMutation);
 				})}
 			/>
 			<UIButton
@@ -550,7 +544,7 @@ const UIButtons = ({ game }: { game: GameT }) => {
 				x={1320}
 				onClick={action(() => {
 					void ClickStart.play();
-					void buyMonster(game, game.player, buyMonsterMutation);
+					void buyMonster(app, game.player, buyMonsterMutation);
 				})}
 			/>
 		</>
@@ -631,10 +625,57 @@ const LogoMoon = ({
 
 const mod = (a: number, b: number) => (b + (a % b)) % b;
 
+const useConnection = (app: AppT) => {
+	const createNewPlayer = useMutation(api.lobby.createNewPlayer);
+	useEffect(() => {
+		if (!app.credentials) {
+			createNewPlayer()
+				.then((credentials) => {
+					runInAction(() => {
+						app.credentials = credentials;
+					});
+				})
+				.catch(() => {
+					console.error("Could not create new player");
+				});
+		}
+	}, [app, createNewPlayer]);
+
+	const ping = useMutation(api.lobby.ping);
+	useInterval(() => {
+		const { credentials } = app;
+		if (credentials) {
+			void ping(credentials);
+		}
+	}, 2000);
+
+	const lastFight = useQuery(api.fight.lastFight, app.credentials || {});
+	useEffect(() => {
+		runInAction(() => {
+			if (lastFight && app.game.gameId) {
+				setupFight(app.game, lastFight);
+			}
+		});
+	}, [lastFight, app.game]);
+
+	// Warn before closing
+	useEffect(() => {
+		const listener = (event: BeforeUnloadEvent) => {
+			event.preventDefault();
+		};
+		window.addEventListener("beforeunload", listener);
+		return () => {
+			window.removeEventListener("beforeunload", listener);
+		};
+	}, []);
+};
+
 export const App = () => {
 	const [app] = useState(() => observable(newApp()));
 	const { game } = app;
 	useEffect(() => startApp(app), [app]);
+
+	useConnection(app);
 
 	useEffect(() => {
 		const callback = action((event: KeyboardEvent) => {
@@ -771,16 +812,16 @@ export const App = () => {
 				{/* 	<ManaPoints items={game.opponent.manaPoints} /> */}
 				{/* </Container> */}
 				<LogoMoon app={app} filters={filters} alpha={screenAlpha} />
-				<UIButtons game={game} />
+				<UIButtons app={app} />
 				<StartButton
 					app={app}
 					button={game.startButton}
 					position={[1920 / 2, 730]}
 				/>
-				{game.credentials && (
-					<PlayerName playerId={game.credentials.playerId} />
+				{app.credentials && (
+					<PlayerName playerId={app.credentials.playerId} />
 				)}
-				{game.opponentId && <OpponentName playerId={game.opponentId} />}
+				{app.opponentId && <OpponentName playerId={app.opponentId} />}
 				<Menu button={game.menuButton} />
 				{/* <SoundButton /> */}
 				{/* <PolygonShape polygon={manaBounds.polygon} alpha={0.4} /> */}
