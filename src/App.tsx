@@ -13,6 +13,7 @@ import {
 	startNewGameAgainstPlayer,
 	startNewGameAgainstComputer,
 	type AppT,
+	type Credentials,
 } from "./appLogic";
 import { observable, action, runInAction } from "mobx";
 import { sound } from "@pixi/sound";
@@ -50,7 +51,13 @@ import {
 	TextBoxAppear,
 	WaitingDot,
 } from "./assets";
-import { buyMonster, buyDefense, buyMushroom, setupFight } from "./gameLogic";
+import {
+	buyMonster,
+	buyDefense,
+	buyMushroom,
+	setupFight,
+	newGame,
+} from "./gameLogic";
 import { Game, Wizard } from "./Game";
 import { wave } from "./ease";
 import { appearButton, disappearButton, type ButtonT } from "./button";
@@ -154,6 +161,21 @@ const PlayerLine = ({
 	);
 };
 
+const clickOutsideLobby = (
+	app: AppT,
+	disconnect: (credentials: Credentials) => Promise<null>,
+) => {
+	disappearButton(app.game.lobby);
+	const { credentials } = app;
+	if (credentials) {
+		void disconnect(credentials);
+		delete app.credentials;
+		app.opponentId = undefined;
+	}
+	void ClickStart.play();
+	void TextBoxAppear.play();
+};
+
 const Lobby = ({ app }: { app: AppT }) => {
 	const { credentials, opponentId } = app;
 
@@ -206,59 +228,90 @@ const Lobby = ({ app }: { app: AppT }) => {
 	const hasPrevPage = page > 0;
 	const hasNextPage = players.length > (page + 1) * PLAYERS_PER_PAGE;
 
+	const disconnect = useMutation(api.lobby.disconnect);
+
 	return (
-		<Container position={{ x: 0, y: -(1 - app.game.lobby.alpha) * 1000 }}>
-			<Sprite
-				texture={TextBox}
-				position={[1920 / 2, 1080 / 2]}
-				anchor={0.5}
+		<>
+			<Box
+				x={0}
+				y={0}
+				width={1920}
+				height={1080}
+				alpha={app.game.lobby.alpha.value * 0.5}
+				cursor="pointer"
 				eventMode="static"
+				pointerdown={action(() => {
+					clickOutsideLobby(app, disconnect);
+				})}
 			/>
-			{!availablePlayers && (
-				<CustomText
-					text="Loading…"
-					anchor={[0, 0.5]}
-					position={{ x: left, y: top + lineHeight }}
+			<Container
+				position={{ x: 0, y: -(1 - app.game.lobby.alpha.value) * 1000 }}
+			>
+				<Sprite
+					texture={TextBox}
+					position={[1920 / 2, 1080 / 2]}
+					anchor={0.5}
+					eventMode="static"
 				/>
-			)}
-			{visiblePlayers.map(({ id, name, type, timeSinceLastPing }, i) => (
-				<Container key={id} x={left} y={top + (i + 1) * lineHeight}>
-					<PlayerLine
-						app={app}
-						id={id}
-						name={name}
-						type={type}
-						timeSinceLastPing={timeSinceLastPing}
+				{!availablePlayers && (
+					<CustomText
+						text="Loading…"
+						anchor={[0, 0.5]}
+						position={{ x: left, y: top + lineHeight }}
 					/>
-				</Container>
-			))}
-			{hasPrevPage && (
-				<Sprite
-					texture={ArrowUp}
-					x={1440}
-					y={210}
-					anchor={0.5}
-					cursor="pointer"
-					eventMode="static"
-					pointerdown={() => setPage((page) => page - 1)}
-				/>
-			)}
-			{hasNextPage && (
-				<Sprite
-					texture={ArrowDown}
-					x={1440}
-					y={870}
-					anchor={0.5}
-					cursor="pointer"
-					eventMode="static"
-					pointerdown={() => setPage((page) => page + 1)}
-				/>
-			)}
-		</Container>
+				)}
+				{visiblePlayers.map(
+					({ id, name, type, timeSinceLastPing }, i) => (
+						<Container
+							key={id}
+							x={left}
+							y={top + (i + 1) * lineHeight}
+						>
+							<PlayerLine
+								app={app}
+								id={id}
+								name={name}
+								type={type}
+								timeSinceLastPing={timeSinceLastPing}
+							/>
+						</Container>
+					),
+				)}
+				{hasPrevPage && (
+					<Sprite
+						texture={ArrowUp}
+						x={1440}
+						y={210}
+						anchor={0.5}
+						cursor="pointer"
+						eventMode="static"
+						pointerdown={() => setPage((page) => page - 1)}
+					/>
+				)}
+				{hasNextPage && (
+					<Sprite
+						texture={ArrowDown}
+						x={1440}
+						y={870}
+						anchor={0.5}
+						cursor="pointer"
+						eventMode="static"
+						pointerdown={() => setPage((page) => page + 1)}
+					/>
+				)}
+			</Container>
+		</>
 	);
 };
 
-const StartButton = ({
+const clickOpenLobby = (app: AppT, createNewPlayer: () => void) => {
+	void ClickStart.play();
+	void TextBoxAppear.play();
+	appearButton(app.game.lobby);
+	createNewPlayer();
+};
+
+const StartButtons = ({
 	app,
 	button,
 	position,
@@ -267,38 +320,16 @@ const StartButton = ({
 	button: ButtonT;
 	position: [number, number];
 }) => {
-	const inLobby = app.game.lobby.alpha > 0.01;
+	const inLobby = app.game.lobby.alpha.value > 0.01;
 
-	// const disconnect = useMutation(api.lobby.disconnect);
+	const createNewPlayer = useCreateNewPlayer(app);
 
-	if (button.alpha < 0.01) {
+	if (button.alpha.value < 0.01) {
 		return null;
 	}
 
 	return (
 		<>
-			{inLobby && (
-				<Box
-					x={0}
-					y={0}
-					width={1920}
-					height={1080}
-					alpha={app.game.lobby.alpha * 0.5}
-					cursor="pointer"
-					eventMode="static"
-					pointerdown={action(() => {
-						disappearButton(app.game.lobby);
-						const { credentials } = app;
-						if (credentials) {
-							// void disconnect(credentials);
-							// delete app.game.credentials;
-							// app.game.opponentId = undefined;
-						}
-						void ClickStart.play();
-						void TextBoxAppear.play();
-					})}
-				/>
-			)}
 			<Sprite
 				texture={StartVsComputerDefault}
 				anchor={0.5}
@@ -306,7 +337,7 @@ const StartButton = ({
 					x: position[0] - 200,
 					y: position[1],
 				}}
-				alpha={button.alpha}
+				alpha={button.alpha.value}
 				hitArea={
 					button.state == "idle" ?
 						new Rectangle(-100, -100, 200, 200)
@@ -327,7 +358,7 @@ const StartButton = ({
 					x: position[0] + 200,
 					y: position[1],
 				}}
-				alpha={button.alpha}
+				alpha={button.alpha.value}
 				hitArea={
 					button.state == "idle" ?
 						new Rectangle(-100, -100, 200, 200)
@@ -336,9 +367,7 @@ const StartButton = ({
 				cursor="pointer"
 				eventMode="static"
 				pointerdown={action(() => {
-					void ClickStart.play();
-					void TextBoxAppear.play();
-					appearButton(app.game.lobby);
+					clickOpenLobby(app, createNewPlayer);
 				})}
 			/>
 			{inLobby && <Lobby app={app} />}
@@ -378,33 +407,36 @@ const SoundButton = (props: SpriteProps) => {
 	);
 };
 
-const ExitButton = (props: SpriteProps) => {
-	// const setVolumeAll = useSetVolumeAll();
-	// const toggleSound = () => {
-	// 	setVolumeAll((volume) => 1 - volume);
-	// };
+const exitGame = (app: AppT) => {
+	app.state = "intro";
+	app.game = newGame("intro", false);
+};
 
+const ExitButton = (props: SpriteProps & { app: AppT }) => {
+	const { app, ...spriteProps } = props;
 	return (
 		<Sprite
-			{...props}
+			{...spriteProps}
 			texture={ExitGameBtn}
 			cursor="pointer"
 			eventMode="static"
-			pointerdown={() => {}}
+			pointerdown={action(() => {
+				exitGame(app);
+			})}
 		/>
 	);
 };
 
-const Menu = ({ button }: { button: ButtonT }) => {
+const Menu = ({ button, app }: { button: ButtonT; app: AppT }) => {
 	return (
 		<Container>
-			{button.alpha > 0.1 && (
+			{button.alpha.value > 0.1 && (
 				<Box
 					x={0}
 					y={0}
 					width={1920}
 					height={1080}
-					alpha={button.alpha * 0.5}
+					alpha={button.alpha.value * 0.5}
 					eventMode="static"
 					pointerdown={action(() => {
 						disappearButton(button);
@@ -422,11 +454,11 @@ const Menu = ({ button }: { button: ButtonT }) => {
 				x={1920 - 30}
 				y={30}
 				anchor={[1, 0]}
-				alpha={button.alpha}
+				alpha={button.alpha.value}
 				cursor="pointer"
 				eventMode="static"
 				pointerdown={action(() => {
-					if (button.targetAlpha == 1) {
+					if (button.alpha.targetValue == 1) {
 						disappearButton(button);
 					} else {
 						appearButton(button);
@@ -435,18 +467,18 @@ const Menu = ({ button }: { button: ButtonT }) => {
 			/>
 			<NineSlicePlane
 				texture={SettingsBoxDefault}
-				x={1920 - 30 - 225 * button.alpha * 1.5}
+				x={1920 - 30 - 225 * button.alpha.value * 1.5}
 				y={30}
-				width={225 * button.alpha}
-				height={150 * button.alpha}
+				width={225 * button.alpha.value}
+				height={150 * button.alpha.value}
 				scale={1.5}
-				alpha={button.alpha}
+				alpha={button.alpha.value}
 			/>
 			<Container
 				x={1920 - 30}
 				y={30}
-				scale={button.alpha}
-				alpha={button.alpha}
+				scale={button.alpha.value}
+				alpha={button.alpha.value}
 			>
 				<SoundButton
 					x={-310 + 282 / 2}
@@ -459,6 +491,7 @@ const Menu = ({ button }: { button: ButtonT }) => {
 					y={110 + 85 / 2}
 					anchor={0.5}
 					scale={0.85}
+					app={app}
 				/>
 			</Container>
 		</Container>
@@ -478,7 +511,7 @@ const UIButton = ({
 	textureOn: Texture;
 	x: number;
 }) => {
-	const enabled = button.alpha > 0.95 && button.fade < 0.05;
+	const enabled = button.alpha.value > 0.95 && button.fade.value < 0.05;
 	const [isPressed, setIsPressed] = useState(false);
 
 	return (
@@ -498,13 +531,13 @@ const UIButton = ({
 						setIsPressed(true);
 					}
 				}}
-				alpha={button.alpha < button.fade ? 0 : 1}
+				alpha={button.alpha.value < button.fade.value ? 0 : 1}
 			/>
 			<Sprite
 				texture={isPressed ? textureOn : textureOff}
 				anchor={0.5}
 				tint={0x333333}
-				alpha={button.fade * button.alpha}
+				alpha={button.fade.value * button.alpha.value}
 			/>
 		</Container>
 	);
@@ -619,28 +652,41 @@ const LogoMoon = ({
 				</>
 			);
 		case "intro":
-			return <Sprite texture={Logo} x={1920 / 2} y={300} anchor={0.5} />;
+			return (
+				<Sprite
+					texture={Logo}
+					x={1920 / 2}
+					y={300}
+					anchor={0.5}
+					filters={[]}
+				/>
+			);
 	}
 };
 
 const mod = (a: number, b: number) => (b + (a % b)) % b;
 
-const useConnection = (app: AppT) => {
+const useCreateNewPlayer = (app: AppT) => {
 	const createNewPlayer = useMutation(api.lobby.createNewPlayer);
-	useEffect(() => {
-		if (!app.credentials) {
-			createNewPlayer()
-				.then((credentials) => {
-					runInAction(() => {
-						app.credentials = credentials;
-					});
-				})
-				.catch(() => {
-					console.error("Could not create new player");
-				});
+	return () => {
+		if (app.credentials) {
+			console.error(
+				"Should not create new player when we already have credentials",
+			);
 		}
-	}, [app, createNewPlayer]);
+		createNewPlayer()
+			.then((credentials) => {
+				runInAction(() => {
+					app.credentials = credentials;
+				});
+			})
+			.catch(() => {
+				console.error("Could not create new player");
+			});
+	};
+};
 
+const usePing = (app: AppT) => {
 	const ping = useMutation(api.lobby.ping);
 	useInterval(() => {
 		const { credentials } = app;
@@ -648,7 +694,9 @@ const useConnection = (app: AppT) => {
 			void ping(credentials);
 		}
 	}, 2000);
+};
 
+const useConnection = (app: AppT) => {
 	const lastFight = useQuery(api.fight.lastFight, app.credentials || {});
 	useEffect(() => {
 		runInAction(() => {
@@ -657,8 +705,9 @@ const useConnection = (app: AppT) => {
 			}
 		});
 	}, [lastFight, app.game]);
+};
 
-	// Warn before closing
+const useWarnBeforeClosing = () => {
 	useEffect(() => {
 		const listener = (event: BeforeUnloadEvent) => {
 			event.preventDefault();
@@ -670,12 +719,20 @@ const useConnection = (app: AppT) => {
 	}, []);
 };
 
-export const App = () => {
+const useApp = () => {
 	const [app] = useState(() => observable(newApp()));
-	const { game } = app;
 	useEffect(() => startApp(app), [app]);
+	return app;
+};
 
+export const App = () => {
+	const app = useApp();
+
+	const { game } = app;
+
+	usePing(app);
 	useConnection(app);
+	useWarnBeforeClosing();
 
 	useEffect(() => {
 		const callback = action((event: KeyboardEvent) => {
@@ -813,7 +870,7 @@ export const App = () => {
 				{/* </Container> */}
 				<LogoMoon app={app} filters={filters} alpha={screenAlpha} />
 				<UIButtons app={app} />
-				<StartButton
+				<StartButtons
 					app={app}
 					button={game.startButton}
 					position={[1920 / 2, 730]}
@@ -822,7 +879,7 @@ export const App = () => {
 					<PlayerName playerId={app.credentials.playerId} />
 				)}
 				{app.opponentId && <OpponentName playerId={app.opponentId} />}
-				<Menu button={game.menuButton} />
+				<Menu button={game.menuButton} app={app} />
 				{/* <SoundButton /> */}
 				{/* <PolygonShape polygon={manaBounds.polygon} alpha={0.4} /> */}
 			</Container>

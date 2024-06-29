@@ -5,16 +5,18 @@ import { newGame, startGame, tickGame, type GameT } from "./gameLogic";
 import { wave } from "./ease";
 import type { Id } from "../convex/_generated/dataModel";
 
+export type Credentials = {
+	playerId: Id<"players">;
+	token: string;
+};
+
 export type AppT = {
 	speed: number;
 	state: "intro" | "transition" | "game";
 	gt: number;
 	lt: number;
 	nt: number;
-	credentials?: {
-		playerId: Id<"players">;
-		token: string;
-	};
+	credentials?: Credentials;
 	opponentId?: Id<"players">;
 	game: GameT;
 };

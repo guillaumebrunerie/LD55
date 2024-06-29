@@ -47,16 +47,6 @@ import { wave } from "./ease";
 import { opponentFilter } from "./filters";
 
 // const DisconnectOnClose = ({ game }: { game: GameT }) => {
-// 	// Warn before closing
-// 	useEffect(() => {
-// 		const listener = (event: BeforeUnloadEvent) => {
-// 			event.preventDefault();
-// 		};
-// 		window.addEventListener("beforeunload", listener);
-// 		return () => {
-// 			window.removeEventListener("beforeunload", listener);
-// 		};
-// 	}, []);
 // 	// Disconnect on close
 // 	const disconnect = useMutation(api.lobby.disconnect);
 // 	useEffect(() => {

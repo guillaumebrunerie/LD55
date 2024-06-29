@@ -41,20 +41,19 @@ export const ping = mutation({
 	},
 });
 
-// export const disconnect = mutation({
-// 	args: {
-// 		playerId: v.id("players"),
-// 		token: v.string(),
-// 	},
-// 	handler: async (ctx, { playerId, token }) => {
-// 		console.log("DISCONNECT");
-// 		const player = await ctx.db.get(playerId);
-// 		if (!player || player.token != token) {
-// 			return;
-// 		}
-// 		await ctx.db.delete(playerId);
-// 	},
-// });
+export const disconnect = mutation({
+	args: {
+		playerId: v.id("players"),
+		token: v.string(),
+	},
+	handler: async (ctx, { playerId, token }) => {
+		const player = await ctx.db.get(playerId);
+		if (!player || player.token != token) {
+			return;
+		}
+		await ctx.db.delete(playerId);
+	},
+});
 
 export const availablePlayers = query({
 	handler: async (ctx) => {
