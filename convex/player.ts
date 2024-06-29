@@ -16,8 +16,8 @@ export const playerName = query({
 		playerId: v.id("players"),
 	},
 	handler: async (ctx, { playerId }) => {
-		const player = await getPlayer(ctx, playerId);
-		return player.name;
+		const player = await getPlayerMaybe(ctx, playerId);
+		return player?.name || null;
 	},
 });
 
@@ -118,19 +118,30 @@ export const buyMonster = mutation({
 	},
 });
 
-const getPlayer = async (
+const getPlayerMaybe = async (
 	ctx: GenericMutationCtx<DataModel> | GenericQueryCtx<DataModel>,
 	playerId: Id<"players">,
 ) => {
 	const player = await ctx.db.get(playerId);
 	if (!player) {
-		throw new Error("No player found");
+		return null;
 	}
 	if (player.mana < 0) {
 		throw new Error("Negative mana");
 	}
 	if (player.defense > maxDefense) {
 		throw new Error("Too much defense");
+	}
+	return player;
+};
+
+const getPlayer = async (
+	ctx: GenericMutationCtx<DataModel> | GenericQueryCtx<DataModel>,
+	playerId: Id<"players">,
+) => {
+	const player = await getPlayerMaybe(ctx, playerId);
+	if (player === null) {
+		throw new Error("No player found");
 	}
 	return player;
 };

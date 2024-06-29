@@ -407,13 +407,22 @@ const SoundButton = (props: SpriteProps) => {
 	);
 };
 
-const exitGame = (app: AppT) => {
+const exitGame = (
+	app: AppT,
+	disconnect: (credentials: Credentials) => Promise<null>,
+) => {
 	app.state = "intro";
 	app.game = newGame("intro", false);
+	if (app.credentials) {
+		disconnect(app.credentials);
+		delete app.credentials;
+		delete app.opponentId;
+	}
 };
 
 const ExitButton = (props: SpriteProps & { app: AppT }) => {
 	const { app, ...spriteProps } = props;
+	const disconnect = useMutation(api.lobby.disconnect);
 	return (
 		<Sprite
 			{...spriteProps}
@@ -421,7 +430,7 @@ const ExitButton = (props: SpriteProps & { app: AppT }) => {
 			cursor="pointer"
 			eventMode="static"
 			pointerdown={action(() => {
-				exitGame(app);
+				exitGame(app, disconnect);
 			})}
 		/>
 	);
@@ -600,13 +609,12 @@ const PlayerName = ({ playerId }: { playerId: Id<"players"> }) => {
 const OpponentName = ({ playerId }: { playerId: Id<"players"> }) => {
 	const playerName = useQuery(api.player.playerName, { playerId });
 	return (
-		playerName && (
-			<CustomText
-				text={playerName}
-				position={{ x: 1920 - 20, y: 1080 - 11 }}
-				anchor={[1, 1]}
-			/>
-		)
+		<CustomText
+			text={playerName ?? "(disconnected)"}
+			position={{ x: 1920 - 20, y: 1080 - 11 }}
+			anchor={[1, 1]}
+			color={playerName ? undefined : "#666"}
+		/>
 	);
 };
 
