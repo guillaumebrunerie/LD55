@@ -707,16 +707,18 @@ const useConnection = (app: AppT) => {
 	}, [lastFight, app.game]);
 };
 
-const useWarnBeforeClosing = () => {
+const useWarnBeforeClosing = (condition: boolean) => {
 	useEffect(() => {
 		const listener = (event: BeforeUnloadEvent) => {
 			event.preventDefault();
 		};
-		window.addEventListener("beforeunload", listener);
-		return () => {
-			window.removeEventListener("beforeunload", listener);
-		};
-	}, []);
+		if (condition) {
+			window.addEventListener("beforeunload", listener);
+			return () => {
+				window.removeEventListener("beforeunload", listener);
+			};
+		}
+	}, [condition]);
 };
 
 const useApp = () => {
@@ -732,7 +734,7 @@ export const App = () => {
 
 	usePing(app);
 	useConnection(app);
-	useWarnBeforeClosing();
+	useWarnBeforeClosing(app.state != "intro");
 
 	useEffect(() => {
 		const callback = action((event: KeyboardEvent) => {
