@@ -13,3 +13,4 @@
 - Show current mana points of opponent when playing online
 - Monsters on top of wizard
 - Add close button to lobby (no asset)
+- Start/restart buttons should trigger on click, not pointerdown

@@ -42,7 +42,6 @@ import {
 	Logo,
 	Moon,
 	RestartBtnDefault,
-	RestartBtnOn,
 	SettingsBoxDefault,
 	SettingsDefault,
 	SettingsOn,
@@ -486,6 +485,7 @@ const ExitButton = (props: SpriteProps & { app: AppT }) => {
 const Menu = ({ app }: { app: AppT }) => {
 	const button = app.menuButton;
 	const alpha = button.alpha.value;
+	const hasExitGame = app.state != "intro";
 	return (
 		<Container>
 			{alpha > 0.1 && (
@@ -525,27 +525,29 @@ const Menu = ({ app }: { app: AppT }) => {
 			/>
 			<NineSlicePlane
 				texture={SettingsBoxDefault}
-				x={1920 - 30 - 225 * alpha * 1.5}
-				y={30}
-				width={225 * alpha}
-				height={150 * alpha}
+				x={1920 - 25 - 190 * alpha * 1.5}
+				y={25}
+				width={190 * alpha}
+				height={(hasExitGame ? 130 : 80) * alpha}
 				scale={1.5}
 				alpha={alpha}
 			/>
 			<Container x={1920 - 30} y={30} scale={alpha} alpha={alpha}>
 				<SoundButton
-					x={-310 + 282 / 2}
-					y={30 + 85 / 2}
+					x={-280 + 282 / 2}
+					y={13 + 85 / 2}
 					anchor={0.5}
 					scale={0.85}
 				/>
-				<ExitButton
-					x={-310 + 282 / 2}
-					y={110 + 85 / 2}
-					anchor={0.5}
-					scale={0.85}
-					app={app}
-				/>
+				{hasExitGame && (
+					<ExitButton
+						x={-283 + 282 / 2}
+						y={85 + 85 / 2}
+						anchor={0.5}
+						scale={0.85}
+						app={app}
+					/>
+				)}
 			</Container>
 		</Container>
 	);
