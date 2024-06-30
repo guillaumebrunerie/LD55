@@ -262,6 +262,14 @@ const Lobby = ({ app }: { app: AppT }) => {
 						position={{ x: left, y: top + lineHeight }}
 					/>
 				)}
+				{players.length == 0 && (
+					<CustomText
+						text="(no wizard available, check again later)"
+						anchor={[0, 0.5]}
+						position={{ x: left, y: top + lineHeight }}
+						color="#666"
+					/>
+				)}
 				{visiblePlayers.map(
 					({ id, name, type, timeSinceLastPing }, i) => (
 						<Container

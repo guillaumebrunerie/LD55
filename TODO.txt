@@ -1,6 +1,5 @@
 # Prio 1
 
-- Remove exit game button in main menu when there is no game
 - Posting when opponent disconnected
 - Restart buttons/flow
 - Exit game
@@ -9,7 +8,7 @@
 # Prio 2
 
 - Fix glitches with global time and Idle and MagicEnd
-- ShieldHit then ShieldEnd
+- ShieldHit then ShieldEnd, and make all monsters attack at the same time
 - Show current mana points of opponent when playing online
 - Monsters on top of wizard
 - Add close button to lobby (no asset)
