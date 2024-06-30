@@ -121,7 +121,7 @@ export const Wizard = ({
 		case "idle":
 			return looping(WizardIdle, 10);
 		case "winning":
-			return looping(WizardWin, 20);
+			return looping(WizardWin, 21);
 		case "magicStart":
 			return transition(WizardMagicStart);
 		case "magicLoop":
@@ -485,47 +485,6 @@ const RuneC = ({ item, i }: { item: Rune; i: number }) => {
 					alpha={1}
 					position={[-14, 613]}
 				/>
-			);
-
-		case "preSpawning": {
-			if (item.hidden) {
-				return null;
-			}
-			if (!item.previousItem) {
-				console.error("No previous item");
-				break;
-			}
-			const dx = item.previousItem.position.x - item.position.x;
-			const dy = item.previousItem.position.y - item.position.y;
-			const angle = Math.atan2(dy, dx);
-			return (
-				<Sprite
-					anchor={0.5}
-					scale={item.previousItem.scale}
-					rotation={angle + Math.PI / 2}
-					blendMode={BLEND_MODES.NORMAL}
-					alpha={Math.min(item.nt * 3, 1)}
-					texture={ManaPointBlurred}
-					position={item.tmpPosition}
-				/>
-			);
-		}
-
-		case "spawning":
-			if (item.hidden) {
-				return appearing;
-			}
-			return (
-				<>
-					{appearing}
-					<Sprite
-						anchor={0.5}
-						scale={0.5}
-						blendMode={BLEND_MODES.ADD}
-						texture={getFrame(Spawn, 30, item.lt)}
-						position={item.position}
-					/>
-				</>
 			);
 	}
 	return null;

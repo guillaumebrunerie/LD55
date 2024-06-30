@@ -99,6 +99,7 @@ export type Mana = Entity<ManaState> & {
 };
 
 type ShieldState =
+	| "waitingToAppear"
 	| "appearing"
 	| "visible"
 	| "disappearing"
@@ -112,12 +113,11 @@ export type Shield = Entity<ShieldState> & {
 };
 
 type RuneState =
+	| "waitingToAppear"
 	| "appearing"
 	| "visible"
 	| "disappearing"
-	| "hidden"
-	| "preSpawning"
-	| "spawning";
+	| "hidden";
 export type Rune = Entity<RuneState> & {
 	position: Point;
 	tmpPosition?: Point;
@@ -218,8 +218,20 @@ const spawnMushroom = (
 	array.push(mushroom);
 };
 
-const spawnRunes = (player: Player, manaPoint: Mana, runes: number) => {
+const spawnRunes = (player: Player, manaPoint: Mana, runeCount: number) => {
 	const position = pickPosition(player.items.runes, feetBounds, delta);
+	for (let i = 0; i < runeCount; i++) {
+		if (!hasShield(player)) {
+			makeWaitToAppearShield(player);
+		} else {
+			const rune: Rune = {
+				...newEntity("waitingToAppear"),
+				position,
+			};
+			player.items.runes.push(rune);
+		}
+	}
+
 	manaPoint.tmpPosition = manaPoint.position;
 	manaPoint.position = position;
 	changeState(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
@@ -230,20 +242,12 @@ const spawnRunes = (player: Player, manaPoint: Mana, runes: number) => {
 			);
 			maybeEndWizardMagic(player);
 		});
-		for (let i = 0; i < runes; i++) {
-			if (!hasShield(player)) {
-				appearShield(player);
-			} else {
-				const rune: Rune = {
-					...newEntity("visible"),
-					position,
-				};
-				player.items.runes.push(rune);
-				// if (player == app.game.player) {
-				// spawnRune(player, manaPoint, hidden);
-				// } else {
-				// 	addRune(player.items.runes);
-				// }
+		if (player.items.shield.state == "waitingToAppear") {
+			appearShield(player);
+		}
+		for (const rune of player.items.runes) {
+			if (rune.state == "waitingToAppear") {
+				idleState(rune, "visible");
 			}
 		}
 	});
@@ -463,6 +467,10 @@ const appearShield = (player: Player) => {
 	);
 };
 
+const makeWaitToAppearShield = (player: Player) => {
+	idleState(player.items.shield, "waitingToAppear");
+};
+
 const disappearShield = (player: Player) => {
 	changeState(
 		player.items.shield,
@@ -475,7 +483,7 @@ const disappearShield = (player: Player) => {
 };
 
 const hasShield = (player: Player) => {
-	return ["visible", "appearing", "fighting"].includes(
+	return ["waitingToAppear", "visible", "appearing", "fighting"].includes(
 		player.items.shield.state,
 	);
 };
