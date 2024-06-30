@@ -1,4 +1,4 @@
-/** Generated on Sun Jun 30 17:29:10 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sun Jun 30 17:40:24 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -8,6 +8,7 @@ import ArrowDown_ from "../gfx/ArrowDown.png?texture";
 import ArrowDownOn_ from "../gfx/ArrowDownOn.png?texture";
 import ArrowUp_ from "../gfx/ArrowUp.png?texture";
 import ArrowUpOn_ from "../gfx/ArrowUpOn.png?texture";
+import BackToMenuDefault_ from "../gfx/BackToMenuDefault.png?texture";
 import Bg_ from "../gfx/Bg.jpg?texture";
 import BgFront_ from "../gfx/BgFront.png?texture";
 import BtnAttack_ from "../gfx/BtnAttack.png?texture";
@@ -124,6 +125,7 @@ export const [
 	ArrowDownOn,
 	ArrowUp,
 	ArrowUpOn,
+	BackToMenuDefault,
 	Bg,
 	BgFront,
 	BtnAttack,
@@ -265,6 +267,7 @@ export const [
 	ArrowDownOn_,
 	ArrowUp_,
 	ArrowUpOn_,
+	BackToMenuDefault_,
 	Bg_,
 	BgFront_,
 	BtnAttack_,

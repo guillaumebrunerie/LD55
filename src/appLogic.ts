@@ -20,6 +20,7 @@ export type AppT = {
 	credentials?: Credentials;
 	opponentId?: Id<"players">;
 	game: GameT;
+	restartButtons: ButtonT;
 	startButtons: ButtonT;
 	lobby: ButtonT;
 	menuButton: ButtonT;
@@ -32,6 +33,7 @@ export const newApp = (): AppT => ({
 	lt: 0,
 	nt: 0,
 	game: newGame("intro", false),
+	restartButtons: newButton(false),
 	startButtons: newButton(true),
 	lobby: newButton(false),
 	menuButton: newButton(false),
@@ -98,6 +100,7 @@ const tickApp = (app: AppT, delta: number) => {
 	}
 	tickGame(app.game, delta, app);
 	tickButton(app.startButtons, delta);
+	tickButton(app.restartButtons, delta);
 	tickButton(app.lobby, delta);
 	tickButton(app.menuButton, delta);
 };

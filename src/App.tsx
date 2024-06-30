@@ -20,6 +20,7 @@ import { sound } from "@pixi/sound";
 import {
 	ArrowDown,
 	ArrowUp,
+	BackToMenuDefault,
 	Bg,
 	BgFront,
 	BtnAttack,
@@ -40,6 +41,8 @@ import {
 	InviteButtonOn,
 	Logo,
 	Moon,
+	RestartBtnDefault,
+	RestartBtnOn,
 	SettingsBoxDefault,
 	SettingsDefault,
 	SettingsOn,
@@ -127,7 +130,7 @@ const PlayerLine = ({
 					}[type]
 				}
 			/>
-			<Circle x={-20} y={0} radius={8} color={color} />
+			<Circle x={-20} y={5} radius={8} color={color} />
 			<Container x={x + (icon.width * 0.75) / 2 + 15}>
 				<Sprite
 					texture={icon}
@@ -362,6 +365,57 @@ const StartButtons = ({
 				})}
 			/>
 			{inLobby && <Lobby app={app} />}
+		</>
+	);
+};
+
+const RestartButtons = ({
+	app,
+	position,
+}: {
+	app: AppT;
+	position: [number, number];
+}) => {
+	const disconnect = useMutation(api.lobby.disconnect);
+
+	const buttons = app.restartButtons;
+	if (buttons.alpha.value < 0.01) {
+		return null;
+	}
+
+	return (
+		<>
+			<Sprite
+				texture={BackToMenuDefault}
+				anchor={0.5}
+				position={{
+					x: position[0] - 200,
+					y: position[1],
+				}}
+				alpha={buttons.alpha.value}
+				hitArea={new Rectangle(-100, -100, 200, 200)}
+				cursor="pointer"
+				eventMode="static"
+				pointerdown={action(() => {
+					void ClickStart.play();
+					exitGame(app, disconnect);
+					disappearButton(app.restartButtons);
+					appearButton(app.startButtons);
+				})}
+			/>
+			<Sprite
+				texture={RestartBtnDefault}
+				anchor={0.5}
+				position={{
+					x: position[0] + 200,
+					y: position[1],
+				}}
+				alpha={buttons.alpha.value}
+				hitArea={new Rectangle(-100, -100, 200, 200)}
+				cursor="pointer"
+				eventMode="static"
+				pointerdown={action(() => {})}
+			/>
 		</>
 	);
 };
@@ -871,6 +925,7 @@ export const App = () => {
 				<LogoMoon app={app} filters={filters} alpha={screenAlpha} />
 				<UIButtons app={app} />
 				<StartButtons app={app} position={[1920 / 2, 730]} />
+				<RestartButtons app={app} position={[1920 / 2, 730]} />
 				{app.credentials && (
 					<PlayerName playerId={app.credentials.playerId} />
 				)}
