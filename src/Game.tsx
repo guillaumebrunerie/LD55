@@ -200,7 +200,7 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 				<Sprite
 					anchor={0.5}
 					scale={item.scale}
-					rotation={lt * 3 + item.offset}
+					rotation={lt * item.rotationSpeed + item.offset}
 					blendMode={BLEND_MODES.NORMAL}
 					texture={ManaPoint}
 					position={item.position}

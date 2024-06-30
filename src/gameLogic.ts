@@ -94,6 +94,7 @@ export type Mana = Entity<ManaState> & {
 	tmpPosition?: Point;
 	scale: number;
 	offset: number;
+	rotationSpeed: number;
 	previousItem?: Mushroom;
 };
 
@@ -248,6 +249,8 @@ const spawnRunes = (player: Player, manaPoint: Mana, runes: number) => {
 	});
 };
 
+const pickManaPointRotation = () => (Math.random() > 0.5 ? 3 : -3);
+
 const addManaPoint = (
 	array: Mana[],
 	bounds: Bounds,
@@ -263,6 +266,7 @@ const addManaPoint = (
 		transitions: [],
 		scale,
 		offset,
+		rotationSpeed: pickManaPointRotation(),
 	});
 };
 
@@ -331,6 +335,7 @@ const spawnManaPoint = (
 		position,
 		scale: 0.7 + Math.random() * 0.3,
 		offset: Math.random() * 2 * Math.PI,
+		rotationSpeed: pickManaPointRotation(),
 		previousItem,
 	};
 	if (!silent) {

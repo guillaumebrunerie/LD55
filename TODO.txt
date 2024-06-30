@@ -1,6 +1,5 @@
 # Prio 1
 
-- Spin mana points randomly
 - Remove exit game button in main menu when there is no game
 - Posting when opponent disconnected
 - Restart buttons/flow
