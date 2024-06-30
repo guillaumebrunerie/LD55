@@ -1,0 +1,175 @@
+{"frames": {
+
+"RestartButtonComputer_000.png":
+{
+	"frame": {"x":811,"y":1,"w":272,"h":165},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":114,"y":166,"w":272,"h":165},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_001.png":
+{
+	"frame": {"x":1085,"y":1,"w":272,"h":165},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":114,"y":166,"w":272,"h":165},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_002.png":
+{
+	"frame": {"x":1359,"y":1,"w":270,"h":165},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":115,"y":166,"w":270,"h":165},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_003.png":
+{
+	"frame": {"x":1,"y":1,"w":268,"h":163},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":116,"y":167,"w":268,"h":163},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_004.png":
+{
+	"frame": {"x":271,"y":1,"w":268,"h":163},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":116,"y":167,"w":268,"h":163},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_005.png":
+{
+	"frame": {"x":541,"y":1,"w":268,"h":163},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":116,"y":167,"w":268,"h":163},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_006.png":
+{
+	"frame": {"x":1631,"y":1,"w":270,"h":165},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":115,"y":166,"w":270,"h":165},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_007.png":
+{
+	"frame": {"x":1,"y":166,"w":272,"h":165},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":114,"y":166,"w":272,"h":165},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_008.png":
+{
+	"frame": {"x":275,"y":166,"w":274,"h":167},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":113,"y":165,"w":274,"h":167},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_009.png":
+{
+	"frame": {"x":551,"y":168,"w":274,"h":167},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":113,"y":165,"w":274,"h":167},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_010.png":
+{
+	"frame": {"x":827,"y":168,"w":276,"h":167},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":112,"y":165,"w":276,"h":167},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_011.png":
+{
+	"frame": {"x":555,"y":337,"w":278,"h":169},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":111,"y":164,"w":278,"h":169},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_012.png":
+{
+	"frame": {"x":835,"y":337,"w":278,"h":169},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":111,"y":164,"w":278,"h":169},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_013.png":
+{
+	"frame": {"x":1115,"y":337,"w":278,"h":169},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":111,"y":164,"w":278,"h":169},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_014.png":
+{
+	"frame": {"x":1395,"y":337,"w":278,"h":169},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":111,"y":164,"w":278,"h":169},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_015.png":
+{
+	"frame": {"x":277,"y":337,"w":276,"h":168},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":112,"y":164,"w":276,"h":168},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_016.png":
+{
+	"frame": {"x":1105,"y":168,"w":276,"h":167},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":112,"y":165,"w":276,"h":167},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_017.png":
+{
+	"frame": {"x":1383,"y":168,"w":274,"h":167},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":113,"y":165,"w":274,"h":167},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_018.png":
+{
+	"frame": {"x":1659,"y":168,"w":274,"h":167},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":113,"y":165,"w":274,"h":167},
+	"sourceSize": {"w":500,"h":500}
+},
+"RestartButtonComputer_019.png":
+{
+	"frame": {"x":1,"y":335,"w":274,"h":167},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":113,"y":165,"w":274,"h":167},
+	"sourceSize": {"w":500,"h":500}
+}},
+"animations": {
+	"RestartButtonComputer": ["RestartButtonComputer_000.png","RestartButtonComputer_001.png","RestartButtonComputer_002.png","RestartButtonComputer_003.png","RestartButtonComputer_004.png","RestartButtonComputer_005.png","RestartButtonComputer_006.png","RestartButtonComputer_007.png","RestartButtonComputer_008.png","RestartButtonComputer_009.png","RestartButtonComputer_010.png","RestartButtonComputer_011.png","RestartButtonComputer_012.png","RestartButtonComputer_013.png","RestartButtonComputer_014.png","RestartButtonComputer_015.png","RestartButtonComputer_016.png","RestartButtonComputer_017.png","RestartButtonComputer_018.png","RestartButtonComputer_019.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "RestartButtonComputer.png",
+	"format": "RGBA8888",
+	"size": {"w":1934,"h":507},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:9583295d129f454987f04c3bded5d1b9:df89fcbce92976887a5c32ffe052f8ad:57f5d983b96649edb73eeb6cf593475d$"
+}
+}
