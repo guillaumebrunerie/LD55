@@ -1,15 +1,13 @@
 # Prio 1
 
-- Posting when opponent disconnected
 - Restart buttons/flow
-- Exit game
+- Exit game flows
+- Posting when opponent disconnected
 - Fix monsters appearing too close to each other
+- Keep wizard persistent
 
 # Prio 2
 
-- Fix glitches with global time and Idle and MagicEnd
 - ShieldHit then ShieldEnd, and make all monsters attack at the same time
 - Show current mana points of opponent when playing online
-- Monsters on top of wizard
-- Add close button to lobby (no asset)
 - Start/restart buttons should trigger on click, not pointerdown

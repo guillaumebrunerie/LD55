@@ -119,7 +119,7 @@ export const Wizard = ({
 
 	switch (wizard.state) {
 		case "idle":
-			return looping(WizardIdle, 10);
+			return looping(WizardIdle, 10, wizard.lt);
 		case "winning":
 			return looping(WizardWin, 21);
 		case "magicStart":

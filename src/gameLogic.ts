@@ -430,8 +430,9 @@ export const startGame = (app: AppT) => {
 	idleState(game, "transition");
 	disappearButton(app.startButtons);
 	void WizardStart.play();
-	appearWizard(game.opponent.wizard);
+	// idleState(game.player.wizard, "idle");
 	appearWizard(game.player.wizard);
+	appearWizard(game.opponent.wizard);
 	schedule2(game.curtain, 0.7, showCurtain);
 	schedule2(game.opponent.wizard, 0, waitingStartWizard);
 	schedule2(game.manaButton, 1.2, appearButton);

@@ -5,6 +5,7 @@ import { newGame, startGame, tickGame, type GameT } from "./gameLogic";
 import { wave } from "./ease";
 import type { Id } from "../convex/_generated/dataModel";
 import { newButton, type ButtonT, tickButton } from "./button";
+import { appearWizard } from "./wizard";
 
 export type Credentials = {
 	playerId: Id<"players">;
@@ -46,7 +47,7 @@ declare global {
 	}
 }
 
-export const startApp = (app: AppT) => {
+const initApp = (app: AppT) => {
 	if (import.meta.env.DEV) {
 		window.appR = app;
 		if (!window.app) {
@@ -64,6 +65,11 @@ export const startApp = (app: AppT) => {
 		Ticker.shared.remove(tick);
 		sound.close();
 	};
+};
+
+export const startApp = (app: AppT) => {
+	initApp(app);
+	// appearWizard(app.game.player.wizard);
 };
 
 export const startNewGameAgainstComputer = (app: AppT) => {
