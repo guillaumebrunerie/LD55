@@ -131,7 +131,7 @@ const PlayerLine = ({
 				}
 			/>
 			<Circle x={-20} y={5} radius={8} color={color} />
-			<Container x={x + (icon.width * 0.75) / 2 + 15}>
+			<Container x={x + (icon.width * 0.75) / 2 + 15} y={5}>
 				<Sprite
 					texture={icon}
 					scale={
