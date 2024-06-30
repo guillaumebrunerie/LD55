@@ -1,4 +1,4 @@
-/** Generated on Sun Jun 30 17:40:24 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sun Jun 30 22:06:53 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -9,6 +9,7 @@ import ArrowDownOn_ from "../gfx/ArrowDownOn.png?texture";
 import ArrowUp_ from "../gfx/ArrowUp.png?texture";
 import ArrowUpOn_ from "../gfx/ArrowUpOn.png?texture";
 import BackToMenuDefault_ from "../gfx/BackToMenuDefault.png?texture";
+import BackToMenuDefaultLeft_ from "../gfx/BackToMenuDefaultLeft.png?texture";
 import Bg_ from "../gfx/Bg.jpg?texture";
 import BgFront_ from "../gfx/BgFront.png?texture";
 import BtnAttack_ from "../gfx/BtnAttack.png?texture";
@@ -40,6 +41,7 @@ import ManaPoint_ from "../gfx/ManaPoint.png?texture";
 import ManaPointBlurred_ from "../gfx/ManaPointBlurred.png?texture";
 import Moon_ from "../gfx/Moon.png?texture";
 import PlayerQuitPost_ from "../gfx/PlayerQuitPost.png?texture";
+import PoofedAwayPost_ from "../gfx/PoofedAwayPost.png?texture";
 import RestartBtnDefault_ from "../gfx/RestartBtnDefault.png?texture";
 import RestartBtnDefaultBG_ from "../gfx/RestartBtnDefaultBG.png?texture";
 import RestartBtnDefaultFront1_ from "../gfx/RestartBtnDefaultFront1.png?texture";
@@ -77,6 +79,7 @@ import Monster2Idle_ from "../gfx/Monster2Idle.png?spritesheet";
 import Monster3Die_ from "../gfx/Monster3Die.png?spritesheet";
 import Monster3Dies_ from "../gfx/Monster3Dies.png?spritesheet";
 import Monster3Idle_ from "../gfx/Monster3Idle.png?spritesheet";
+import RestartButtonComputer_ from "../gfx/RestartButtonComputer.png?spritesheet";
 import RestartButtonIdle_ from "../gfx/RestartButtonIdle.png?spritesheet";
 import Runes_ from "../gfx/Runes.png?spritesheet";
 import ShieldEnd_ from "../gfx/ShieldEnd.png?spritesheet";
@@ -126,6 +129,7 @@ export const [
 	ArrowUp,
 	ArrowUpOn,
 	BackToMenuDefault,
+	BackToMenuDefaultLeft,
 	Bg,
 	BgFront,
 	BtnAttack,
@@ -157,6 +161,7 @@ export const [
 	ManaPointBlurred,
 	Moon,
 	PlayerQuitPost,
+	PoofedAwayPost,
 	RestartBtnDefault,
 	RestartBtnDefaultBG,
 	RestartBtnDefaultFront1,
@@ -204,6 +209,8 @@ export const [
 	{ animations: { Monster3Dies } },
 	Monster3IdleSheet,
 	{ animations: { Monster3Idle } },
+	RestartButtonComputerSheet,
+	{ animations: { RestartButtonComputer } },
 	RestartButtonIdleSheet,
 	{ animations: { RestartButtonIdle } },
 	RunesSheet,
@@ -268,6 +275,7 @@ export const [
 	ArrowUp_,
 	ArrowUpOn_,
 	BackToMenuDefault_,
+	BackToMenuDefaultLeft_,
 	Bg_,
 	BgFront_,
 	BtnAttack_,
@@ -299,6 +307,7 @@ export const [
 	ManaPointBlurred_,
 	Moon_,
 	PlayerQuitPost_,
+	PoofedAwayPost_,
 	RestartBtnDefault_,
 	RestartBtnDefaultBG_,
 	RestartBtnDefaultFront1_,
@@ -346,6 +355,8 @@ export const [
 	Monster3Dies_,
 	Monster3Idle_,
 	Monster3Idle_,
+	RestartButtonComputer_,
+	RestartButtonComputer_,
 	RestartButtonIdle_,
 	RestartButtonIdle_,
 	Runes_,

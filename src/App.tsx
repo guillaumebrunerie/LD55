@@ -21,6 +21,7 @@ import {
 	ArrowDown,
 	ArrowUp,
 	BackToMenuDefault,
+	BackToMenuDefaultLeft,
 	Bg,
 	BgFront,
 	BtnAttack,
@@ -41,7 +42,9 @@ import {
 	InviteButtonOn,
 	Logo,
 	Moon,
+	PoofedAwayPost,
 	RestartBtnDefault,
+	RestartButtonComputer,
 	SettingsBoxDefault,
 	SettingsDefault,
 	SettingsOn,
@@ -72,6 +75,8 @@ import { Rectangle as Box } from "./Rectangle";
 import { darkFilter } from "./filters";
 import { useInterval } from "usehooks-ts";
 import { Circle } from "./Circle";
+import { getFrame } from "./Animation";
+import { schedule2 } from "./entities";
 
 const left = 420;
 const top = 105;
@@ -321,13 +326,11 @@ const clickOpenLobby = (app: AppT, createNewPlayer: () => void) => {
 	createNewPlayer();
 };
 
-const StartButtons = ({
-	app,
-	position,
-}: {
-	app: AppT;
-	position: [number, number];
-}) => {
+const buttonsLeftX = 1920 / 2 - 200;
+const buttonsRightX = 1920 / 2 + 200;
+const buttonsY = 730;
+
+const StartButtons = ({ app }: { app: AppT }) => {
 	const inLobby = app.lobby.alpha.value > 0.01;
 
 	const createNewPlayer = useCreateNewPlayer(app);
@@ -343,8 +346,8 @@ const StartButtons = ({
 				texture={StartVsComputerDefault}
 				anchor={0.5}
 				position={{
-					x: position[0] - 200,
-					y: position[1],
+					x: buttonsLeftX,
+					y: buttonsY,
 				}}
 				alpha={buttons.alpha.value}
 				hitArea={new Rectangle(-100, -100, 200, 200)}
@@ -360,8 +363,8 @@ const StartButtons = ({
 				texture={StartVsHumanOffDefault}
 				anchor={0.5}
 				position={{
-					x: position[0] + 200,
-					y: position[1],
+					x: buttonsRightX,
+					y: buttonsY,
 				}}
 				alpha={buttons.alpha.value}
 				hitArea={new Rectangle(-100, -100, 200, 200)}
@@ -376,55 +379,124 @@ const StartButtons = ({
 	);
 };
 
-const RestartButtons = ({
-	app,
-	position,
-}: {
-	app: AppT;
-	position: [number, number];
-}) => {
-	const disconnect = useMutation(api.lobby.disconnect);
+const RestartVsComputer = ({ app }: { app: AppT }) => {
+	const buttons = app.restartButtons;
+	return (
+		<Sprite
+			texture={getFrame(RestartButtonComputer, 20, buttons.lt)}
+			anchor={0.5}
+			position={{
+				x: buttonsLeftX,
+				y: buttonsY,
+			}}
+			alpha={buttons.alpha.value}
+			hitArea={new Rectangle(-100, -100, 200, 200)}
+			cursor="pointer"
+			eventMode="static"
+			pointerdown={action(() => {
+				void ClickStart.play();
+				startNewGameAgainstComputer(app);
+			})}
+		/>
+	);
+};
 
+const RestartVsPlayer = ({ app }: { app: AppT }) => {
+	const buttons = app.restartButtons;
+	return (
+		<Sprite
+			texture={RestartBtnDefault}
+			anchor={0.5}
+			position={{
+				x: buttonsRightX,
+				y: buttonsY,
+			}}
+			alpha={buttons.alpha.value}
+			hitArea={new Rectangle(-100, -100, 200, 200)}
+			cursor="pointer"
+			eventMode="static"
+			pointerdown={action(() => {})}
+		/>
+	);
+};
+
+const backToMenu = (
+	app: AppT,
+	disconnect: (credentials: Credentials) => Promise<null>,
+) => {
+	void ClickStart.play();
+	exitGame(app, disconnect);
+	disappearButton(app.restartButtons);
+	schedule2(app.startButtons, 0.4, appearButton);
+};
+
+const BackToMenuLeft = ({ app }: { app: AppT }) => {
+	const disconnect = useMutation(api.lobby.disconnect);
+	const buttons = app.restartButtons;
+
+	return (
+		<Sprite
+			texture={BackToMenuDefaultLeft}
+			anchor={0.5}
+			position={{
+				x: buttonsLeftX,
+				y: buttonsY,
+			}}
+			alpha={buttons.alpha.value}
+			hitArea={new Rectangle(-100, -100, 200, 200)}
+			cursor="pointer"
+			eventMode="static"
+			pointerdown={action(() => {
+				backToMenu(app, disconnect);
+			})}
+		/>
+	);
+};
+
+const BackToMenuRight = ({ app }: { app: AppT }) => {
+	const disconnect = useMutation(api.lobby.disconnect);
+	const buttons = app.restartButtons;
+
+	return (
+		<Sprite
+			texture={BackToMenuDefault}
+			anchor={0.5}
+			position={{
+				x: buttonsRightX,
+				y: buttonsY,
+			}}
+			alpha={buttons.alpha.value}
+			hitArea={new Rectangle(-100, -100, 200, 200)}
+			cursor="pointer"
+			eventMode="static"
+			pointerdown={action(() => {
+				backToMenu(app, disconnect);
+			})}
+		/>
+	);
+};
+
+const RestartButtons = ({ app }: { app: AppT }) => {
 	const buttons = app.restartButtons;
 	if (buttons.alpha.value < 0.01) {
 		return null;
 	}
 
-	return (
-		<>
-			<Sprite
-				texture={BackToMenuDefault}
-				anchor={0.5}
-				position={{
-					x: position[0] - 200,
-					y: position[1],
-				}}
-				alpha={buttons.alpha.value}
-				hitArea={new Rectangle(-100, -100, 200, 200)}
-				cursor="pointer"
-				eventMode="static"
-				pointerdown={action(() => {
-					void ClickStart.play();
-					exitGame(app, disconnect);
-					disappearButton(app.restartButtons);
-					appearButton(app.startButtons);
-				})}
-			/>
-			<Sprite
-				texture={RestartBtnDefault}
-				anchor={0.5}
-				position={{
-					x: position[0] + 200,
-					y: position[1],
-				}}
-				alpha={buttons.alpha.value}
-				hitArea={new Rectangle(-100, -100, 200, 200)}
-				cursor="pointer"
-				eventMode="static"
-				pointerdown={action(() => {})}
-			/>
-		</>
-	);
+	if (app.credentials) {
+		return (
+			<>
+				<BackToMenuLeft app={app} />
+				<RestartVsPlayer app={app} />
+			</>
+		);
+	} else {
+		return (
+			<>
+				<RestartVsComputer app={app} />
+				<BackToMenuRight app={app} />
+			</>
+		);
+	}
 };
 
 const useForceUpdate = () => {
@@ -466,12 +538,20 @@ const exitGame = (
 	app.state = "intro";
 	app.game = newGame("intro", false);
 	disappearButton(app.menuButton);
-	appearButton(app.startButtons);
 	if (app.credentials) {
 		void disconnect(app.credentials);
 		delete app.credentials;
 		delete app.opponentId;
 	}
+};
+
+const clickExitGame = (
+	app: AppT,
+	disconnect: (credentials: Credentials) => Promise<null>,
+) => {
+	disappearButton(app.restartButtons);
+	appearButton(app.startButtons);
+	exitGame(app, disconnect);
 };
 
 const ExitButton = (props: SpriteProps & { app: AppT }) => {
@@ -484,7 +564,7 @@ const ExitButton = (props: SpriteProps & { app: AppT }) => {
 			cursor="pointer"
 			eventMode="static"
 			pointerdown={action(() => {
-				exitGame(app, disconnect);
+				clickExitGame(app, disconnect);
 			})}
 		/>
 	);
@@ -493,7 +573,7 @@ const ExitButton = (props: SpriteProps & { app: AppT }) => {
 const Menu = ({ app }: { app: AppT }) => {
 	const button = app.menuButton;
 	const alpha = button.alpha.value;
-	const hasExitGame = app.state != "intro";
+	const hasExitGame = app.state != "intro" && app.game.state != "gameover";
 	return (
 		<Container>
 			{alpha > 0.1 && (
@@ -726,6 +806,29 @@ const LogoMoon = ({
 	}
 };
 
+const PoofedAway = () => {
+	return (
+		<>
+			<Box
+				x={0}
+				y={0}
+				width={1920}
+				height={1080}
+				alpha={0.5}
+				cursor="pointer"
+				eventMode="static"
+				pointerdown={action(() => {})}
+			/>
+			<Sprite
+				texture={PoofedAwayPost}
+				anchor={0.5}
+				x={1920 / 2}
+				y={1080 / 2}
+			/>
+		</>
+	);
+};
+
 const mod = (a: number, b: number) => (b + (a % b)) % b;
 
 const useCreateNewPlayer = (app: AppT) => {
@@ -934,8 +1037,8 @@ export const App = () => {
 				{/* </Container> */}
 				<LogoMoon app={app} filters={filters} alpha={screenAlpha} />
 				<UIButtons app={app} />
-				<StartButtons app={app} position={[1920 / 2, 730]} />
-				<RestartButtons app={app} position={[1920 / 2, 730]} />
+				<StartButtons app={app} />
+				<RestartButtons app={app} />
 				{app.credentials && (
 					<PlayerName playerId={app.credentials.playerId} />
 				)}
@@ -943,6 +1046,7 @@ export const App = () => {
 				<Menu app={app} />
 				{/* <SoundButton /> */}
 				{/* <PolygonShape polygon={manaBounds.polygon} alpha={0.4} /> */}
+				{/* <PoofedAway /> */}
 			</Container>
 		</GlobalTimeContext.Provider>
 	);

@@ -423,21 +423,26 @@ export const startGame = (app: AppT) => {
 	const { game } = app;
 	void WinMusic.stop();
 	void Music.play({ loop: true, volume: 0.5 });
-	if (game.state == "gameover") {
-		restartGame(app);
-		return;
-	}
-	idleState(game, "transition");
+	disappearButton(app.lobby);
 	disappearButton(app.startButtons);
-	void WizardStart.play();
-	// idleState(game.player.wizard, "idle");
-	appearWizard(game.player.wizard);
-	appearWizard(game.opponent.wizard);
+	disappearButton(app.restartButtons);
 	schedule2(game.curtain, 0.7, showCurtain);
 	schedule2(game.opponent.wizard, 0, waitingStartWizard);
 	schedule2(game.manaButton, 1.2, appearButton);
 	schedule2(game.attackButton, 1.2, appearButton);
 	schedule2(game.defenseButton, 1.2, appearButton);
+	idleState(game, "transition");
+	void WizardStart.play();
+	// idleState(game.player.wizard, "idle");
+	// appearWizard(game.player.wizard);
+	// appearWizard(game.opponent.wizard);
+	for (const player of [game.player, game.opponent]) {
+		if (player.wizard.state == "die" || player.wizard.state == "hidden") {
+			appearWizard(player.wizard);
+		} else {
+			idleState(player.wizard, "idle");
+		}
+	}
 
 	let t = 1;
 	for (let i = 0; i < initialMana; i++) {
@@ -500,29 +505,6 @@ const appearRune = (player: Player) => {
 		idleState(rune, "visible");
 	});
 	player.items.runes.push(rune);
-};
-
-const restartGame = (app: AppT) => {
-	const { game } = app;
-	idleState(game, "restart");
-	disappearButton(app.startButtons);
-	for (const player of [game.player, game.opponent]) {
-		if (player.wizard.state == "die") {
-			appearWizard(player.wizard);
-		} else {
-			idleState(player.wizard, "idle");
-		}
-	}
-	schedule(showCurtain, game.curtain, 0.7);
-	schedule(waitingStartWizard, game.opponent.wizard, 0);
-	schedule(appearButton, game.manaButton, 1.2);
-	schedule(appearButton, game.attackButton, 1.2);
-	schedule(appearButton, game.defenseButton, 1.2);
-
-	for (let i = 0; i < initialMana; i++) {
-		schedule(spawnManaPoint, game.player, i == 0 ? 1.2 : 0.2);
-		schedule(spawnManaPointSilent, game.opponent, i == 0 ? 1.2 : 0.2);
-	}
 };
 
 type LastFight = {
@@ -1050,7 +1032,7 @@ const doWin = (app: AppT, winner: Player, loser: Player) => {
 		}
 	}
 	idleState(game, "gameover");
-	schedule(appearButton, app.startButtons, 1);
+	schedule(appearButton, app.restartButtons, 1);
 };
 
 const removeRune = (player: Player, rune: Rune) => {
