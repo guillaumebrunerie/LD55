@@ -340,7 +340,7 @@ const spawnManaPoint = (
 	};
 	if (!silent) {
 		if (previousItem) {
-			void Flower5Mana.play({ volume: 0.8 });
+			void Flower5Mana.play({ volume: 1 });
 		} else {
 			void ManaCreated.play({ volume: 0.5 });
 		}
