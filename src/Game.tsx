@@ -206,6 +206,33 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 					position={item.position}
 				/>
 			);
+		case "traveling": {
+			if (!item.tmpPosition) {
+				console.error("No tmpPosition in traveling");
+				return null;
+			}
+			const dx = item.tmpPosition.x - item.position.x;
+			const dy = item.tmpPosition.y - item.position.y;
+			const angle = Math.atan2(dy, dx);
+			return (
+				<Sprite
+					anchor={0.5}
+					scale={item.scale}
+					rotation={angle + Math.PI / 2}
+					blendMode={BLEND_MODES.NORMAL}
+					alpha={Math.min(item.nt * 3, 1)}
+					texture={ManaPointBlurred}
+					x={
+						item.tmpPosition.x * (1 - item.nt) +
+						item.position.x * item.nt
+					}
+					y={
+						item.tmpPosition.y * (1 - item.nt) +
+						item.position.y * item.nt
+					}
+				/>
+			);
+		}
 		case "spawning": {
 			if (item.previousItem) {
 				return (
@@ -327,25 +354,6 @@ const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 				/>
 			);
 		}
-		case "preSpawning": {
-			if (!item.previousItem) {
-				break;
-			}
-			const dx = item.previousItem.position.x - item.position.x;
-			const dy = item.previousItem.position.y - item.position.y;
-			const angle = Math.atan2(dy, dx);
-			return (
-				<Sprite
-					anchor={0.5}
-					scale={item.previousItem.scale}
-					rotation={angle + Math.PI / 2}
-					blendMode={BLEND_MODES.NORMAL}
-					alpha={Math.min(item.nt * 3, 1)}
-					texture={ManaPointBlurred}
-					position={item.destination}
-				/>
-			);
-		}
 		case "spawning":
 			return (
 				<>
@@ -360,7 +368,6 @@ const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 				</>
 			);
 	}
-	return null;
 };
 
 const Mushrooms = ({ items }: { items: Mushroom[] }) => {

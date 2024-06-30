@@ -4,6 +4,7 @@ import { sound } from "@pixi/sound";
 import { newGame, startGame, tickGame, type GameT } from "./gameLogic";
 import { wave } from "./ease";
 import type { Id } from "../convex/_generated/dataModel";
+import { newButton, type ButtonT, tickButton } from "./button";
 
 export type Credentials = {
 	playerId: Id<"players">;
@@ -19,6 +20,9 @@ export type AppT = {
 	credentials?: Credentials;
 	opponentId?: Id<"players">;
 	game: GameT;
+	startButtons: ButtonT;
+	lobby: ButtonT;
+	menuButton: ButtonT;
 };
 
 export const newApp = (): AppT => ({
@@ -28,6 +32,9 @@ export const newApp = (): AppT => ({
 	lt: 0,
 	nt: 0,
 	game: newGame("intro", false),
+	startButtons: newButton(true),
+	lobby: newButton(false),
+	menuButton: newButton(false),
 });
 
 declare global {
@@ -63,7 +70,7 @@ export const startNewGameAgainstComputer = (app: AppT) => {
 	}
 	app.lt = 0;
 	app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
-	startGame(app.game);
+	startGame(app);
 };
 
 export const startNewGameAgainstPlayer = (app: AppT, gameId: Id<"games">) => {
@@ -73,7 +80,7 @@ export const startNewGameAgainstPlayer = (app: AppT, gameId: Id<"games">) => {
 	app.lt = 0;
 	app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
 	app.game.gameId = gameId;
-	startGame(app.game);
+	startGame(app);
 };
 
 const transitionDuration = 0.5;
@@ -89,5 +96,8 @@ const tickApp = (app: AppT, delta: number) => {
 				app.state = "game";
 			}
 	}
-	tickGame(app.game, delta);
+	tickGame(app.game, delta, app);
+	tickButton(app.startButtons, delta);
+	tickButton(app.lobby, delta);
+	tickButton(app.menuButton, delta);
 };

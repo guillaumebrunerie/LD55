@@ -43,16 +43,21 @@ export const changeState = <E extends Entity<string>>(
 };
 
 export const makeTick =
-	<State extends string, T extends Entity<State>>(
+	<
+		State extends string,
+		T extends Entity<State>,
+		Args extends unknown[] = [],
+	>(
 		callback: (
 			entity: T,
 			delta: number,
+			...args: Args
 		) => {
 			[S in NoInfer<State>]?: () => void;
 		} = () => ({}),
 	) =>
-	(entity: T, delta: number) => {
-		const stateCallbacks = callback(entity, delta);
+	(entity: T, delta: number, ...args: Args) => {
+		const stateCallbacks = callback(entity, delta, ...args);
 		entity.lt += delta;
 		if (entity.transitions.length > 0) {
 			entity.nt = entity.lt / entity.transitions[0].duration;

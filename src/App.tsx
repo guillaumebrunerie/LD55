@@ -8,14 +8,14 @@ import {
 } from "pixi.js";
 import { Container, NineSlicePlane, Sprite } from "@pixi/react";
 import {
-	newApp,
-	startApp,
 	startNewGameAgainstPlayer,
 	startNewGameAgainstComputer,
 	type AppT,
 	type Credentials,
+	newApp,
+	startApp,
 } from "./appLogic";
-import { observable, action, runInAction } from "mobx";
+import { action, observable, runInAction } from "mobx";
 import { sound } from "@pixi/sound";
 import {
 	ArrowDown,
@@ -165,7 +165,7 @@ const clickOutsideLobby = (
 	app: AppT,
 	disconnect: (credentials: Credentials) => Promise<null>,
 ) => {
-	disappearButton(app.game.lobby);
+	disappearButton(app.lobby);
 	const { credentials } = app;
 	if (credentials) {
 		void disconnect(credentials);
@@ -237,7 +237,7 @@ const Lobby = ({ app }: { app: AppT }) => {
 				y={0}
 				width={1920}
 				height={1080}
-				alpha={app.game.lobby.alpha.value * 0.5}
+				alpha={app.lobby.alpha.value * 0.5}
 				cursor="pointer"
 				eventMode="static"
 				pointerdown={action(() => {
@@ -245,7 +245,7 @@ const Lobby = ({ app }: { app: AppT }) => {
 				})}
 			/>
 			<Container
-				position={{ x: 0, y: -(1 - app.game.lobby.alpha.value) * 1000 }}
+				position={{ x: 0, y: -(1 - app.lobby.alpha.value) * 1000 }}
 			>
 				<Sprite
 					texture={TextBox}
@@ -307,24 +307,23 @@ const Lobby = ({ app }: { app: AppT }) => {
 const clickOpenLobby = (app: AppT, createNewPlayer: () => void) => {
 	void ClickStart.play();
 	void TextBoxAppear.play();
-	appearButton(app.game.lobby);
+	appearButton(app.lobby);
 	createNewPlayer();
 };
 
 const StartButtons = ({
 	app,
-	button,
 	position,
 }: {
 	app: AppT;
-	button: ButtonT;
 	position: [number, number];
 }) => {
-	const inLobby = app.game.lobby.alpha.value > 0.01;
+	const inLobby = app.lobby.alpha.value > 0.01;
 
 	const createNewPlayer = useCreateNewPlayer(app);
 
-	if (button.alpha.value < 0.01) {
+	const buttons = app.startButtons;
+	if (buttons.alpha.value < 0.01) {
 		return null;
 	}
 
@@ -337,16 +336,12 @@ const StartButtons = ({
 					x: position[0] - 200,
 					y: position[1],
 				}}
-				alpha={button.alpha.value}
-				hitArea={
-					button.state == "idle" ?
-						new Rectangle(-100, -100, 200, 200)
-					:	null
-				}
+				alpha={buttons.alpha.value}
+				hitArea={new Rectangle(-100, -100, 200, 200)}
 				cursor="pointer"
 				eventMode="static"
 				pointerdown={action(() => {
-					disappearButton(app.game.lobby);
+					disappearButton(app.lobby);
 					void ClickStart.play();
 					startNewGameAgainstComputer(app);
 				})}
@@ -358,12 +353,8 @@ const StartButtons = ({
 					x: position[0] + 200,
 					y: position[1],
 				}}
-				alpha={button.alpha.value}
-				hitArea={
-					button.state == "idle" ?
-						new Rectangle(-100, -100, 200, 200)
-					:	null
-				}
+				alpha={buttons.alpha.value}
+				hitArea={new Rectangle(-100, -100, 200, 200)}
 				cursor="pointer"
 				eventMode="static"
 				pointerdown={action(() => {
@@ -413,8 +404,10 @@ const exitGame = (
 ) => {
 	app.state = "intro";
 	app.game = newGame("intro", false);
+	disappearButton(app.menuButton);
+	appearButton(app.startButtons);
 	if (app.credentials) {
-		disconnect(app.credentials);
+		void disconnect(app.credentials);
 		delete app.credentials;
 		delete app.opponentId;
 	}
@@ -436,19 +429,19 @@ const ExitButton = (props: SpriteProps & { app: AppT }) => {
 	);
 };
 
-const Menu = ({ button, app }: { button: ButtonT; app: AppT }) => {
+const Menu = ({ app }: { app: AppT }) => {
 	return (
 		<Container>
-			{button.alpha.value > 0.1 && (
+			{app.menuButton.alpha.value > 0.1 && (
 				<Box
 					x={0}
 					y={0}
 					width={1920}
 					height={1080}
-					alpha={button.alpha.value * 0.5}
+					alpha={app.menuButton.alpha.value * 0.5}
 					eventMode="static"
 					pointerdown={action(() => {
-						disappearButton(button);
+						disappearButton(app.menuButton);
 					})}
 				/>
 			)}
@@ -463,31 +456,31 @@ const Menu = ({ button, app }: { button: ButtonT; app: AppT }) => {
 				x={1920 - 30}
 				y={30}
 				anchor={[1, 0]}
-				alpha={button.alpha.value}
+				alpha={app.menuButton.alpha.value}
 				cursor="pointer"
 				eventMode="static"
 				pointerdown={action(() => {
-					if (button.alpha.targetValue == 1) {
-						disappearButton(button);
+					if (app.menuButton.alpha.targetValue == 1) {
+						disappearButton(app.menuButton);
 					} else {
-						appearButton(button);
+						appearButton(app.menuButton);
 					}
 				})}
 			/>
 			<NineSlicePlane
 				texture={SettingsBoxDefault}
-				x={1920 - 30 - 225 * button.alpha.value * 1.5}
+				x={1920 - 30 - 225 * app.menuButton.alpha.value * 1.5}
 				y={30}
-				width={225 * button.alpha.value}
-				height={150 * button.alpha.value}
+				width={225 * app.menuButton.alpha.value}
+				height={150 * app.menuButton.alpha.value}
 				scale={1.5}
-				alpha={button.alpha.value}
+				alpha={app.menuButton.alpha.value}
 			/>
 			<Container
 				x={1920 - 30}
 				y={30}
-				scale={button.alpha.value}
-				alpha={button.alpha.value}
+				scale={app.menuButton.alpha.value}
+				alpha={app.menuButton.alpha.value}
 			>
 				<SoundButton
 					x={-310 + 282 / 2}
@@ -709,10 +702,10 @@ const useConnection = (app: AppT) => {
 	useEffect(() => {
 		runInAction(() => {
 			if (lastFight && app.game.gameId) {
-				setupFight(app.game, lastFight);
+				setupFight(app, lastFight);
 			}
 		});
-	}, [lastFight, app.game]);
+	}, [lastFight, app]);
 };
 
 const useWarnBeforeClosing = (condition: boolean) => {
@@ -880,16 +873,12 @@ export const App = () => {
 				{/* </Container> */}
 				<LogoMoon app={app} filters={filters} alpha={screenAlpha} />
 				<UIButtons app={app} />
-				<StartButtons
-					app={app}
-					button={game.startButton}
-					position={[1920 / 2, 730]}
-				/>
+				<StartButtons app={app} position={[1920 / 2, 730]} />
 				{app.credentials && (
 					<PlayerName playerId={app.credentials.playerId} />
 				)}
 				{app.opponentId && <OpponentName playerId={app.opponentId} />}
-				<Menu button={game.menuButton} app={app} />
+				<Menu app={app} />
 				{/* <SoundButton /> */}
 				{/* <PolygonShape polygon={manaBounds.polygon} alpha={0.4} /> */}
 			</Container>
