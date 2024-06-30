@@ -430,18 +430,20 @@ const ExitButton = (props: SpriteProps & { app: AppT }) => {
 };
 
 const Menu = ({ app }: { app: AppT }) => {
+	const button = app.menuButton;
+	const alpha = button.alpha.value;
 	return (
 		<Container>
-			{app.menuButton.alpha.value > 0.1 && (
+			{alpha > 0.1 && (
 				<Box
 					x={0}
 					y={0}
 					width={1920}
 					height={1080}
-					alpha={app.menuButton.alpha.value * 0.5}
+					alpha={alpha * 0.5}
 					eventMode="static"
 					pointerdown={action(() => {
-						disappearButton(app.menuButton);
+						disappearButton(button);
 					})}
 				/>
 			)}
@@ -456,32 +458,27 @@ const Menu = ({ app }: { app: AppT }) => {
 				x={1920 - 30}
 				y={30}
 				anchor={[1, 0]}
-				alpha={app.menuButton.alpha.value}
+				alpha={alpha}
 				cursor="pointer"
 				eventMode="static"
 				pointerdown={action(() => {
-					if (app.menuButton.alpha.targetValue == 1) {
-						disappearButton(app.menuButton);
+					if (button.alpha.targetValue == 1) {
+						disappearButton(button);
 					} else {
-						appearButton(app.menuButton);
+						appearButton(button);
 					}
 				})}
 			/>
 			<NineSlicePlane
 				texture={SettingsBoxDefault}
-				x={1920 - 30 - 225 * app.menuButton.alpha.value * 1.5}
+				x={1920 - 30 - 225 * alpha * 1.5}
 				y={30}
-				width={225 * app.menuButton.alpha.value}
-				height={150 * app.menuButton.alpha.value}
+				width={225 * alpha}
+				height={150 * alpha}
 				scale={1.5}
-				alpha={app.menuButton.alpha.value}
+				alpha={alpha}
 			/>
-			<Container
-				x={1920 - 30}
-				y={30}
-				scale={app.menuButton.alpha.value}
-				alpha={app.menuButton.alpha.value}
-			>
+			<Container x={1920 - 30} y={30} scale={alpha} alpha={alpha}>
 				<SoundButton
 					x={-310 + 282 / 2}
 					y={30 + 85 / 2}

@@ -4,6 +4,7 @@
 - Posting when opponent disconnected
 - Restart buttons/flow
 - Exit game
+- Fix monsters appearing too close to each other
 
 # Prio 2
 
