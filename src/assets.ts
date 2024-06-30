@@ -1,4 +1,4 @@
-/** Generated on Sat Jun 22 19:59:32 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sun Jun 30 17:29:10 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -107,7 +107,6 @@ import Flower3Mana_ from "../audio/Flower3Mana.mp3?sound";
 import Flower4Mana_ from "../audio/Flower4Mana.mp3?sound";
 import Flower5Mana_ from "../audio/Flower5Mana.mp3?sound";
 import ManaCreated_ from "../audio/ManaCreated.mp3?sound";
-import ManaCreated2_ from "../audio/ManaCreated2.mp3?sound";
 import MonsterAttacks_ from "../audio/MonsterAttacks.mp3?sound";
 import MonsterSwoosh_ from "../audio/MonsterSwoosh.mp3?sound";
 import MonstersClash_ from "../audio/MonstersClash.mp3?sound";
@@ -250,7 +249,6 @@ export const [
 	Flower4Mana,
 	Flower5Mana,
 	ManaCreated,
-	ManaCreated2,
 	MonsterAttacks,
 	MonsterSwoosh,
 	MonstersClash,
@@ -392,7 +390,6 @@ export const [
 	Flower4Mana_,
 	Flower5Mana_,
 	ManaCreated_,
-	ManaCreated2_,
 	MonsterAttacks_,
 	MonsterSwoosh_,
 	MonstersClash_,
