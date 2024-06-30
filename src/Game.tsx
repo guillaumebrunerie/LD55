@@ -188,6 +188,7 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 					rotation={lt * 3 + item.offset}
 					blendMode={BLEND_MODES.NORMAL}
 					texture={ManaPoint}
+					alpha={1}
 					position={{
 						x: item.position.x + dx,
 						y: item.position.y + dy,
@@ -203,6 +204,7 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 					rotation={lt * item.rotationSpeed + item.offset}
 					blendMode={BLEND_MODES.NORMAL}
 					texture={ManaPoint}
+					alpha={1}
 					position={item.position}
 				/>
 			);
@@ -240,6 +242,7 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 					scale={0.5}
 					blendMode={BLEND_MODES.ADD}
 					texture={getFrame(Spawn, 30, item.lt)}
+					alpha={1}
 					position={item.position}
 				/>
 			);

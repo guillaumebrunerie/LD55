@@ -13,7 +13,7 @@ export const CustomText = ({
 	text: string;
 	myRef?: Ref<TextT>;
 	position?: Point;
-	anchor?: [number, number];
+	anchor?: [number, number] | number;
 	color?: string;
 }) => {
 	return (

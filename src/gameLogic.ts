@@ -427,7 +427,6 @@ export const startGame = (app: AppT) => {
 	disappearButton(app.startButtons);
 	disappearButton(app.restartButtons);
 	schedule2(game.curtain, 0.7, showCurtain);
-	schedule2(game.opponent.wizard, 0, waitingStartWizard);
 	schedule2(game.manaButton, 1.2, appearButton);
 	schedule2(game.attackButton, 1.2, appearButton);
 	schedule2(game.defenseButton, 1.2, appearButton);
@@ -443,6 +442,7 @@ export const startGame = (app: AppT) => {
 			idleState(player.wizard, "idle");
 		}
 	}
+	schedule2(game.opponent.wizard, 0.5, waitingStartWizard);
 
 	let t = 1;
 	for (let i = 0; i < initialMana; i++) {

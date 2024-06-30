@@ -806,7 +806,8 @@ const LogoMoon = ({
 	}
 };
 
-const PoofedAway = () => {
+const PoofedAway = ({ app }: { app: AppT }) => {
+	const disconnect = useMutation(api.lobby.disconnect);
 	return (
 		<>
 			<Box
@@ -814,10 +815,12 @@ const PoofedAway = () => {
 				y={0}
 				width={1920}
 				height={1080}
-				alpha={0.5}
+				alpha={0.7}
 				cursor="pointer"
 				eventMode="static"
-				pointerdown={action(() => {})}
+				pointerdown={action(() => {
+					backToMenu(app, disconnect);
+				})}
 			/>
 			<Sprite
 				texture={PoofedAwayPost}
@@ -825,6 +828,18 @@ const PoofedAway = () => {
 				x={1920 / 2}
 				y={1080 / 2}
 			/>
+			<Container x={1920 / 2} y={1080 / 2}>
+				<CustomText
+					text={"Philosophical Salvatore"}
+					position={{ x: 0, y: 10 }}
+					anchor={0.5}
+				/>
+				<CustomText
+					text={"poofed away!"}
+					position={{ x: 0, y: 70 }}
+					anchor={0.5}
+				/>
+			</Container>
 		</>
 	);
 };
@@ -1044,9 +1059,8 @@ export const App = () => {
 				)}
 				{app.opponentId && <OpponentName playerId={app.opponentId} />}
 				<Menu app={app} />
-				{/* <SoundButton /> */}
 				{/* <PolygonShape polygon={manaBounds.polygon} alpha={0.4} /> */}
-				{/* <PoofedAway /> */}
+				{/* <PoofedAway app={app} /> */}
 			</Container>
 		</GlobalTimeContext.Provider>
 	);
