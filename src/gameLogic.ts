@@ -58,7 +58,7 @@ import { smartStrategy, type Strategy } from "./strategies";
 import {
 	appearWizard,
 	dieWizard,
-	endWizardMagic,
+	maybeEndWizardMagic,
 	newWizard,
 	startWizardMagic,
 	tickWizard,
@@ -83,7 +83,12 @@ import {
 import { getDuration } from "./Animation";
 import type { AppT } from "./appLogic";
 
-type ManaState = "visible" | "anticipating" | "spawning" | "traveling";
+type ManaState =
+	| "visible"
+	| "anticipating"
+	| "spawning"
+	| "traveling"
+	| "spawningOut";
 export type Mana = Entity<ManaState> & {
 	position: Point;
 	tmpPosition?: Point;
@@ -128,7 +133,7 @@ export type Mushroom = Entity<MushroomState> & {
 	strength: 1 | 2;
 };
 
-type MonsterState = "spawning" | "visible" | "approach" | "fighting";
+type MonsterState = "visible" | "approach" | "fighting";
 export type Monster = Entity<MonsterState> & {
 	id: string;
 	position: Point;
@@ -163,29 +168,28 @@ const generateId = () => {
 
 const spawnMonster = (
 	player: Player,
-	array: Monster[],
 	strength: 1 | 2 | 3,
 	position: Point,
 	manaPoint: Mana,
 ) => {
 	manaPoint.tmpPosition = manaPoint.position;
 	manaPoint.position = position;
-	changeState(manaPoint, "traveling", preSpawnDuration, (manaPoint) => {
+	changeState(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
 		void ClickAttack.play();
-		player.manaPoints = player.manaPoints.filter(
-			(item) => item != manaPoint,
-		);
+		changeState(manaPoint, "spawningOut", spawnDuration, (manaPoint) => {
+			player.manaPoints = player.manaPoints.filter(
+				(item) => item != manaPoint,
+			);
+			maybeEndWizardMagic(player);
+		});
 		const monster: Monster = {
-			...newEntity("spawning"),
+			...newEntity("visible"),
 			id: generateId(),
 			position,
 			strength,
 			hp: strength,
 		};
-		changeState(monster, "spawning", spawnDuration, (monster) => {
-			idleState(monster, "visible");
-		});
-		array.push(monster);
+		player.items.monsters.push(monster);
 	});
 };
 
@@ -204,7 +208,7 @@ const spawnMushroom = (
 		tmpPosition: manaPoint?.position,
 		previousItem: manaPoint,
 	};
-	changeState(mushroom, "preSpawning", preSpawnDuration, (mushroom) => {
+	changeState(mushroom, "preSpawning", manaTravelDuration, (mushroom) => {
 		void ClickMana.play();
 		changeState(mushroom, "spawning", spawnDuration, (mushroom) => {
 			idleState(mushroom, "visible");
@@ -213,29 +217,35 @@ const spawnMushroom = (
 	array.push(mushroom);
 };
 
-const spawnRune = (
-	array: Rune[],
-	bounds: Bounds,
-	manaPoint: Mana | undefined,
-	hidden: boolean,
-) => {
-	const position = pickPosition(array, bounds, delta);
-	const rune: Rune = {
-		...newEntity("preSpawning"),
-		position,
-		tmpPosition: manaPoint?.position,
-		previousItem: manaPoint,
-		hidden,
-	};
-	changeState(rune, "preSpawning", preSpawnDuration, (rune) => {
-		if (!hidden) {
-			void ClickDefense.play({ volume: 0.7 });
-		}
-		changeState(rune, "spawning", spawnDuration, (rune) => {
-			idleState(rune, "visible");
+const spawnRunes = (player: Player, manaPoint: Mana, runes: number) => {
+	const position = pickPosition(player.items.runes, feetBounds, delta);
+	manaPoint.tmpPosition = manaPoint.position;
+	manaPoint.position = position;
+	changeState(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
+		void ClickDefense.play({ volume: 0.7 });
+		changeState(manaPoint, "spawningOut", spawnDuration, (manaPoint) => {
+			player.manaPoints = player.manaPoints.filter(
+				(item) => item != manaPoint,
+			);
+			maybeEndWizardMagic(player);
 		});
+		for (let i = 0; i < runes; i++) {
+			if (!hasShield(player)) {
+				appearShield(player);
+			} else {
+				const rune: Rune = {
+					...newEntity("visible"),
+					position,
+				};
+				player.items.runes.push(rune);
+				// if (player == app.game.player) {
+				// spawnRune(player, manaPoint, hidden);
+				// } else {
+				// 	addRune(player.items.runes);
+				// }
+			}
+		}
 	});
-	array.push(rune);
 };
 
 const addManaPoint = (
@@ -743,41 +753,20 @@ const areAllItemsVisible = (player: Player) => {
 	);
 };
 
-const preSpawnDuration = 0.2;
+const manaTravelDuration = 0.2;
 const spawnDuration = 0.3;
 
-const tickMonster = makeTick<MonsterState, Monster>((item) => {
+const tickMonster = makeTick<MonsterState, Monster>((_item) => {
 	// if (item.state == "waitingForFight") {
 	// 	item.position.x += delta * 25;
 	// }
 
-	return {
-		spawning: () => {
-			item.destination = undefined;
-		},
-	};
+	return {};
 });
 
 const tickShield = makeTick<ShieldState, Shield>();
 
-const tickRune = makeTick<RuneState, Rune>((item) => {
-	return {
-		preSpawning: () => {
-			if (!item.previousItem) {
-				item.tmpPosition = item.position;
-			} else {
-				const prevPos = item.previousItem.position;
-				item.tmpPosition = {
-					x: prevPos.x + (item.position.x - prevPos.x) * item.nt,
-					y: prevPos.y + (item.position.y - prevPos.y) * item.nt,
-				};
-			}
-		},
-		spawning: () => {
-			item.tmpPosition = undefined;
-		},
-	};
-});
+const tickRune = makeTick<RuneState, Rune>();
 
 const tickMushroom = makeTick<MushroomState, Mushroom>((item) => {
 	return {
@@ -1227,11 +1216,7 @@ const spendManaPoint = (player: Player, manaPoint: Mana | undefined) => {
 		return;
 	}
 	player.manaPoints = player.manaPoints.filter((item) => item != manaPoint);
-	endWizardMagic(player);
-};
-
-const spendManaPoint2 = (player: Player) => {
-	endWizardMagic(player);
+	maybeEndWizardMagic(player);
 };
 
 export const buyMushroom = async (
@@ -1301,18 +1286,11 @@ export const buyMonster = async (
 	}
 	runInAction(() => {
 		const { strength, position } = result;
-		spendManaPoint2(player);
 		if (!manaPoint) {
 			console.error("No mana point in buyMonster");
 			return;
 		}
-		spawnMonster(
-			player,
-			player.items.monsters,
-			strength,
-			position,
-			manaPoint,
-		);
+		spawnMonster(player, strength, position, manaPoint);
 	});
 };
 
@@ -1340,32 +1318,6 @@ export const buyDefense = async (
 			return;
 		}
 		const { strength } = result;
-		spendManaPoint(player, manaPoint);
-		const add = (hidden: boolean) => {
-			if (!hasShield(player)) {
-				if (!hidden) {
-					void ClickDefense.play({ volume: 0.7 });
-				}
-				appearShield(player);
-			} else {
-				if (player == app.game.player) {
-					spawnRune(
-						player.items.runes,
-						feetBounds,
-						manaPoint,
-						hidden,
-					);
-				} else {
-					addRune(player.items.runes);
-				}
-			}
-		};
-		add(false);
-		if (strength >= 2) {
-			add(true);
-		}
-		if (strength >= 3) {
-			add(true);
-		}
+		spawnRunes(player, manaPoint, strength);
 	});
 };

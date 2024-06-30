@@ -156,8 +156,8 @@ const Player = ({
 }) => {
 	return (
 		<Container>
-			<ManaPoints items={player.manaPoints} />
 			<Wizard game={game} player={player} wizard={player.wizard} />
+			<ManaPoints items={player.manaPoints} />
 			<Shield shield={player.items.shield} />
 			<Runes runes={player.items.runes} />
 			<Mushrooms items={player.items.mushrooms} />
@@ -233,6 +233,16 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 				/>
 			);
 		}
+		case "spawningOut":
+			return (
+				<Sprite
+					anchor={0.5}
+					scale={0.5}
+					blendMode={BLEND_MODES.ADD}
+					texture={getFrame(Spawn, 30, item.lt)}
+					position={item.position}
+				/>
+			);
 		case "spawning": {
 			if (item.previousItem) {
 				return (
@@ -354,19 +364,6 @@ const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 				/>
 			);
 		}
-		case "spawning":
-			return (
-				<>
-					{visible}
-					<Sprite
-						anchor={0.5}
-						scale={0.5}
-						blendMode={BLEND_MODES.ADD}
-						texture={getFrame(Spawn, 30, item.lt)}
-						position={item.position}
-					/>
-				</>
-			);
 	}
 };
 

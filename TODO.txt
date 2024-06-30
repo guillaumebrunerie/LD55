@@ -1,8 +1,8 @@
 # Prio 1
 
-- Better presence handling, not showing inactive players
+- Spin mana points randomly
+- Remove exit game button in main menu when there is no game
 - Posting when opponent disconnected
-- Buying back the shield does not show the mana point going there
 - Restart buttons/flow
 - Exit game
 

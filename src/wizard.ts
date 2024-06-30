@@ -39,7 +39,7 @@ export const newWizard = (): WizardT => newEntity<WizardState>("hidden");
 export const tickWizard = makeTick<WizardState, WizardT>();
 
 export const appearWizard = (wizard: WizardT) => {
-	changeState(wizard, "appearing", getDuration(WizardAppear, 20), () => {
+	changeState(wizard, "appearing", getDuration(WizardAppear, 15), () => {
 		idleState(wizard, "idle");
 	});
 };
@@ -105,7 +105,7 @@ export const startWizardMagic = (player: Player) => {
 	}
 };
 
-export const endWizardMagic = (player: Player) => {
+export const maybeEndWizardMagic = (player: Player) => {
 	if (player.manaPoints.length == 0) {
 		magicEndWizard(player.wizard);
 	}
