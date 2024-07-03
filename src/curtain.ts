@@ -14,17 +14,14 @@ export const newCurtain = (): Curtain => newEntity("hidden");
 export const tickCurtain = makeTick3<Curtain>();
 
 export const showCurtain = flow(function* (curtain: Curtain) {
-	console.log("show curtain");
 	yield doTransition(curtain, 0.5, "appearing", "idle");
 });
 
 export const hideCurtain = flow(function* (curtain: Curtain, nt: number) {
-	console.log("hide curtain");
 	yield doTransition(curtain, 0.5, "disappearing", "hidden", nt);
 });
 
 export const ensureHiddenCurtain = flow(function* (curtain: Curtain) {
-	console.log("ensure hidden curtain", curtain.state);
 	switch (curtain.state) {
 		case "hidden":
 		case "disappearing":

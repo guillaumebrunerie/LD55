@@ -158,8 +158,8 @@ const Player = ({
 			<ManaPoints items={player.manaPoints} />
 			<Shield shield={player.protection.shield} />
 			<Runes runes={player.protection.runes} />
-			<Mushrooms items={player.items.mushrooms} />
-			<MonsterItems items={player.items.monsters} tint={monsterTint} />
+			<Mushrooms items={player.mushrooms} />
+			<MonsterItems items={player.monsters} tint={monsterTint} />
 		</Container>
 	);
 };
