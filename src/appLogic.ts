@@ -1,11 +1,18 @@
-import { action } from "mobx";
+import { action, runInAction } from "mobx";
 import { Ticker } from "pixi.js";
 import { sound } from "@pixi/sound";
-import { newGame, startGame, tickGame, type GameT } from "./gameLogic";
+import {
+	newGame,
+	startGame,
+	tickGame,
+	type GameT,
+	resetGame,
+} from "./gameLogic";
 import { wave } from "./ease";
 import type { Id } from "../convex/_generated/dataModel";
 import { newButton, type ButtonT, tickButton } from "./button";
 import { appearWizard } from "./wizard";
+import { newLogo, tickLogo, type LogoT } from "./logo";
 
 export type Credentials = {
 	playerId: Id<"players">;
@@ -21,6 +28,7 @@ export type AppT = {
 	credentials?: Credentials;
 	opponentId?: Id<"players">;
 	game: GameT;
+	logo: LogoT;
 	restartButtons: ButtonT;
 	startButtons: ButtonT;
 	lobby: ButtonT;
@@ -34,6 +42,7 @@ export const newApp = (): AppT => ({
 	lt: 0,
 	nt: 0,
 	game: newGame("intro", false),
+	logo: newLogo(),
 	restartButtons: newButton(false),
 	startButtons: newButton(true),
 	lobby: newButton(false),
@@ -69,7 +78,9 @@ const initApp = (app: AppT) => {
 
 export const startApp = (app: AppT) => {
 	initApp(app);
-	// appearWizard(app.game.player.wizard);
+	runInAction(() => {
+		void appearWizard(app.game.player.wizard);
+	});
 };
 
 export const startNewGameAgainstComputer = (app: AppT) => {
@@ -77,7 +88,7 @@ export const startNewGameAgainstComputer = (app: AppT) => {
 		app.state = "transition";
 	}
 	app.lt = 0;
-	app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
+	resetGame(app);
 	startGame(app);
 };
 
@@ -86,7 +97,7 @@ export const startNewGameAgainstPlayer = (app: AppT, gameId: Id<"games">) => {
 		app.state = "transition";
 	}
 	app.lt = 0;
-	app.game = newGame(app.game.state == "intro" ? "intro" : "restart");
+	resetGame(app);
 	app.game.gameId = gameId;
 	startGame(app);
 };
@@ -105,6 +116,7 @@ const tickApp = (app: AppT, delta: number) => {
 			}
 	}
 	tickGame(app.game, delta, app);
+	tickLogo(app.logo, delta);
 	tickButton(app.startButtons, delta);
 	tickButton(app.restartButtons, delta);
 	tickButton(app.lobby, delta);

@@ -1,26 +1,40 @@
+import { flow } from "mobx";
 import {
-	idleState,
+	clear,
+	doTransition,
+	makeTick3,
 	newEntity,
-	makeTick,
-	type Entity,
-	changeState,
-} from "./entities";
+	type Entity2,
+} from "./entities2";
 
-export type Curtain = Entity<"hidden" | "appearing" | "idle" | "disappearing">;
+export type Curtain = Entity2<"hidden" | "appearing" | "idle" | "disappearing">;
 
 export const newCurtain = (): Curtain => newEntity("hidden");
 
-export const tickCurtain = makeTick<Curtain["state"], Curtain>();
+export const tickCurtain = makeTick3<Curtain>();
 
-export const showCurtain = (curtain: Curtain) => {
-	changeState(curtain, "appearing", 0.5, () => {
-		idleState(curtain, "idle");
-	});
-};
+export const showCurtain = flow(function* (curtain: Curtain) {
+	console.log("show curtain");
+	yield doTransition(curtain, 0.5, "appearing", "idle");
+});
 
-export const hideCurtain = (curtain: Curtain, callback?: () => void) => {
-	changeState(curtain, "disappearing", 0.5, () => {
-		idleState(curtain, "hidden");
-		callback?.();
-	});
-};
+export const hideCurtain = flow(function* (curtain: Curtain, nt: number) {
+	console.log("hide curtain");
+	yield doTransition(curtain, 0.5, "disappearing", "hidden", nt);
+});
+
+export const ensureHiddenCurtain = flow(function* (curtain: Curtain) {
+	console.log("ensure hidden curtain", curtain.state);
+	switch (curtain.state) {
+		case "hidden":
+		case "disappearing":
+			clear(curtain);
+			break;
+		case "idle":
+			yield hideCurtain(curtain, 0);
+			break;
+		case "appearing":
+			yield hideCurtain(curtain, 1 - curtain.nt);
+			break;
+	}
+});

@@ -79,32 +79,25 @@ export const makeTick2 =
 	(entity: T, delta: number) => {
 		callback(entity, delta);
 		entity.lt += delta;
-		let executedTransition = false;
+		entity.nt = 0;
+		if (entity.transitions[0]) {
+			entity.nt = entity.lt / entity.transitions[0].duration;
+		}
+		const transitionsToRemove: Transition[] = [];
 		for (const transition of entity.transitions) {
 			if (entity.lt > transition.duration) {
 				transition.callback(entity);
-				executedTransition = true;
+				transitionsToRemove.push(transition);
 			}
 		}
-		if (executedTransition) {
+		if (transitionsToRemove.length > 0) {
 			entity.transitions = entity.transitions.filter(
-				(t) => t.duration >= entity.lt,
+				(t) => !transitionsToRemove.includes(t),
 			);
 		}
 	};
 
-export const schedule = <State extends string, T extends Entity<State>>(
-	callback: (v: T) => void,
-	entity: T,
-	delay: number,
-) => {
-	entity.transitions.push({
-		duration: entity.lt + delay,
-		callback,
-	});
-};
-
-export const schedule2 = <E extends Entity<string>>(
+export const schedule = <E extends Entity<string>>(
 	entity: E,
 	duration: number,
 	callback: (entity: E) => void,
@@ -115,6 +108,55 @@ export const schedule2 = <E extends Entity<string>>(
 	});
 };
 
+export const scheduleP = <E extends Entity<string>>(
+	entity: E,
+	duration: number,
+): Promise<void> =>
+	new Promise((resolve) => {
+		entity.transitions.push({
+			duration: entity.lt + duration,
+			callback: () => {
+				resolve();
+			},
+		});
+	});
+
 export const areIdle = (...entities: Entity<string>[]) => {
 	return entities.every((entity) => entity.transitions.length == 0);
+};
+
+export const waitUntilIdle = async (entity: Entity<string>) => {
+	await scheduleP(entity, 0);
+};
+
+export const waitUntilFullLoop = async (
+	entity: Entity<string>,
+	loopDuration: number,
+) => {
+	const t = Math.ceil(entity.lt / loopDuration) * loopDuration - entity.lt;
+	await scheduleP(entity, t);
+};
+
+export const doTransition = <E extends Entity<string>>(
+	entity: E,
+	state: E["state"],
+	duration: number,
+): Promise<void> => {
+	return new Promise((resolve) => {
+		entity.state = state;
+		entity.lt = 0;
+		entity.nt = 0;
+		entity.transitions = [
+			{
+				duration,
+				callback: () => {
+					resolve();
+				},
+			},
+		];
+	});
+};
+
+export const clearTransitions = <E extends Entity<string>>(entity: E) => {
+	entity.transitions = [];
 };

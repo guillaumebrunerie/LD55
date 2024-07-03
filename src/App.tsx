@@ -61,11 +61,16 @@ import {
 	buyDefense,
 	buyMushroom,
 	setupFight,
-	newGame,
+	resetGame,
 } from "./gameLogic";
 import { Game, Wizard } from "./Game";
 import { wave } from "./ease";
-import { appearButton, disappearButton, type ButtonT } from "./button";
+import {
+	appearButton,
+	disappearButton,
+	isButtonOn,
+	type ButtonT,
+} from "./button";
 import { GlobalTimeContext } from "./globalTimeContext";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
@@ -76,7 +81,8 @@ import { darkFilter } from "./filters";
 import { useInterval } from "usehooks-ts";
 import { Circle } from "./Circle";
 import { getFrame } from "./Animation";
-import { schedule2 } from "./entities";
+import { useButton } from "./useButton";
+import type { LogoT } from "./logo";
 
 const left = 420;
 const top = 105;
@@ -336,9 +342,22 @@ const StartButtons = ({ app }: { app: AppT }) => {
 	const createNewPlayer = useCreateNewPlayer(app);
 
 	const buttons = app.startButtons;
-	if (buttons.alpha.value < 0.01) {
-		return null;
-	}
+
+	const startVsComputer = useButton({
+		onClick: () => {
+			disappearButton(app.lobby);
+			void ClickStart.play();
+			startNewGameAgainstComputer(app);
+		},
+		enabled: isButtonOn(buttons),
+	});
+
+	const startVsPlayer = useButton({
+		onClick: () => {
+			clickOpenLobby(app, createNewPlayer);
+		},
+		enabled: isButtonOn(buttons),
+	});
 
 	return (
 		<>
@@ -351,13 +370,7 @@ const StartButtons = ({ app }: { app: AppT }) => {
 				}}
 				alpha={buttons.alpha.value}
 				hitArea={new Rectangle(-100, -100, 200, 200)}
-				cursor="pointer"
-				eventMode="static"
-				pointerdown={action(() => {
-					disappearButton(app.lobby);
-					void ClickStart.play();
-					startNewGameAgainstComputer(app);
-				})}
+				{...startVsComputer.props}
 			/>
 			<Sprite
 				texture={StartVsHumanOffDefault}
@@ -368,11 +381,7 @@ const StartButtons = ({ app }: { app: AppT }) => {
 				}}
 				alpha={buttons.alpha.value}
 				hitArea={new Rectangle(-100, -100, 200, 200)}
-				cursor="pointer"
-				eventMode="static"
-				pointerdown={action(() => {
-					clickOpenLobby(app, createNewPlayer);
-				})}
+				{...startVsPlayer.props}
 			/>
 			{inLobby && <Lobby app={app} />}
 		</>
@@ -427,7 +436,7 @@ const backToMenu = (
 	void ClickStart.play();
 	exitGame(app, disconnect);
 	disappearButton(app.restartButtons);
-	schedule2(app.startButtons, 0.4, appearButton);
+	appearButton(app.startButtons, 0.4);
 };
 
 const BackToMenuLeft = ({ app }: { app: AppT }) => {
@@ -536,7 +545,8 @@ const exitGame = (
 	disconnect: (credentials: Credentials) => Promise<null>,
 ) => {
 	app.state = "intro";
-	app.game = newGame("intro", false);
+	resetGame(app);
+	// app.game = newGame("intro", false);
 	disappearButton(app.menuButton);
 	if (app.credentials) {
 		void disconnect(app.credentials);
@@ -604,7 +614,7 @@ const Menu = ({ app }: { app: AppT }) => {
 				cursor="pointer"
 				eventMode="static"
 				pointerdown={action(() => {
-					if (button.alpha.targetValue == 1) {
+					if (button.alpha.target == 1) {
 						disappearButton(button);
 					} else {
 						appearButton(button);
@@ -753,57 +763,33 @@ const OpponentName = ({ playerId }: { playerId: Id<"players"> }) => {
 };
 
 const LogoMoon = ({
-	app,
+	logo,
 	filters = [],
 	alpha = 1,
 }: {
-	app: AppT;
+	logo: LogoT;
 	filters?: Filter[];
 	alpha?: number;
 }) => {
-	switch (app.state) {
-		case "game":
-			return (
-				<Sprite
-					texture={Moon}
-					anchor={[0.5, 0.5]}
-					x={1920 / 2}
-					y={-100}
-					filters={filters}
-					alpha={alpha}
-				/>
-			);
-		case "transition":
-			return (
-				<>
-					<Sprite
-						texture={Moon}
-						anchor={[0.5, 0.5]}
-						x={1920 / 2}
-						y={300 - app.nt * 400}
-						filters={filters}
-						alpha={alpha}
-					/>
-					<Sprite
-						texture={Logo}
-						anchor={[0.5, 0.5]}
-						x={1920 / 2}
-						y={300 - app.nt * 400}
-						alpha={1 - app.nt}
-					/>
-				</>
-			);
-		case "intro":
-			return (
-				<Sprite
-					texture={Logo}
-					x={1920 / 2}
-					y={300}
-					anchor={0.5}
-					filters={[]}
-				/>
-			);
-	}
+	return (
+		<>
+			<Sprite
+				texture={Moon}
+				anchor={[0.5, 0.5]}
+				x={1920 / 2}
+				y={300 - logo.progress.value * 400}
+				filters={filters}
+				alpha={alpha}
+			/>
+			<Sprite
+				texture={Logo}
+				anchor={[0.5, 0.5]}
+				x={1920 / 2}
+				y={300 - logo.progress.value * 400}
+				alpha={1 - logo.progress.value}
+			/>
+		</>
+	);
 };
 
 const PoofedAway = ({ app }: { app: AppT }) => {
@@ -986,7 +972,7 @@ export const App = () => {
 						console.log(`${Math.round(x)}, ${Math.round(y)}`);
 					}}
 				/>
-				<LogoMoon app={app} />
+				<LogoMoon logo={app.logo} />
 				<Sprite texture={Cloud3} position={cloud3} />
 				<Sprite texture={Cloud2} position={cloud2} />
 				<Sprite texture={Cloud1} position={cloud1} />
@@ -1050,7 +1036,11 @@ export const App = () => {
 				{/* > */}
 				{/* 	<ManaPoints items={game.opponent.manaPoints} /> */}
 				{/* </Container> */}
-				<LogoMoon app={app} filters={filters} alpha={screenAlpha} />
+				<LogoMoon
+					logo={app.logo}
+					filters={filters}
+					alpha={screenAlpha}
+				/>
 				<UIButtons app={app} />
 				<StartButtons app={app} />
 				<RestartButtons app={app} />

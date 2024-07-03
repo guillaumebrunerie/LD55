@@ -1,13 +1,12 @@
 # Prio 1
 
-- Restart buttons/flow
-- Exit game flows
+- ShieldHit then ShieldEnd, and make all remaining monsters attack at the same time
 - Posting when opponent disconnected
-- Fix monsters appearing too close to each other
-- Keep wizard persistent
+- Restart game against player
+- Clean up a lot of things
 
 # Prio 2
 
-- ShieldHit then ShieldEnd, and make all monsters attack at the same time
+- Fix glitches with start/exit/restart
 - Show current mana points of opponent when playing online
 - Start/restart buttons should trigger on click, not pointerdown

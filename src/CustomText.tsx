@@ -20,7 +20,7 @@ export const CustomText = ({
 		<Text
 			ref={myRef}
 			text={text}
-			position={position}
+			position={position || { x: 0, y: 0 }}
 			anchor={anchor}
 			style={
 				new TextStyle({

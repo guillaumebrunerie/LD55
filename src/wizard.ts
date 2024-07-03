@@ -1,3 +1,4 @@
+import { flow } from "mobx";
 import { getDuration } from "./Animation";
 import {
 	WizardAppear,
@@ -10,103 +11,103 @@ import {
 	WizardWaitingStart,
 } from "./assets";
 import {
+	doTransition,
 	idleState,
+	makeTick3,
 	newEntity,
-	makeTick,
-	type Entity,
-	changeState,
-	schedule2,
-} from "./entities";
+	waitUntilFullLoop,
+	type Entity2,
+} from "./entities2";
 import type { Player } from "./gameLogic";
 
 type WizardState =
 	| "hidden"
-	| "appearing"
+	| ">appear"
 	| "idle"
-	| "magicStart"
+	| ">magicStart"
 	| "magicLoop"
-	| "magicEnd"
-	| "winning"
-	| "waitingStart"
+	| ">magicEnd"
+	| ">waitingStart"
 	| "waitingLoop"
-	| "waitingEnd"
-	| "die";
+	| ">waitingEnd"
+	| "win"
+	| ">die"
+	| ">disappear";
 
-export type WizardT = Entity<WizardState>;
+export type WizardT = Entity2<WizardState>;
 
 export const newWizard = (): WizardT => newEntity<WizardState>("hidden");
 
-export const tickWizard = makeTick<WizardState, WizardT>();
+export const tickWizard = makeTick3<WizardT>();
 
-export const appearWizard = (wizard: WizardT) => {
-	changeState(wizard, "appearing", getDuration(WizardAppear, 15), () => {
-		idleState(wizard, "idle");
-	});
-};
-
-export const magicStartWizard = (wizard: WizardT) => {
-	changeState(wizard, "magicStart", getDuration(WizardMagicStart, 20), () => {
-		idleState(wizard, "magicLoop");
-	});
-};
-
-export const magicEndWizard = (wizard: WizardT) => {
-	const loopDuration = getDuration(WizardMagicLoop, 20);
-	const loops = Math.ceil(wizard.lt / loopDuration);
-
-	schedule2(wizard, loops * loopDuration - wizard.lt, () => {
-		changeState(wizard, "magicEnd", getDuration(WizardMagicEnd, 20), () => {
-			idleState(wizard, "idle");
-		});
-	});
-};
-
-export const waitingStartWizard = (wizard: WizardT) => {
-	changeState(
+export const appearWizard = flow(function* (wizard: WizardT) {
+	yield doTransition(
 		wizard,
-		"waitingStart",
-		getDuration(WizardWaitingStart, 20),
-		() => {
-			idleState(wizard, "waitingLoop");
-		},
+		getDuration(WizardAppear, 15),
+		">appear",
+		"idle",
 	);
-};
+});
 
-export const waitingEndWizard = (wizard: WizardT, callback: () => void) => {
+export const magicStartWizard = flow(function* (wizard: WizardT) {
+	yield doTransition(
+		wizard,
+		getDuration(WizardMagicStart, 20),
+		">magicStart",
+		"magicLoop",
+	);
+});
+
+export const magicEndWizard = flow(function* (wizard: WizardT) {
+	yield waitUntilFullLoop(wizard, getDuration(WizardMagicLoop, 20));
+	yield doTransition(
+		wizard,
+		getDuration(WizardMagicEnd, 20),
+		">magicEnd",
+		"idle",
+	);
+});
+
+export const waitingStartWizard = flow(function* (wizard: WizardT) {
+	yield doTransition(
+		wizard,
+		getDuration(WizardWaitingStart, 20),
+		">waitingStart",
+		"waitingLoop",
+	);
+});
+
+export const waitingEndWizard = flow(function* (wizard: WizardT) {
 	const loopDuration = getDuration(WizardWaitingLoop, 20);
-	const loops = Math.ceil(wizard.lt / loopDuration);
+	yield waitUntilFullLoop(wizard, loopDuration);
+	const endDuration = getDuration(WizardWaitingEnd, 20);
+	yield doTransition(wizard, endDuration, ">waitingEnd", "idle");
+});
 
-	schedule2(wizard, loops * loopDuration - wizard.lt, () => {
-		changeState(
-			wizard,
-			"waitingEnd",
-			getDuration(WizardWaitingEnd, 20),
-			() => {
-				idleState(wizard, "idle");
-				callback();
-			},
-		);
-	});
-};
-
-export const dieWizard = (wizard: WizardT) => {
-	changeState(wizard, "die", getDuration(WizardDie, 20), () => {
-		idleState(wizard, "hidden");
-	});
-};
+export const dieWizard = flow(function* (wizard: WizardT) {
+	yield doTransition(wizard, getDuration(WizardDie, 20), ">die", "hidden");
+});
 
 export const winWizard = (wizard: WizardT) => {
-	idleState(wizard, "winning");
+	idleState(wizard, "win");
 };
 
-export const startWizardMagic = (player: Player) => {
+export const idleWizard = (wizard: WizardT) => {
+	idleState(wizard, "idle");
+};
+
+export const hiddenWizard = (wizard: WizardT) => {
+	idleState(wizard, "hidden");
+};
+
+export const startWizardMagic = async (player: Player) => {
 	if (player.wizard.state == "idle") {
-		magicStartWizard(player.wizard);
+		await magicStartWizard(player.wizard);
 	}
 };
 
-export const maybeEndWizardMagic = (player: Player) => {
+export const maybeEndWizardMagic = async (player: Player) => {
 	if (player.manaPoints.length == 0) {
-		magicEndWizard(player.wizard);
+		await magicEndWizard(player.wizard);
 	}
 };

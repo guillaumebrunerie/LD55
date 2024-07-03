@@ -22,6 +22,13 @@ export type PlayerData = {
 	defense: number;
 };
 
+export const emptyPlayerData = (): PlayerData => ({
+	mana: 0,
+	monsters: [],
+	mushrooms: [],
+	defense: 0,
+});
+
 export const pickFighter = <T extends MonsterData>(items: T[]): T => {
 	const a = items.find((item) => item.hp != item.strength);
 	const b = items.toSorted((a, b) => b.position.x - a.position.x)[0];

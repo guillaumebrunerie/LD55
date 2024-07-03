@@ -1,3 +1,4 @@
+import { runInAction } from "mobx";
 import type { EventMode } from "pixi.js";
 import { useCallback, useState } from "react";
 
@@ -15,8 +16,10 @@ export const useButton = ({
 	const mouseout = useCallback(() => setIsHovered(false), []);
 	const pointerdown = useCallback(() => setIsPressed(true), []);
 	const pointerup = useCallback(() => {
-		onClick();
 		setIsPressed(false);
+		runInAction(() => {
+			onClick();
+		});
 	}, [onClick]);
 	const pointerupoutside = useCallback(() => setIsPressed(false), []);
 	const eventMode: EventMode = "static";

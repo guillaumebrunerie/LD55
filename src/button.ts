@@ -1,104 +1,45 @@
-import { makeAutoObservable } from "mobx";
-import { makeTick } from "./entities";
-
-// class EntityClass {
-// 	state;
-// 	lt = 0;
-// 	nt = 0;
-// 	transitions = [];
-
-// 	constructor(state: string) {
-// 		this.state = state;
-// 	}
-
-// 	tick(_delta: number) {
-// 		throw new Error("Abstract method");
-// 	}
-// }
+import { makeTick3, newEntity, type Entity2 } from "./entities2";
+import {
+	newExponentialToggle,
+	setTarget,
+	tickExponentialToggle,
+	type ExponentialToggle,
+} from "./exponentialToggle";
 
 const fadeSpeed = 10;
 const alphaSpeed = 10;
 
-class Toggle {
-	value;
-	targetValue;
-	speed;
-	constructor(initialValue: number, speed: number) {
-		this.value = initialValue;
-		this.targetValue = initialValue;
-		this.speed = speed;
-		makeAutoObservable(this);
-	}
-
-	set(value: number) {
-		this.targetValue = value;
-	}
-
-	tick(delta: number) {
-		this.value +=
-			(this.targetValue - this.value) *
-			(1 - Math.exp(-this.speed * delta));
-	}
-}
-
-export class Button {
-	state;
-	lt = 0;
-	nt = 0;
-	transitions = [];
-	fade = new Toggle(1, fadeSpeed);
-	alpha = new Toggle(0, alphaSpeed);
-	constructor(visible: boolean) {
-		this.state = "idle";
-		makeAutoObservable(this);
-		this.alpha.targetValue = visible ? 1 : 0;
-	}
-
-	tick(delta: number) {
-		this.fade.tick(delta);
-		this.alpha.tick(delta);
-	}
-
-	appear() {
-		this.alpha.set(1);
-	}
-
-	disappear() {
-		this.alpha.set(0);
-	}
-
-	fadeButtonOn() {
-		this.fade.set(0);
-	}
-
-	fadeButtonOff() {
-		this.fade.set(1);
-	}
-}
-
-export type ButtonT = Button;
-
-export const newButton = (visible: boolean): ButtonT => new Button(visible);
-
-export const tickButton = makeTick<ButtonT["state"], ButtonT>(
-	(entity, delta) => {
-		entity.tick(delta);
-		return {};
-	},
-);
-
-export const appearButton = (button: ButtonT) => {
-	button.appear();
+export type ButtonT = Entity2<"idle"> & {
+	alpha: ExponentialToggle;
+	fade: ExponentialToggle;
 };
 
-export const disappearButton = (button: ButtonT) => {
-	button.disappear();
+export const newButton = (visible: boolean): ButtonT => ({
+	...newEntity("idle"),
+	alpha: newExponentialToggle(visible ? 1 : 0),
+	fade: newExponentialToggle(1),
+});
+
+export const tickButton = makeTick3<ButtonT>((entity, delta) => {
+	tickExponentialToggle(entity.alpha, delta);
+	tickExponentialToggle(entity.fade, delta);
+});
+
+export const appearButton = (button: ButtonT, delay = 0) => {
+	setTarget(button.alpha, 1, alphaSpeed, delay);
 };
 
-export const fadeButtonOn = (button: ButtonT) => {
-	button.fadeButtonOn();
+export const disappearButton = (button: ButtonT, delay = 0) => {
+	setTarget(button.alpha, 0, alphaSpeed, delay);
 };
 
-export const fadeButtonOff = (button: ButtonT) => {
-	button.fadeButtonOff();
+export const fadeButtonOn = (button: ButtonT, delay = 0) => {
+	setTarget(button.fade, 0, fadeSpeed, delay);
 };
+
+export const fadeButtonOff = (button: ButtonT, delay = 0) => {
+	setTarget(button.fade, 1, fadeSpeed, delay);
+};
+
+export const isButtonOn = (button: ButtonT) =>
+	button.alpha.target == 1 && button.alpha.value > 0.1;

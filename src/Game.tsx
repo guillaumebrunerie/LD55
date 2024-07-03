@@ -96,8 +96,6 @@ export const Wizard = ({
 	player: Player;
 	wizard: WizardT;
 }) => {
-	const gt = useGlobalTime();
-
 	const props = {
 		x: -15,
 		y: 230,
@@ -113,30 +111,30 @@ export const Wizard = ({
 			/>
 		);
 	};
-	const looping = (animation: Texture[], fps = 20, time = gt) => {
+	const looping = (animation: Texture[], fps = 20, time = wizard.lt) => {
 		return <Sprite texture={getFrame(animation, fps, time)} {...props} />;
 	};
 
 	switch (wizard.state) {
 		case "idle":
-			return looping(WizardIdle, 10, wizard.lt);
-		case "winning":
+			return looping(WizardIdle, 10);
+		case "win":
 			return looping(WizardWin, 21);
-		case "magicStart":
+		case ">magicStart":
 			return transition(WizardMagicStart);
 		case "magicLoop":
-			return looping(WizardMagicLoop, 20, wizard.lt);
-		case "magicEnd":
+			return looping(WizardMagicLoop, 20);
+		case ">magicEnd":
 			return transition(WizardMagicEnd);
-		case "waitingStart":
+		case ">waitingStart":
 			return transition(WizardWaitingStart);
 		case "waitingLoop":
-			return looping(WizardWaitingLoop, 20, wizard.lt);
-		case "waitingEnd":
+			return looping(WizardWaitingLoop, 20);
+		case ">waitingEnd":
 			return transition(WizardWaitingEnd);
-		case "appearing":
+		case ">appear":
 			return transition(WizardAppear);
-		case "die":
+		case ">die":
 			return transition(WizardDie, { x: -80, y: 170 });
 		case "hidden":
 			break;
@@ -158,8 +156,8 @@ const Player = ({
 		<Container>
 			<Wizard game={game} player={player} wizard={player.wizard} />
 			<ManaPoints items={player.manaPoints} />
-			<Shield shield={player.items.shield} />
-			<Runes runes={player.items.runes} />
+			<Shield shield={player.protection.shield} />
+			<Runes runes={player.protection.runes} />
 			<Mushrooms items={player.items.mushrooms} />
 			<MonsterItems items={player.items.monsters} tint={monsterTint} />
 		</Container>
@@ -490,11 +488,37 @@ const RuneC = ({ item, i }: { item: Rune; i: number }) => {
 				/>
 			);
 	}
-	return null;
 };
 
 const Shield = ({ shield }: { shield: Shield }) => {
 	switch (shield.state) {
+		case "hidden":
+		case "waitingToAppear":
+			return null;
+
+		case "fadeOut":
+			return (
+				<>
+					<Sprite
+						texture={RunesSheet.animations.Rune[0]}
+						anchor={0}
+						rotation={0}
+						scale={1}
+						alpha={1 - shield.nt}
+						blendMode={BLEND_MODES.NORMAL}
+						position={[-14, 613]}
+					/>
+					<Sprite
+						texture={ShieldLoop}
+						blendMode={BLEND_MODES.ADD}
+						position={[18, -70]}
+						anchor={0}
+						scale={2}
+						alpha={1 - shield.nt}
+					/>
+				</>
+			);
+
 		case "appearing":
 			return (
 				<>
@@ -516,6 +540,7 @@ const Shield = ({ shield }: { shield: Shield }) => {
 					/>
 				</>
 			);
+
 		case "disappearing":
 			return (
 				<>
@@ -537,6 +562,7 @@ const Shield = ({ shield }: { shield: Shield }) => {
 					/>
 				</>
 			);
+
 		case "visible":
 			return (
 				<>
@@ -588,5 +614,4 @@ const Shield = ({ shield }: { shield: Shield }) => {
 				</>
 			);
 	}
-	return null;
 };
