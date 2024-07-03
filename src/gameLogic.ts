@@ -32,7 +32,6 @@ import {
 	manaPointsBounds,
 	fightDuration,
 	attackApproachDuration,
-	playerBounds,
 	feetBounds,
 	chestBounds,
 } from "./configuration";
@@ -83,7 +82,7 @@ import {
 	type PlayerData,
 } from "./rules";
 import { getDuration } from "./Animation";
-import type { AppT } from "./appLogic";
+import type { AppT, Credentials } from "./appLogic";
 import { areIdle2, scheduleX } from "./entities2";
 import { hideLogo, showLogo } from "./logo";
 
@@ -110,12 +109,7 @@ type ShieldState =
 	| "hidden"
 	| "fadeOut"
 	| "fighting";
-export type Shield = Entity<ShieldState> & {
-	position: Point;
-	tmpPosition?: Point;
-	previousItem?: Mana;
-	hidden?: boolean;
-};
+export type Shield = Entity<ShieldState>;
 
 type RuneState =
 	| "waitingToAppear"
@@ -125,12 +119,10 @@ type RuneState =
 	| "hidden";
 export type Rune = Entity<RuneState>;
 
-type MushroomState = "visible" | "preSpawning" | "spawning" | "disappearing";
+type MushroomState = "waitingToAppear" | "visible" | "disappearing";
 export type Mushroom = Entity<MushroomState> & {
 	id: string;
 	position: Point;
-	tmpPosition?: Point;
-	previousItem?: Mana;
 	strength: 1 | 2;
 };
 
@@ -198,8 +190,6 @@ const spawnMonster = (
 	position: Point,
 	manaPoint: Mana,
 ) => {
-	manaPoint.tmpPosition = manaPoint.position;
-	manaPoint.position = position;
 	const id = generateId();
 	player.items.monsters.push({
 		...newEntity("waitingToAppear"),
@@ -213,6 +203,8 @@ const spawnMonster = (
 		throw new Error("IMPOSSIBLE");
 	}
 
+	manaPoint.tmpPosition = manaPoint.position;
+	manaPoint.position = position;
 	changeState(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
 		void ClickAttack.play();
 		changeState(manaPoint, "spawningOut", spawnDuration, (manaPoint) => {
@@ -225,28 +217,32 @@ const spawnMonster = (
 	});
 };
 
-const spawnMushroom = (
-	array: Mushroom[],
-	bounds: Bounds,
-	strength: 1 | 2,
-	manaPoint: Mana | undefined,
-) => {
-	const position = pickPosition(array, bounds, delta);
-	const mushroom: Mushroom = {
-		...newEntity("preSpawning"),
-		id: generateId(),
+const spawnMushroom = (player: Player, strength: 1 | 2, manaPoint: Mana) => {
+	const position = pickPosition(player.items.mushrooms, manaBounds, delta);
+	const id = generateId();
+	player.items.mushrooms.push({
+		...newEntity("waitingToAppear"),
+		id,
 		position,
 		strength,
-		tmpPosition: manaPoint?.position,
-		previousItem: manaPoint,
-	};
-	changeState(mushroom, "preSpawning", manaTravelDuration, (mushroom) => {
-		void ClickMana.play();
-		changeState(mushroom, "spawning", spawnDuration, (mushroom) => {
-			idleState(mushroom, "visible");
-		});
 	});
-	array.push(mushroom);
+	const mushroom = player.items.mushrooms.find((m) => m.id == id);
+	if (!mushroom) {
+		throw new Error("IMPOSSIBLE");
+	}
+
+	manaPoint.tmpPosition = manaPoint.position;
+	manaPoint.position = position;
+	changeState(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
+		void ClickMana.play();
+		changeState(manaPoint, "spawningOut", spawnDuration, (manaPoint) => {
+			player.manaPoints = player.manaPoints.filter(
+				(item) => item != manaPoint,
+			);
+			void maybeEndWizardMagic(player);
+		});
+		idleState(mushroom, "visible");
+	});
 };
 
 const spawnRunes = (player: Player, manaPoint: Mana, runeCount: number) => {
@@ -333,10 +329,7 @@ const newPlayer = (): Player => ({
 	manaPoints: [],
 	protection: {
 		...newEntity<"idle" | "tombola">("idle"),
-		shield: {
-			...newEntity<ShieldState>("hidden"),
-			position: pickPosition([], playerBounds, 0),
-		},
+		shield: newEntity<ShieldState>("hidden"),
 		runes: [],
 	},
 	items: {
@@ -808,24 +801,7 @@ const tickShield = makeTick<ShieldState, Shield>();
 
 const tickRune = makeTick<RuneState, Rune>();
 
-const tickMushroom = makeTick<MushroomState, Mushroom>((item) => {
-	return {
-		preSpawning: () => {
-			if (!item.previousItem) {
-				item.tmpPosition = item.position;
-			} else {
-				const prevPos = item.previousItem.position;
-				item.tmpPosition = {
-					x: prevPos.x + (item.position.x - prevPos.x) * item.nt,
-					y: prevPos.y + (item.position.y - prevPos.y) * item.nt,
-				};
-			}
-		},
-		spawning: () => {
-			item.tmpPosition = undefined;
-		},
-	};
-});
+const tickMushroom = makeTick<MushroomState, Mushroom>();
 
 const manaSpawnDuration = 0.5;
 
@@ -1209,14 +1185,6 @@ const unlockManaPoint = (manaPoint: Mana) => {
 	idleState(manaPoint, "visible");
 };
 
-const spendManaPoint = (player: Player, manaPoint: Mana | undefined) => {
-	if (!manaPoint) {
-		return;
-	}
-	player.manaPoints = player.manaPoints.filter((item) => item != manaPoint);
-	void maybeEndWizardMagic(player);
-};
-
 export const buyMushroom = async (
 	app: AppT,
 	player: Player,
@@ -1236,14 +1204,13 @@ export const buyMushroom = async (
 	}
 	const strength = result.strength;
 	runInAction(() => {
-		spendManaPoint(player, manaPoint);
+		if (!manaPoint) {
+			console.error("No mana point in buyMonster");
+			return;
+		}
+
 		if (player == app.game.player) {
-			spawnMushroom(
-				player.items.mushrooms,
-				manaBounds,
-				strength,
-				manaPoint,
-			);
+			spawnMushroom(player, strength, manaPoint);
 		} else {
 			addMushroom(player.items.mushrooms, manaBounds, strength);
 		}
@@ -1270,7 +1237,9 @@ const getPlayerData = (player: Player): PlayerData => {
 export const buyMonster = async (
 	app: AppT,
 	player: Player,
-	buyMonsterMutation: ReactMutation<typeof api.player.buyMonster>,
+	buyMonsterMutation: (
+		credentials: Credentials,
+	) => Promise<{ strength: 1 | 2 | 3; position: Point } | null>,
 ) => {
 	const manaPoint = lockManaPoint(player);
 	const {

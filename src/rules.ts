@@ -5,7 +5,7 @@ export const initialMana = 5;
 export const initialDefense = 8;
 export const maxDefense = 16;
 
-type MonsterData = {
+export type MonsterData = {
 	hp: number;
 	strength: 1 | 2 | 3;
 	position: Point;

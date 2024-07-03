@@ -380,51 +380,17 @@ const ManaTexture = {
 } as const;
 
 const Mushroom = ({ item }: { item: Mushroom }) => {
-	const visible = (
-		<Sprite
-			texture={ManaTexture[item.strength]}
-			rotation={0}
-			blendMode={BLEND_MODES.NORMAL}
-			scale={1}
-			anchor={0.5}
-			position={item.position}
-		/>
-	);
 	switch (item.state) {
 		case "visible":
-			return visible;
-		case "preSpawning": {
-			if (!item.previousItem) {
-				console.error("No previous item");
-				break;
-			}
-			const dx = item.previousItem.position.x - item.position.x;
-			const dy = item.previousItem.position.y - item.position.y;
-			const angle = Math.atan2(dy, dx);
 			return (
 				<Sprite
-					anchor={0.5}
-					scale={item.previousItem.scale}
-					rotation={angle + Math.PI / 2}
+					texture={ManaTexture[item.strength]}
+					rotation={0}
 					blendMode={BLEND_MODES.NORMAL}
-					alpha={Math.min(item.nt * 3, 1)}
-					texture={ManaPointBlurred}
-					position={item.tmpPosition}
+					scale={1}
+					anchor={0.5}
+					position={item.position}
 				/>
-			);
-		}
-		case "spawning":
-			return (
-				<>
-					{visible}
-					<Sprite
-						anchor={0.5}
-						scale={0.5}
-						blendMode={BLEND_MODES.ADD}
-						texture={getFrame(Spawn, 30, item.lt)}
-						position={item.position}
-					/>
-				</>
 			);
 		case "disappearing":
 			return (
@@ -449,20 +415,18 @@ const Runes = ({ runes: items }: { runes: Rune[] }) => {
 };
 
 const RuneC = ({ item, i }: { item: Rune; i: number }) => {
-	const appearing = (
-		<Sprite
-			texture={RunesSheet.animations.Rune[i + 1]}
-			anchor={0}
-			rotation={0}
-			scale={1}
-			alpha={Math.min(item.nt * 2, 1)}
-			position={[-14, 613]}
-		/>
-	);
-
 	switch (item.state) {
 		case "appearing":
-			return appearing;
+			return (
+				<Sprite
+					texture={RunesSheet.animations.Rune[i + 1]}
+					anchor={0}
+					rotation={0}
+					scale={1}
+					alpha={Math.min(item.nt * 2, 1)}
+					position={[-14, 613]}
+				/>
+			);
 
 		case "disappearing":
 			return (

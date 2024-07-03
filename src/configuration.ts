@@ -49,7 +49,3 @@ export const manaBounds = makeBounds(
 export const attackBounds = makeBounds(
 	new Polygon([850, 211, 723, 174, 496, 294, 453, 310, 448, 593, 850, 850]),
 );
-
-export const playerBounds = makeBounds(
-	new Polygon([193, 625, 251, 626, 254, 439, 217, 436]),
-);
