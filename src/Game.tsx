@@ -155,10 +155,10 @@ const Player = ({
 	return (
 		<Container>
 			<Wizard game={game} player={player} wizard={player.wizard} />
-			<ManaPoints items={player.manaPoints} />
 			<Shield shield={player.protection.shield} />
 			<Runes runes={player.protection.runes} />
 			<Mushrooms items={player.mushrooms} />
+			<ManaPoints items={player.manaPoints} />
 			<MonsterItems items={player.monsters} tint={monsterTint} />
 		</Container>
 	);

@@ -43,15 +43,24 @@ import {
 	ensureHiddenCurtain,
 } from "./curtain";
 import {
-	idleState,
-	newEntity,
-	makeTick,
-	type Entity,
+	idleState as idleStateOld,
+	newEntity as newEntityOld,
+	makeTick as makeTickOld,
+	type Entity as EntityOld,
 	changeState,
 	schedule,
-	makeTick2,
+	makeTick2 as makeTick2Old,
 	clearTransitions,
 } from "./entities";
+import {
+	areIdle2,
+	scheduleX,
+	type Entity2 as Entity,
+	newEntity,
+	idleState,
+	makeTick3 as makeTick,
+	doTransition,
+} from "./entities2";
 import { smartStrategy, type Strategy } from "./strategies";
 import {
 	appearWizard,
@@ -83,7 +92,6 @@ import {
 } from "./rules";
 import { getDuration } from "./Animation";
 import type { AppT, Credentials } from "./appLogic";
-import { areIdle2, scheduleX } from "./entities2";
 import { hideLogo, showLogo } from "./logo";
 
 type ManaState =
@@ -92,7 +100,7 @@ type ManaState =
 	| "spawning"
 	| "traveling"
 	| "spawningOut";
-export type Mana = Entity<ManaState> & {
+export type Mana = EntityOld<ManaState> & {
 	position: Point;
 	tmpPosition?: Point;
 	scale: number;
@@ -109,7 +117,7 @@ type ShieldState =
 	| "hidden"
 	| "fadeOut"
 	| "fighting";
-export type Shield = Entity<ShieldState>;
+export type Shield = EntityOld<ShieldState>;
 
 type RuneState =
 	| "waitingToAppear"
@@ -117,9 +125,9 @@ type RuneState =
 	| "visible"
 	| "disappearing"
 	| "hidden";
-export type Rune = Entity<RuneState>;
+export type Rune = EntityOld<RuneState>;
 
-type MushroomState = "waitingToAppear" | "visible" | "disappearing";
+type MushroomState = "hidden" | "visible" | "disappearing";
 export type Mushroom = Entity<MushroomState> & {
 	id: string;
 	position: Point;
@@ -127,7 +135,7 @@ export type Mushroom = Entity<MushroomState> & {
 };
 
 type MonsterState = "waitingToAppear" | "visible" | "approach" | "fighting";
-export type Monster = Entity<MonsterState> & {
+export type Monster = EntityOld<MonsterState> & {
 	id: string;
 	position: Point;
 	destination?: Point;
@@ -135,18 +143,18 @@ export type Monster = Entity<MonsterState> & {
 	hp: number;
 };
 
-export type Protection = Entity<"idle" | "tombola"> & {
+export type Protection = EntityOld<"idle" | "tombola"> & {
 	shield: Shield;
 	runes: Rune[];
 };
 
 const resetProtection = (protection: Protection) => {
-	idleState(protection, "idle");
+	idleStateOld(protection, "idle");
 	protection.runes = [];
 	fadeOutShield(protection.shield);
 };
 
-export type Player = Entity<"idle"> & {
+export type Player = EntityOld<"idle"> & {
 	wizard: WizardT;
 	manaPoints: Mana[];
 	protection: Protection;
@@ -171,7 +179,7 @@ const resetPlayer = (player: Player, doIdle: boolean) => {
 	player.previousEndData = emptyPlayerData();
 };
 
-const tickPlayer = makeTick2((player: Player, delta) => {
+const tickPlayer = makeTick2Old((player: Player, delta) => {
 	tickWizard(player.wizard, delta);
 	tickItems(player, delta);
 });
@@ -190,7 +198,7 @@ const spawnMonster = (
 ) => {
 	const id = generateId();
 	player.monsters.push({
-		...newEntity("waitingToAppear"),
+		...newEntityOld("waitingToAppear"),
 		id,
 		position,
 		strength,
@@ -211,7 +219,7 @@ const spawnMonster = (
 			);
 			void maybeEndWizardMagic(player);
 		});
-		idleState(monster, "visible");
+		idleStateOld(monster, "visible");
 	});
 };
 
@@ -219,7 +227,7 @@ const spawnMushroom = (player: Player, strength: 1 | 2, manaPoint: Mana) => {
 	const position = pickPosition(player.mushrooms, manaBounds, delta);
 	const id = generateId();
 	player.mushrooms.push({
-		...newEntity("waitingToAppear"),
+		...newEntity("hidden"),
 		id,
 		position,
 		strength,
@@ -251,7 +259,7 @@ const spawnRunes = (player: Player, manaPoint: Mana, runeCount: number) => {
 		if (!hasShield(shield)) {
 			makeWaitToAppearShield(shield);
 		} else {
-			const rune: Rune = newEntity("waitingToAppear");
+			const rune: Rune = newEntityOld("waitingToAppear");
 			runes.push(rune);
 		}
 	}
@@ -271,7 +279,7 @@ const spawnRunes = (player: Player, manaPoint: Mana, runeCount: number) => {
 		}
 		for (const rune of runes) {
 			if (rune.state == "waitingToAppear") {
-				idleState(rune, "visible");
+				idleStateOld(rune, "visible");
 			}
 		}
 	});
@@ -311,23 +319,20 @@ const addRune = (array: Rune[], props?: Partial<Rune>) => {
 const addMushroom = (array: Mushroom[], bounds: Bounds, strength: 1 | 2) => {
 	const position = pickPosition(array, bounds, delta);
 	array.push({
+		...newEntity("visible"),
 		id: generateId(),
-		lt: 0,
-		nt: 0,
 		position,
 		strength,
-		state: "visible",
-		transitions: [],
 	});
 };
 
 const newPlayer = (): Player => ({
-	...newEntity("idle"),
+	...newEntityOld("idle"),
 	wizard: newWizard(),
 	manaPoints: [],
 	protection: {
-		...newEntity<"idle" | "tombola">("idle"),
-		shield: newEntity<ShieldState>("hidden"),
+		...newEntityOld<"idle" | "tombola">("idle"),
+		shield: newEntityOld<ShieldState>("hidden"),
 		runes: [],
 	},
 	mushrooms: [],
@@ -345,7 +350,7 @@ const spawnManaPoint = (
 	const position = pickPosition(player.manaPoints, manaPointsBounds, delta);
 
 	const manaPoint: Mana = {
-		...newEntity<ManaState>("spawning"),
+		...newEntityOld<ManaState>("spawning"),
 		position,
 		scale: 0.7 + Math.random() * 0.3,
 		offset: Math.random() * 2 * Math.PI,
@@ -363,7 +368,7 @@ const spawnManaPoint = (
 		if (!silent && previousItem) {
 			void ManaCreated.play({ volume: 0.5 });
 		}
-		idleState(manaPoint, "visible");
+		idleStateOld(manaPoint, "visible");
 		callback?.();
 	});
 
@@ -407,7 +412,7 @@ type GameState =
 	| "gameover"
 	| "restart";
 
-export type GameT = Entity<GameState> & {
+export type GameT = EntityOld<GameState> & {
 	gameId?: Id<"games">;
 	round: number;
 	player: Player;
@@ -420,7 +425,7 @@ export type GameT = Entity<GameState> & {
 
 export const resetGame = (app: AppT) => {
 	const { game } = app;
-	idleState(game, "intro");
+	idleStateOld(game, "intro");
 	showLogo(app.logo);
 	game.round = 0;
 	void ensureHiddenCurtain(game.curtain);
@@ -432,7 +437,7 @@ export const resetGame = (app: AppT) => {
 };
 
 export const newGame = (state: "intro" | "restart", buttons = true): GameT => ({
-	...newEntity<GameState>(state),
+	...newEntityOld<GameState>(state),
 	round: 0,
 	player: newPlayer(),
 	opponent: newPlayer(),
@@ -454,7 +459,7 @@ export const startGame = (app: AppT) => {
 	appearButton(game.manaButton, 1.2);
 	appearButton(game.attackButton, 1.2);
 	appearButton(game.defenseButton, 1.2);
-	idleState(game, "transition");
+	idleStateOld(game, "transition");
 	void WizardStart.play();
 	// idleState(game.player.wizard, "idle");
 	// appearWizard(game.player.wizard);
@@ -494,12 +499,12 @@ export const startGame = (app: AppT) => {
 
 const appearShield = (shield: Shield) => {
 	changeState(shield, "appearing", getDuration(ShieldStart, 20), (shield) => {
-		idleState(shield, "visible");
+		idleStateOld(shield, "visible");
 	});
 };
 
 const makeWaitToAppearShield = (shield: Shield) => {
-	idleState(shield, "waitingToAppear");
+	idleStateOld(shield, "waitingToAppear");
 };
 
 const disappearShield = (shield: Shield) => {
@@ -508,7 +513,7 @@ const disappearShield = (shield: Shield) => {
 		"disappearing",
 		getDuration(ShieldEnd, 20),
 		(shield) => {
-			idleState(shield, "hidden");
+			idleStateOld(shield, "hidden");
 		},
 	);
 };
@@ -516,7 +521,7 @@ const disappearShield = (shield: Shield) => {
 const fadeOutDuration = 0.2;
 const fadeOutShield = (shield: Shield) => {
 	changeState(shield, "fadeOut", fadeOutDuration, (shield) => {
-		idleState(shield, "hidden");
+		idleStateOld(shield, "hidden");
 	});
 };
 
@@ -527,9 +532,9 @@ const hasShield = (shield: Shield) => {
 };
 
 const appearRune = (player: Player) => {
-	const rune: Rune = newEntity("hidden");
+	const rune: Rune = newEntityOld("hidden");
 	changeState(rune, "appearing", spawnDuration, (rune) => {
-		idleState(rune, "visible");
+		idleStateOld(rune, "visible");
 	});
 	player.protection.runes.push(rune);
 };
@@ -558,7 +563,7 @@ export const setupFight = (app: AppT, lastFight: LastFight) => {
 	for (const monsterData of lastFight.opponent.monsters) {
 		const { hp, strength, position } = monsterData;
 		const monster: Monster = {
-			...newEntity("visible"),
+			...newEntityOld("visible"),
 			id: generateId(),
 			position,
 			strength,
@@ -568,10 +573,10 @@ export const setupFight = (app: AppT, lastFight: LastFight) => {
 	}
 	// Set up defense
 	game.opponent.protection.runes = [];
-	idleState(game.opponent.protection.shield, "hidden");
+	idleStateOld(game.opponent.protection.shield, "hidden");
 	for (let i = 0; i < lastFight.opponent.defense; i++) {
 		if (i == 0) {
-			idleState(game.opponent.protection.shield, "visible");
+			idleStateOld(game.opponent.protection.shield, "visible");
 		} else {
 			addRune(game.opponent.protection.runes);
 		}
@@ -594,7 +599,7 @@ export const setupFight = (app: AppT, lastFight: LastFight) => {
 	game.round = lastFight.round;
 
 	// Start the fight
-	idleState(game, "attack");
+	idleStateOld(game, "attack");
 	// for (const monster of game.player.monsters) {
 	// 	idleState(monster, "waitingForFight");
 	// }
@@ -637,7 +642,7 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 					getPlayerData(opponent),
 				);
 				const monster: Monster = {
-					...newEntity("visible"),
+					...newEntityOld("visible"),
 					id: generateId(),
 					position,
 					strength: strength,
@@ -655,7 +660,10 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 
 				const add = () => {
 					if (!hasShield(game.opponent.protection.shield)) {
-						idleState(game.opponent.protection.shield, "visible");
+						idleStateOld(
+							game.opponent.protection.shield,
+							"visible",
+						);
 					} else {
 						addRune(game.opponent.protection.runes);
 					}
@@ -686,7 +694,7 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 
 const rebuildDuration = 0.2;
 
-export const tickGame = makeTick<GameState, GameT, [AppT]>(
+export const tickGame = makeTickOld<GameState, GameT, [AppT]>(
 	(game: GameT, delta: number, app: AppT) => {
 		tickPlayer(game.player, delta);
 		tickPlayer(game.opponent, delta);
@@ -706,12 +714,12 @@ export const tickGame = makeTick<GameState, GameT, [AppT]>(
 		return {
 			transition: () => {
 				if (idle) {
-					idleState(game, "buildUp");
+					idleStateOld(game, "buildUp");
 				}
 			},
 			restart: () => {
 				if (idle) {
-					idleState(game, "buildUp");
+					idleStateOld(game, "buildUp");
 				}
 			},
 			buildUp: () => {
@@ -719,7 +727,7 @@ export const tickGame = makeTick<GameState, GameT, [AppT]>(
 					game.player.manaPoints.length == 0 &&
 					areAllItemsVisible(game.player)
 				) {
-					idleState(game, "waiting");
+					idleStateOld(game, "waiting");
 					if (!game.gameId) {
 						opponentMove(game, game.opponent, smartStrategy);
 					}
@@ -727,7 +735,7 @@ export const tickGame = makeTick<GameState, GameT, [AppT]>(
 			},
 			waiting: () => {
 				if (!game.gameId && game.opponent.manaPoints.length == 0) {
-					idleState(game, "attack");
+					idleStateOld(game, "attack");
 					// for (const monster of game.player.monsters) {
 					// 	idleState(monster, "waitingForFight");
 					// }
@@ -778,7 +786,7 @@ const areAllItemsVisible = (player: Player) => {
 const manaTravelDuration = 0.2;
 const spawnDuration = 0.3;
 
-const tickMonster = makeTick<MonsterState, Monster>((_item) => {
+const tickMonster = makeTickOld<MonsterState, Monster>((_item) => {
 	// if (item.state == "waitingForFight") {
 	// 	item.position.x += delta * 25;
 	// }
@@ -786,15 +794,15 @@ const tickMonster = makeTick<MonsterState, Monster>((_item) => {
 	return {};
 });
 
-const tickShield = makeTick<ShieldState, Shield>();
+const tickShield = makeTickOld<ShieldState, Shield>();
 
-const tickRune = makeTick<RuneState, Rune>();
+const tickRune = makeTickOld<RuneState, Rune>();
 
-const tickMushroom = makeTick<MushroomState, Mushroom>();
+const tickMushroom = makeTick<Mushroom>();
 
 const manaSpawnDuration = 0.5;
 
-const tickManaPoint = makeTick<ManaState, Mana>((item) => {
+const tickManaPoint = makeTickOld<ManaState, Mana>((item) => {
 	return {
 		visible: () => {
 			item.tmpPosition = undefined;
@@ -836,7 +844,7 @@ const rebuildOne = (game: GameT) => {
 		rebuildManaPoint(game.player);
 		changeState(game, "rebuild", rebuildDuration, () => rebuildOne(game));
 	} else {
-		idleState(game, "buildUp");
+		idleStateOld(game, "buildUp");
 		nextRound(game);
 	}
 };
@@ -872,7 +880,7 @@ const rebuildPlayerMana = (player: Player) => {
 };
 
 const rebuildMana = (game: GameT, callback: () => void) => {
-	idleState(game, "rebuild");
+	idleStateOld(game, "rebuild");
 	void showCurtain(game.curtain);
 	scheduleX(game.opponent.wizard, 0.5, waitingStartWizard);
 
@@ -894,7 +902,7 @@ const pickAttackOrDefensePair = (app: AppT) => {
 	if (playerMonsters == 0 && opponentMonsters == 0) {
 		// No monsters, we move to the next round
 		rebuildMana(game, () => {
-			idleState(game, "buildUp");
+			idleStateOld(game, "buildUp");
 			nextRound(game);
 		});
 		return;
@@ -939,7 +947,7 @@ const pickAttackPair = (app: AppT) => {
 					(item) => item != playerAttacker,
 				);
 			} else {
-				idleState(playerAttacker, "visible");
+				idleStateOld(playerAttacker, "visible");
 			}
 			count--;
 			if (count == 0) {
@@ -956,7 +964,7 @@ const pickAttackPair = (app: AppT) => {
 					(item) => item != opponentAttacker,
 				);
 			} else {
-				idleState(opponentAttacker, "visible");
+				idleStateOld(opponentAttacker, "visible");
 			}
 			count--;
 			if (count == 0) {
@@ -976,7 +984,7 @@ const doWin = (app: AppT, winner: Player, loser: Player) => {
 	disappearButton(game.manaButton);
 	disappearButton(game.attackButton);
 	disappearButton(game.defenseButton);
-	idleState(winner.protection, "tombola");
+	idleStateOld(winner.protection, "tombola");
 	runeTombola()(winner);
 	for (const item of winner.monsters) {
 		if (item.state == "visible") {
@@ -986,20 +994,12 @@ const doWin = (app: AppT, winner: Player, loser: Player) => {
 		}
 	}
 	for (const item of winner.mushrooms) {
-		if (item.state == "visible") {
-			changeState(item, "visible", fightDuration * 2, () => {
-				removeMushroom(winner, item);
-			});
-		}
+		void removeMushroom(winner, item, fightDuration * 2);
 	}
 	for (const item of loser.mushrooms) {
-		if (item.state == "visible") {
-			changeState(item, "visible", fightDuration * 2, () => {
-				removeMushroom(loser, item);
-			});
-		}
+		void removeMushroom(loser, item, fightDuration * 2);
 	}
-	idleState(game, "gameover");
+	idleStateOld(game, "gameover");
 	appearButton(app.restartButtons, 1);
 };
 
@@ -1020,13 +1020,20 @@ const removeMonster = (player: Player, monster: Monster) => {
 	});
 };
 
-const removeMushroom = (player: Player, mushroom: Mushroom) => {
-	changeState(mushroom, "disappearing", fightDuration, (mushroom) => {
-		player.mushrooms = player.mushrooms.filter(
-			(item) => item.id != mushroom.id,
-		);
-	});
-};
+const removeMushroom = flow(function* (
+	player: Player,
+	mushroom: Mushroom,
+	delay: number,
+) {
+	if (mushroom.state != "visible") {
+		return;
+	}
+	yield doTransition(mushroom, delay, "visible", "visible");
+	yield doTransition(mushroom, fightDuration, "disappearing", "hidden");
+	player.mushrooms = player.mushrooms.filter(
+		(item) => item.id != mushroom.id,
+	);
+});
 
 const pickDefensePair = (app: AppT) => {
 	const { game } = app;
@@ -1080,7 +1087,7 @@ const pickDefensePair = (app: AppT) => {
 				});
 			removeMonster(attacker, fighter);
 			changeState(shield, "fighting", fightDuration, () => {
-				idleState(shield, "visible");
+				idleStateOld(shield, "visible");
 			});
 			void ShieldDefends.play({ volume: 0.4 });
 		});
@@ -1163,12 +1170,12 @@ const lockManaPoint = (player: Player) => {
 	if (!manaPoint) {
 		return;
 	}
-	idleState(manaPoint, "anticipating");
+	idleStateOld(manaPoint, "anticipating");
 	return manaPoint;
 };
 
 const unlockManaPoint = (manaPoint: Mana) => {
-	idleState(manaPoint, "visible");
+	idleStateOld(manaPoint, "visible");
 };
 
 export const buyMushroom = async (
