@@ -143,13 +143,13 @@ export type Monster = EntityOld<MonsterState> & {
 	hp: number;
 };
 
-export type Protection = EntityOld<"idle" | "tombola"> & {
+export type Protection = Entity<"idle" | "tombola"> & {
 	shield: Shield;
 	runes: Rune[];
 };
 
 const resetProtection = (protection: Protection) => {
-	idleStateOld(protection, "idle");
+	idleState(protection, "idle");
 	protection.runes = [];
 	fadeOutShield(protection.shield);
 };
@@ -331,7 +331,7 @@ const newPlayer = (): Player => ({
 	wizard: newWizard(),
 	manaPoints: [],
 	protection: {
-		...newEntityOld<"idle" | "tombola">("idle"),
+		...newEntity<"idle" | "tombola">("idle"),
 		shield: newEntityOld<ShieldState>("hidden"),
 		runes: [],
 	},
@@ -984,7 +984,7 @@ const doWin = (app: AppT, winner: Player, loser: Player) => {
 	disappearButton(game.manaButton);
 	disappearButton(game.attackButton);
 	disappearButton(game.defenseButton);
-	idleStateOld(winner.protection, "tombola");
+	idleState(winner.protection, "tombola");
 	runeTombola()(winner);
 	for (const item of winner.monsters) {
 		if (item.state == "visible") {
