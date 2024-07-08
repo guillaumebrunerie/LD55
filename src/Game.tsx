@@ -44,7 +44,7 @@ import { getFrame, getNtFrame } from "./Animation";
 import type { WizardT } from "./wizard";
 import { useGlobalTime } from "./useGlobalTime";
 import { wave } from "./ease";
-import { opponentFilter } from "./filters";
+import { opponentFilter, opponentFilterAdd } from "./filters";
 
 // const DisconnectOnClose = ({ game }: { game: GameT }) => {
 // 	// Disconnect on close
@@ -132,8 +132,16 @@ export const Wizard = ({
 			return looping(WizardWaitingLoop, 20);
 		case ">waitingEnd":
 			return transition(WizardWaitingEnd);
-		case ">appear":
-			return transition(WizardAppear);
+		case ">appear": {
+			const addMode = wizard.nt <= 14 / 23;
+			return transition(WizardAppear, {
+				blendMode: addMode ? BLEND_MODES.ADD : BLEND_MODES.NORMAL,
+				filters:
+					player == game.opponent ?
+						[addMode ? opponentFilterAdd : opponentFilter]
+					:	[],
+			});
+		}
 		case ">die":
 			return transition(WizardDie, { x: -80, y: 170 });
 		case "hidden":

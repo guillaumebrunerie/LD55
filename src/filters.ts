@@ -1,4 +1,4 @@
-import { ColorMatrixFilter } from "pixi.js";
+import { BLEND_MODES, ColorMatrixFilter } from "pixi.js";
 
 export const darkFilter = new ColorMatrixFilter();
 darkFilter.matrix = [
@@ -51,3 +51,7 @@ darkFilterMana.matrix = [
 
 export const opponentFilter = new ColorMatrixFilter();
 opponentFilter.hue(70, false);
+
+export const opponentFilterAdd = new ColorMatrixFilter();
+opponentFilterAdd.hue(70, false);
+opponentFilterAdd.blendMode = BLEND_MODES.ADD;

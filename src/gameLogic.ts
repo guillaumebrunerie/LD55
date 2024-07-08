@@ -155,6 +155,7 @@ const resetProtection = (protection: Protection) => {
 };
 
 export type Player = EntityOld<"idle"> & {
+	boughtSomething: boolean; // TODO: remove
 	wizard: WizardT;
 	manaPoints: Mana[];
 	protection: Protection;
@@ -165,6 +166,7 @@ export type Player = EntityOld<"idle"> & {
 };
 
 const resetPlayer = (player: Player, doIdle: boolean) => {
+	player.boughtSomething = false;
 	clearTransitions(player);
 	if (doIdle) {
 		idleWizard(player.wizard);
@@ -779,7 +781,8 @@ const areAllItemsVisible = (player: Player) => {
 	return (
 		player.monsters.every((item) => item.state == "visible") &&
 		player.protection.runes.every((item) => item.state == "visible") &&
-		player.mushrooms.every((item) => item.state == "visible")
+		player.mushrooms.every((item) => item.state == "visible") &&
+		player.boughtSomething
 	);
 };
 
@@ -1137,6 +1140,7 @@ const nextRound = (game: GameT) => {
 	addManaPoints(game.opponent);
 	game.player.previousStartData = getPlayerData(game.player);
 	game.opponent.previousStartData = getPlayerData(game.opponent);
+	game.player.boughtSomething = false;
 };
 
 ////// Buying
@@ -1207,6 +1211,7 @@ export const buyMushroom = async (
 		} else {
 			addMushroom(player.mushrooms, manaBounds, strength);
 		}
+		player.boughtSomething = true;
 	});
 };
 
@@ -1253,6 +1258,7 @@ export const buyMonster = async (
 			return;
 		}
 		spawnMonster(player, strength, position, manaPoint);
+		player.boughtSomething = true;
 	});
 };
 
@@ -1281,5 +1287,6 @@ export const buyDefense = async (
 		}
 		const { strength } = result;
 		spawnRunes(player, manaPoint, strength);
+		player.boughtSomething = true;
 	});
 };

@@ -12,7 +12,7 @@ import { wave } from "./ease";
 import type { Id } from "../convex/_generated/dataModel";
 import { newButton, type ButtonT, tickButton } from "./button";
 import { appearWizard } from "./wizard";
-import { newLogo, tickLogo, type LogoT } from "./logo";
+import { newLogo, showLogoAppear, tickLogo, type LogoT } from "./logo";
 
 export type Credentials = {
 	playerId: Id<"players">;
@@ -79,7 +79,8 @@ const initApp = (app: AppT) => {
 export const startApp = (app: AppT) => {
 	initApp(app);
 	runInAction(() => {
-		void appearWizard(app.game.player.wizard);
+		void appearWizard(app.game.player.wizard, 1);
+		showLogoAppear(app.logo, 0.4);
 	});
 };
 

@@ -1,4 +1,4 @@
-/** Generated on Sun Jun 30 22:06:53 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Tue Jul  9 00:04:45 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -69,6 +69,7 @@ import WizzyWizzy_Mocup_Buttons_ from "../gfx/WizzyWizzy_Mocup_Buttons.jpg?textu
 /** Spritesheets */
 import Font_ from "../gfx/Font.png?spritesheet";
 import Font2_ from "../gfx/Font2.png?spritesheet";
+import LogoStart_ from "../gfx/LogoStart.png?spritesheet";
 import Mana1End_ from "../gfx/Mana1End.png?spritesheet";
 import Mana2End_ from "../gfx/Mana2End.png?spritesheet";
 import ManaPointStart_ from "../gfx/ManaPointStart.png?spritesheet";
@@ -189,6 +190,8 @@ export const [
 	{ animations: { Font } },
 	Font2Sheet,
 	{ animations: { Font2 } },
+	LogoStartSheet,
+	{ animations: { LogoStart } },
 	Mana1EndSheet,
 	{ animations: { Mana1End } },
 	Mana2EndSheet,
@@ -335,6 +338,8 @@ export const [
 	Font_,
 	Font2_,
 	Font2_,
+	LogoStart_,
+	LogoStart_,
 	Mana1End_,
 	Mana1End_,
 	Mana2End_,

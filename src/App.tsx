@@ -41,6 +41,7 @@ import {
 	InviteButtonDefault,
 	InviteButtonOn,
 	Logo,
+	LogoStart,
 	Moon,
 	PoofedAwayPost,
 	RestartBtnDefault,
@@ -80,7 +81,7 @@ import { Rectangle as Box } from "./Rectangle";
 import { darkFilter } from "./filters";
 import { useInterval } from "usehooks-ts";
 import { Circle } from "./Circle";
-import { getFrame } from "./Animation";
+import { getFrame, getNtFrame } from "./Animation";
 import { useButton } from "./useButton";
 import type { LogoT } from "./logo";
 
@@ -782,11 +783,12 @@ const LogoMoon = ({
 				alpha={alpha}
 			/>
 			<Sprite
-				texture={Logo}
+				texture={getNtFrame(LogoStart, logo.logoAppear.value)}
 				anchor={[0.5, 0.5]}
 				x={1920 / 2}
 				y={300 - logo.progress.value * 400}
 				alpha={1 - logo.progress.value}
+				scale={1.7}
 			/>
 		</>
 	);
