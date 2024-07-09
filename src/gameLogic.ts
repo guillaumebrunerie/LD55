@@ -1,4 +1,4 @@
-import { flow, runInAction } from "mobx";
+import { flow } from "mobx";
 import {
 	ClickAttack,
 	ClickDefense,
@@ -125,7 +125,7 @@ type RuneState =
 	| "visible"
 	| "disappearing"
 	| "hidden";
-export type Rune = EntityOld<RuneState>;
+export type Rune = Entity<RuneState>;
 
 export type Mushroom = Entity<"hidden" | "visible" | "disappearing"> & {
 	id: string;
@@ -260,7 +260,7 @@ const spawnRunes = (player: Player, manaPoint: Mana, runeCount: number) => {
 		if (!hasShield(shield)) {
 			makeWaitToAppearShield(shield);
 		} else {
-			const rune: Rune = newEntityOld("waitingToAppear");
+			const rune: Rune = newEntity("waitingToAppear");
 			runes.push(rune);
 		}
 	}
@@ -280,7 +280,7 @@ const spawnRunes = (player: Player, manaPoint: Mana, runeCount: number) => {
 		}
 		for (const rune of runes) {
 			if (rune.state == "waitingToAppear") {
-				idleStateOld(rune, "visible");
+				idleState(rune, "visible");
 			}
 		}
 	});
@@ -310,10 +310,7 @@ const addManaPoint = (
 
 const addRune = (array: Rune[], props?: Partial<Rune>) => {
 	array.push({
-		lt: 0,
-		nt: 0,
-		state: "visible",
-		transitions: [],
+		...newEntity("visible"),
 		...props,
 	});
 };
@@ -525,8 +522,8 @@ export const startGame = (app: AppT) => {
 			appearShield(game.player.protection.shield);
 			appearShield(game.opponent.protection.shield);
 		} else {
-			appearRune(game.player);
-			appearRune(game.opponent);
+			void appearRune(game.player);
+			void appearRune(game.opponent);
 		}
 	}
 };
@@ -570,13 +567,14 @@ const hasShield = (shield: Shield) => {
 	);
 };
 
-const appearRune = (player: Player) => {
-	const rune: Rune = newEntityOld("hidden");
-	changeStateOld(rune, "appearing", spawnDuration, (rune) => {
-		idleStateOld(rune, "visible");
-	});
-	player.protection.runes.push(rune);
-};
+const appearRune = flow(function* (player: Player) {
+	player.protection.runes.push(newEntity("hidden"));
+	const rune = player.protection.runes.at(-1);
+	if (!rune) {
+		throw new Error("IMPOSSIBLE");
+	}
+	yield doTransition(rune, spawnDuration, "appearing", "visible");
+});
 
 type LastFight = {
 	round: number;
@@ -836,7 +834,7 @@ const tickMonster = makeTickOld<MonsterState, Monster>((_item) => {
 
 const tickShield = makeTickOld<ShieldState, Shield>();
 
-const tickRune = makeTickOld<RuneState, Rune>();
+const tickRune = makeTick<Rune>();
 
 const tickMushroom = makeTick<Mushroom>();
 
@@ -1021,13 +1019,12 @@ const doWin = (app: AppT, winner: Player, loser: Player) => {
 	appearButton(app.restartButtons, 1);
 };
 
-const removeRune = (player: Player, rune: Rune) => {
-	changeStateOld(rune, "disappearing", fightDuration, (rune) => {
-		player.protection.runes = player.protection.runes.filter(
-			(item) => item != rune,
-		);
-	});
-};
+const removeRune = flow(function* (player: Player, rune: Rune) {
+	yield doTransition(rune, fightDuration, "disappearing", "hidden");
+	player.protection.runes = player.protection.runes.filter(
+		(item) => item != rune,
+	);
+});
 
 const removeMonster = (player: Player, monster: Monster) => {
 	monster.hp = 0;
@@ -1101,7 +1098,7 @@ const pickDefensePair = (app: AppT) => {
 				.toReversed()
 				.slice(0, Math.min(fighter.hp, runes))
 				.forEach((rune) => {
-					removeRune(defender, rune);
+					void removeRune(defender, rune);
 				});
 			removeMonster(attacker, fighter);
 			changeStateOld(shield, "fighting", fightDuration, () => {

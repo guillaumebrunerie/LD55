@@ -33,5 +33,5 @@ export const showLogo = (logo: LogoT) => {
 };
 
 export const showLogoAppear = (logo: LogoT, delay?: number) => {
-	setTarget(logo.logoAppear, 1, getDuration(LogoStart, 10), delay);
+	setTarget(logo.logoAppear, 1, getDuration(LogoStart, 20), delay);
 };

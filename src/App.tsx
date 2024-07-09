@@ -779,16 +779,18 @@ const LogoMoon = ({
 				x={1920 / 2}
 				y={300 - logo.progress.value * 400}
 				filters={filters}
-				alpha={alpha}
+				alpha={logo.logoAppear.value < 1 ? 0 : alpha}
 			/>
-			<Sprite
-				texture={getNtFrame(LogoStart, logo.logoAppear.value)}
-				anchor={[0.5, 0.5]}
-				x={1920 / 2}
-				y={300 - logo.progress.value * 400}
-				alpha={1 - logo.progress.value}
-				scale={1.7}
-			/>
+			{logo.logoAppear.value > 0 && (
+				<Sprite
+					texture={getNtFrame(LogoStart, logo.logoAppear.value)}
+					anchor={[0.5, 0.5]}
+					x={1920 / 2}
+					y={300 - logo.progress.value * 400}
+					alpha={1 - logo.progress.value}
+					scale={1.7}
+				/>
+			)}
 		</>
 	);
 };
