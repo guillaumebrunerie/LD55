@@ -636,19 +636,16 @@ export const setupFight = (app: AppT, lastFight: LastFight) => {
 	game.round = lastFight.round;
 
 	// Start the fight
-	idleStateOld(game, "attack");
-	// for (const monster of game.player.monsters) {
-	// 	idleState(monster, "waitingForFight");
-	// }
-	// for (const monster of game.opponent.monsters) {
-	// 	idleState(monster, "waitingForFight");
-	// }
-	void flow(function* () {
-		yield waitingEndWizard(game.opponent.wizard);
-		yield ensureHiddenCurtain(game.curtain);
-		pickAttackOrDefensePair(app);
-	})();
+	void startFight(app);
 };
+
+const startFight = flow(function* (app: AppT) {
+	const { game } = app;
+	idleStateOld(game, "attack");
+	yield waitingEndWizard(game.opponent.wizard);
+	yield ensureHiddenCurtain(game.curtain);
+	yield pickAttackOrDefensePair(app);
+});
 
 const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 	while (opponent.manaPoints.some((p) => p.state == "visible")) {
@@ -772,21 +769,7 @@ export const tickGame = makeTickOld<GameState, GameT, [AppT]>(
 			},
 			waiting: () => {
 				if (!game.gameId && game.opponent.manaPoints.length == 0) {
-					idleStateOld(game, "attack");
-					// for (const monster of game.player.monsters) {
-					// 	idleState(monster, "waitingForFight");
-					// }
-					// for (const monster of game.opponent.monsters) {
-					// 	idleState(monster, "waitingForFight");
-					// }
-					// await backToIdle(game.opponent.wizard);
-					// await hideCurtain(game.curtain);
-					// pickAttackOrDefensePair(app);
-					void flow(function* () {
-						yield waitingEndWizard(game.opponent.wizard);
-						yield ensureHiddenCurtain(game.curtain);
-						pickAttackOrDefensePair(app);
-					})();
+					void startFight(app);
 				}
 			},
 		};
@@ -1199,7 +1182,7 @@ const unlockManaPoint = (manaPoint: Mana) => {
 	idleStateOld(manaPoint, "visible");
 };
 
-export const buyMushroom = flow(async function* (
+export const buyMushroom = flow(function* (
 	app: AppT,
 	player: Player,
 	buyMushroomMutation: ReactMutation<typeof api.player.buyMushroom>,
@@ -1209,9 +1192,9 @@ export const buyMushroom = flow(async function* (
 		credentials,
 		game: { gameId },
 	} = app;
-	const result =
+	const result: { strength: 1 | 2 } | null =
 		gameId && credentials ?
-			await buyMushroomMutation(credentials)
+			yield buyMushroomMutation(credentials)
 		:	pickMushroomData(getPlayerData(player));
 	if (!result) {
 		return;
@@ -1247,7 +1230,7 @@ const getPlayerData = (player: Player): PlayerData => {
 	};
 };
 
-export const buyMonster = flow(async function* (
+export const buyMonster = flow(function* (
 	app: AppT,
 	player: Player,
 	buyMonsterMutation: (
@@ -1259,9 +1242,9 @@ export const buyMonster = flow(async function* (
 		credentials,
 		game: { gameId },
 	} = app;
-	const result =
+	const result: { strength: 1 | 2 | 3; position: Point } | null =
 		gameId && credentials ?
-			await buyMonsterMutation(credentials)
+			yield buyMonsterMutation(credentials)
 		:	pickMonsterData(getPlayerData(player));
 	if (!result) {
 		return;
@@ -1275,7 +1258,7 @@ export const buyMonster = flow(async function* (
 	player.boughtSomething = true;
 });
 
-export const buyDefense = flow(async function* (
+export const buyDefense = flow(function* (
 	app: AppT,
 	player: Player,
 	buyDefenseMutation: ReactMutation<typeof api.player.buyDefense>,
@@ -1289,9 +1272,9 @@ export const buyDefense = flow(async function* (
 		credentials,
 		game: { gameId },
 	} = app;
-	const result =
+	const result: { strength: number } | null =
 		gameId && credentials ?
-			await buyDefenseMutation(credentials)
+			yield buyDefenseMutation(credentials)
 		:	pickDefenseData(getPlayerData(player));
 	if (!result) {
 		unlockManaPoint(manaPoint);
