@@ -1,4 +1,4 @@
-import { makeTick3, newEntity, type Entity2 } from "./entities2";
+import { makeTick, newEntity, type Entity } from "./entities2";
 import {
 	newExponentialToggle,
 	setTarget,
@@ -9,7 +9,7 @@ import {
 const fadeSpeed = 10;
 const alphaSpeed = 10;
 
-export type ButtonT = Entity2<"idle"> & {
+export type ButtonT = Entity<"idle"> & {
 	alpha: ExponentialToggle;
 	fade: ExponentialToggle;
 };
@@ -20,7 +20,7 @@ export const newButton = (visible: boolean): ButtonT => ({
 	fade: newExponentialToggle(1),
 });
 
-export const tickButton = makeTick3<ButtonT>((entity, delta) => {
+export const tickButton = makeTick<ButtonT>((entity, delta) => {
 	tickExponentialToggle(entity.alpha, delta);
 	tickExponentialToggle(entity.fade, delta);
 });

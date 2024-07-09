@@ -1,4 +1,4 @@
-export type Entity2<State extends string = string> = {
+export type Entity<State extends string = string> = {
 	state: State;
 	gt: number; // Never reset
 	lt: number; // Reset at each state change
@@ -18,7 +18,7 @@ export type DelayedCallback = {
 
 export const newEntity = <State extends string>(
 	initialState: State,
-): Entity2<State> => ({
+): Entity<State> => ({
 	state: initialState,
 	gt: 0,
 	lt: 0,
@@ -30,7 +30,7 @@ export const newEntity = <State extends string>(
 });
 
 export const idleState = <State extends string>(
-	entity: Entity2<State>,
+	entity: Entity<State>,
 	state: NoInfer<State>,
 ) => {
 	entity.state = state;
@@ -42,12 +42,12 @@ export const idleState = <State extends string>(
 	entity.delayedCallbacks = [];
 };
 
-export const clear = <State extends string>(entity: Entity2<State>) => {
+export const clear = <State extends string>(entity: Entity<State>) => {
 	entity.delayedCallbacks = [];
 };
 
-export const makeTick3 =
-	<T extends Entity2>(
+export const makeTick =
+	<T extends Entity>(
 		callback: (entity: T, delta: number) => void = () => {},
 	) =>
 	(entity: T, delta: number) => {
@@ -78,7 +78,7 @@ export const makeTick3 =
 		}
 	};
 
-export const doTransition = <E extends Entity2>(
+export const doTransition = <E extends Entity>(
 	entity: E,
 	duration: number,
 	transitionState: E["state"],
@@ -114,7 +114,7 @@ Building blocks:
 
  */
 
-export const scheduleX = <E extends Entity2>(
+export const scheduleX = <E extends Entity>(
 	entity: E,
 	lt: number,
 	callback: (entity: E) => void,
@@ -125,7 +125,7 @@ export const scheduleX = <E extends Entity2>(
 	});
 };
 
-export const scheduleP = <E extends Entity2>(
+export const scheduleP = <E extends Entity>(
 	entity: E,
 	lt: number,
 ): Promise<void> =>
@@ -138,7 +138,7 @@ export const scheduleP = <E extends Entity2>(
 		});
 	});
 
-export const schedule0 = <E extends Entity2>(entity: E): Promise<void> =>
+export const schedule0 = <E extends Entity>(entity: E): Promise<void> =>
 	new Promise((resolve) => {
 		entity.callbacks.push(resolve);
 	});
@@ -147,12 +147,12 @@ export const schedule0 = <E extends Entity2>(entity: E): Promise<void> =>
 // 	return entities.every((entity) => entity.transitions.length == 0);
 // };
 
-export const waitUntilIdle = async (entity: Entity2) => {
+export const waitUntilIdle = async (entity: Entity) => {
 	await schedule0(entity);
 };
 
 export const waitUntilFullLoop = async (
-	entity: Entity2,
+	entity: Entity,
 	loopDuration: number,
 ) => {
 	const t = Math.ceil(entity.lt / loopDuration) * loopDuration;
@@ -183,6 +183,6 @@ export const waitUntilFullLoop = async (
 // 	entity.transitions = [];
 // };
 
-export const areIdle2 = (...entities: Entity2[]) => {
+export const areIdle2 = (...entities: Entity[]) => {
 	return entities.every((entity) => entity.duration === null);
 };

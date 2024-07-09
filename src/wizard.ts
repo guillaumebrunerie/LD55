@@ -13,10 +13,10 @@ import {
 import {
 	doTransition,
 	idleState,
-	makeTick3,
+	makeTick,
 	newEntity,
 	waitUntilFullLoop,
-	type Entity2,
+	type Entity,
 } from "./entities2";
 import type { Player } from "./gameLogic";
 
@@ -34,11 +34,11 @@ type WizardState =
 	| ">die"
 	| ">disappear";
 
-export type WizardT = Entity2<WizardState>;
+export type WizardT = Entity<WizardState>;
 
 export const newWizard = (): WizardT => newEntity<WizardState>("hidden");
 
-export const tickWizard = makeTick3<WizardT>();
+export const tickWizard = makeTick<WizardT>();
 
 export const appearWizard = flow(function* (wizard: WizardT, delay = 0) {
 	yield doTransition(wizard, delay, "hidden", "hidden");

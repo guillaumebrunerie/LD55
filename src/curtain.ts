@@ -2,16 +2,16 @@ import { flow } from "mobx";
 import {
 	clear,
 	doTransition,
-	makeTick3,
+	makeTick,
 	newEntity,
-	type Entity2,
+	type Entity,
 } from "./entities2";
 
-export type Curtain = Entity2<"hidden" | "appearing" | "idle" | "disappearing">;
+export type Curtain = Entity<"hidden" | "appearing" | "idle" | "disappearing">;
 
 export const newCurtain = (): Curtain => newEntity("hidden");
 
-export const tickCurtain = makeTick3<Curtain>();
+export const tickCurtain = makeTick<Curtain>();
 
 export const showCurtain = flow(function* (curtain: Curtain) {
 	yield doTransition(curtain, 0.5, "appearing", "idle");

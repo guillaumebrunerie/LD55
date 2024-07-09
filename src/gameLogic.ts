@@ -47,18 +47,18 @@ import {
 	newEntity as newEntityOld,
 	makeTick as makeTickOld,
 	type Entity as EntityOld,
-	changeState,
-	schedule,
+	changeState as changeStateOld,
+	schedule as scheduleOld,
 	makeTick2 as makeTick2Old,
-	clearTransitions,
+	clearTransitions as clearTransitionsOld,
 } from "./entities";
 import {
 	areIdle2,
 	scheduleX,
-	type Entity2 as Entity,
+	type Entity,
 	newEntity,
 	idleState,
-	makeTick3 as makeTick,
+	makeTick,
 	doTransition,
 } from "./entities2";
 import { smartStrategy, type Strategy } from "./strategies";
@@ -127,8 +127,7 @@ type RuneState =
 	| "hidden";
 export type Rune = EntityOld<RuneState>;
 
-type MushroomState = "hidden" | "visible" | "disappearing";
-export type Mushroom = Entity<MushroomState> & {
+export type Mushroom = Entity<"hidden" | "visible" | "disappearing"> & {
 	id: string;
 	position: Point;
 	strength: 1 | 2;
@@ -167,7 +166,7 @@ export type Player = EntityOld<"idle"> & {
 
 const resetPlayer = (player: Player, doIdle: boolean) => {
 	player.boughtSomething = false;
-	clearTransitions(player);
+	clearTransitionsOld(player);
 	if (doIdle) {
 		idleWizard(player.wizard);
 	} else {
@@ -213,9 +212,9 @@ const spawnMonster = (
 
 	manaPoint.prevPosition = manaPoint.position;
 	manaPoint.position = position;
-	changeState(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
+	changeStateOld(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
 		void ClickAttack.play();
-		changeState(manaPoint, "spawningOut", spawnDuration, (manaPoint) => {
+		changeStateOld(manaPoint, "spawningOut", spawnDuration, (manaPoint) => {
 			player.manaPoints = player.manaPoints.filter(
 				(item) => item != manaPoint,
 			);
@@ -241,9 +240,9 @@ const spawnMushroom = (player: Player, strength: 1 | 2, manaPoint: Mana) => {
 
 	manaPoint.prevPosition = manaPoint.position;
 	manaPoint.position = position;
-	changeState(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
+	changeStateOld(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
 		void ClickMana.play();
-		changeState(manaPoint, "spawningOut", spawnDuration, (manaPoint) => {
+		changeStateOld(manaPoint, "spawningOut", spawnDuration, (manaPoint) => {
 			player.manaPoints = player.manaPoints.filter(
 				(item) => item != manaPoint,
 			);
@@ -268,9 +267,9 @@ const spawnRunes = (player: Player, manaPoint: Mana, runeCount: number) => {
 
 	manaPoint.prevPosition = manaPoint.position;
 	manaPoint.position = position;
-	changeState(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
+	changeStateOld(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
 		void ClickDefense.play({ volume: 0.7 });
-		changeState(manaPoint, "spawningOut", spawnDuration, (manaPoint) => {
+		changeStateOld(manaPoint, "spawningOut", spawnDuration, (manaPoint) => {
 			player.manaPoints = player.manaPoints.filter(
 				(item) => item != manaPoint,
 			);
@@ -387,16 +386,26 @@ const spawnManaPoint = (
 				(m) => m.id !== mushroom.id,
 			);
 		})();
-		changeState(manaPoint, "traveling", manaSpawnDuration, (manaPoint) => {
-			if (!silent) {
-				void ManaCreated.play({ volume: 0.5 });
-			}
-			idleStateOld(manaPoint, "visible");
-		});
+		changeStateOld(
+			manaPoint,
+			"traveling",
+			manaSpawnDuration,
+			(manaPoint) => {
+				if (!silent) {
+					void ManaCreated.play({ volume: 0.5 });
+				}
+				idleStateOld(manaPoint, "visible");
+			},
+		);
 	} else {
-		changeState(manaPoint, "spawning", manaSpawnDuration, (manaPoint) => {
-			idleStateOld(manaPoint, "visible");
-		});
+		changeStateOld(
+			manaPoint,
+			"spawning",
+			manaSpawnDuration,
+			(manaPoint) => {
+				idleStateOld(manaPoint, "visible");
+			},
+		);
 	}
 };
 
@@ -507,8 +516,8 @@ export const startGame = (app: AppT) => {
 	let t = 1;
 	for (let i = 0; i < initialMana; i++) {
 		t += 0.2;
-		schedule(game.player, t, spawnManaPoint);
-		schedule(game.opponent, t, spawnManaPointSilent);
+		scheduleOld(game.player, t, spawnManaPoint);
+		scheduleOld(game.opponent, t, spawnManaPointSilent);
 	}
 
 	for (let i = 0; i < initialDefense; i++) {
@@ -523,9 +532,14 @@ export const startGame = (app: AppT) => {
 };
 
 const appearShield = (shield: Shield) => {
-	changeState(shield, "appearing", getDuration(ShieldStart, 20), (shield) => {
-		idleStateOld(shield, "visible");
-	});
+	changeStateOld(
+		shield,
+		"appearing",
+		getDuration(ShieldStart, 20),
+		(shield) => {
+			idleStateOld(shield, "visible");
+		},
+	);
 };
 
 const makeWaitToAppearShield = (shield: Shield) => {
@@ -533,7 +547,7 @@ const makeWaitToAppearShield = (shield: Shield) => {
 };
 
 const disappearShield = (shield: Shield) => {
-	changeState(
+	changeStateOld(
 		shield,
 		"disappearing",
 		getDuration(ShieldEnd, 20),
@@ -545,7 +559,7 @@ const disappearShield = (shield: Shield) => {
 
 const fadeOutDuration = 0.2;
 const fadeOutShield = (shield: Shield) => {
-	changeState(shield, "fadeOut", fadeOutDuration, (shield) => {
+	changeStateOld(shield, "fadeOut", fadeOutDuration, (shield) => {
 		idleStateOld(shield, "hidden");
 	});
 };
@@ -558,7 +572,7 @@ const hasShield = (shield: Shield) => {
 
 const appearRune = (player: Player) => {
 	const rune: Rune = newEntityOld("hidden");
-	changeState(rune, "appearing", spawnDuration, (rune) => {
+	changeStateOld(rune, "appearing", spawnDuration, (rune) => {
 		idleStateOld(rune, "visible");
 	});
 	player.protection.runes.push(rune);
@@ -847,7 +861,9 @@ const rebuildManaPoint = (player: Player) => {
 const rebuildOne = (game: GameT) => {
 	if (hasManaToSpawn(game.player)) {
 		rebuildManaPoint(game.player);
-		changeState(game, "rebuild", rebuildDuration, () => rebuildOne(game));
+		changeStateOld(game, "rebuild", rebuildDuration, () =>
+			rebuildOne(game),
+		);
 	} else {
 		idleStateOld(game, "buildUp");
 		nextRound(game);
@@ -857,7 +873,7 @@ const rebuildOne = (game: GameT) => {
 const rebuildPlayerMana = (player: Player) => {
 	let time = 0;
 	for (let i = 0; i < initialMana; i++) {
-		schedule(player, i * rebuildDuration, (player) => {
+		scheduleOld(player, i * rebuildDuration, (player) => {
 			spawnManaPoint(player, undefined, undefined);
 		});
 		time = Math.max(time, i * rebuildDuration + manaSpawnDuration);
@@ -865,7 +881,7 @@ const rebuildPlayerMana = (player: Player) => {
 	player.mushrooms.forEach((mushroom, i) => {
 		// void ManaCreated.play({ volume: 0.5 });
 		for (let j = 0; j < mushroom.strength; j++) {
-			schedule(
+			scheduleOld(
 				player,
 				i * rebuildDuration + 4 * rebuildDuration,
 				(player) => {
@@ -889,7 +905,7 @@ const rebuildMana = (game: GameT, callback: () => void) => {
 	let time = 0;
 	time = Math.max(time, rebuildPlayerMana(game.player));
 	// time = Math.max(time, rebuildPlayerMana(game.opponent));
-	schedule(game, time + 0.05, callback);
+	scheduleOld(game, time + 0.05, callback);
 	// rebuildOne(game);
 };
 
@@ -940,10 +956,10 @@ const pickAttackPair = (app: AppT) => {
 	void MonsterAttacks.play({ volume: 0.5 });
 
 	let count = 2;
-	changeState(playerAttacker, "approach", attackApproachDuration, () => {
+	changeStateOld(playerAttacker, "approach", attackApproachDuration, () => {
 		void MonstersClash.play({ volume: 1 });
 		playerAttacker.position = { ...destination };
-		changeState(playerAttacker, "fighting", fightDuration, () => {
+		changeStateOld(playerAttacker, "fighting", fightDuration, () => {
 			if (playerAttacker.hp == 0) {
 				game.player.monsters = game.player.monsters.filter(
 					(item) => item != playerAttacker,
@@ -958,9 +974,9 @@ const pickAttackPair = (app: AppT) => {
 		});
 	});
 
-	changeState(opponentAttacker, "approach", attackApproachDuration, () => {
+	changeStateOld(opponentAttacker, "approach", attackApproachDuration, () => {
 		opponentAttacker.position = { ...destination2 };
-		changeState(opponentAttacker, "fighting", fightDuration, () => {
+		changeStateOld(opponentAttacker, "fighting", fightDuration, () => {
 			if (opponentAttacker.hp == 0) {
 				game.opponent.monsters = game.opponent.monsters.filter(
 					(item) => item != opponentAttacker,
@@ -990,7 +1006,7 @@ const doWin = (app: AppT, winner: Player, loser: Player) => {
 	runeTombola()(winner);
 	for (const item of winner.monsters) {
 		if (item.state == "visible") {
-			changeState(item, "visible", fightDuration * 2, () => {
+			changeStateOld(item, "visible", fightDuration * 2, () => {
 				removeMonster(winner, item);
 			});
 		}
@@ -1006,7 +1022,7 @@ const doWin = (app: AppT, winner: Player, loser: Player) => {
 };
 
 const removeRune = (player: Player, rune: Rune) => {
-	changeState(rune, "disappearing", fightDuration, (rune) => {
+	changeStateOld(rune, "disappearing", fightDuration, (rune) => {
 		player.protection.runes = player.protection.runes.filter(
 			(item) => item != rune,
 		);
@@ -1015,7 +1031,7 @@ const removeRune = (player: Player, rune: Rune) => {
 
 const removeMonster = (player: Player, monster: Monster) => {
 	monster.hp = 0;
-	changeState(monster, "fighting", fightDuration, (monster) => {
+	changeStateOld(monster, "fighting", fightDuration, (monster) => {
 		player.monsters = player.monsters.filter(
 			(item) => item.id != monster.id,
 		);
@@ -1057,7 +1073,7 @@ const pickDefensePair = (app: AppT) => {
 		const destination = pickPosition([], chestBounds, 0);
 		destination.x = 1920 - destination.x;
 		fighter.destination = destination;
-		changeState(fighter, "approach", attackApproachDuration, () => {
+		changeStateOld(fighter, "approach", attackApproachDuration, () => {
 			fighter.position = { ...destination };
 			removeMonster(attacker, fighter);
 			doWin(app, attacker, defender);
@@ -1068,7 +1084,7 @@ const pickDefensePair = (app: AppT) => {
 		const destination = pickPosition([], shieldImpactBounds, 0);
 		destination.x = 1920 - destination.x;
 		fighter.destination = destination;
-		changeState(fighter, "approach", attackApproachDuration, () => {
+		changeStateOld(fighter, "approach", attackApproachDuration, () => {
 			fighter.position = { ...destination };
 			removeMonster(attacker, fighter);
 			disappearShield(shield);
@@ -1079,7 +1095,7 @@ const pickDefensePair = (app: AppT) => {
 		const destination = pickPosition([], shieldImpactBounds, 0);
 		destination.x = 1920 - destination.x;
 		fighter.destination = destination;
-		changeState(fighter, "approach", attackApproachDuration, () => {
+		changeStateOld(fighter, "approach", attackApproachDuration, () => {
 			fighter.position = { ...destination };
 			defender.protection.runes
 				.toReversed()
@@ -1088,16 +1104,21 @@ const pickDefensePair = (app: AppT) => {
 					removeRune(defender, rune);
 				});
 			removeMonster(attacker, fighter);
-			changeState(shield, "fighting", fightDuration, () => {
+			changeStateOld(shield, "fighting", fightDuration, () => {
 				idleStateOld(shield, "visible");
 			});
 			void ShieldDefends.play({ volume: 0.4 });
 		});
 	}
 
-	changeState(game, "defense", attackApproachDuration + fightDuration, () => {
-		pickAttackOrDefensePair(app);
-	});
+	changeStateOld(
+		game,
+		"defense",
+		attackApproachDuration + fightDuration,
+		() => {
+			pickAttackOrDefensePair(app);
+		},
+	);
 };
 
 const pickTombola = (previous: number[]) => {
@@ -1126,7 +1147,7 @@ export const runeTombola =
 				state: tombola[i] ? "visible" : "hidden",
 			});
 		}
-		schedule(player, 0.12, runeTombola(next));
+		scheduleOld(player, 0.12, runeTombola(next));
 	};
 
 const hasManaToSpawn = (player: Player) => {

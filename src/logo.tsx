@@ -1,6 +1,6 @@
 import { getDuration } from "./Animation";
 import { LogoStart } from "./assets";
-import { makeTick3, newEntity, type Entity2 } from "./entities2";
+import { makeTick, newEntity, type Entity } from "./entities2";
 import {
 	newLinearToggle,
 	setTarget,
@@ -8,7 +8,7 @@ import {
 	type LinearToggle,
 } from "./linearToggle";
 
-export type LogoT = Entity2<"idle"> & {
+export type LogoT = Entity<"idle"> & {
 	progress: LinearToggle;
 	logoAppear: LinearToggle;
 };
@@ -19,7 +19,7 @@ export const newLogo = (): LogoT => ({
 	logoAppear: newLinearToggle(0),
 });
 
-export const tickLogo = makeTick3<LogoT>((logo, delta) => {
+export const tickLogo = makeTick<LogoT>((logo, delta) => {
 	tickLinearToggle(logo.progress, delta);
 	tickLinearToggle(logo.logoAppear, delta);
 });
