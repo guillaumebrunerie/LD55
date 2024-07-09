@@ -103,11 +103,10 @@ type ManaState =
 export type Mana = EntityOld<ManaState> & {
 	id: string;
 	position: Point;
-	tmpPosition?: Point;
+	prevPosition?: Point;
 	scale: number;
 	offset: number;
 	rotationSpeed: number;
-	previousItem?: Mushroom;
 };
 
 type ShieldState =
@@ -212,7 +211,7 @@ const spawnMonster = (
 		throw new Error("IMPOSSIBLE");
 	}
 
-	manaPoint.tmpPosition = manaPoint.position;
+	manaPoint.prevPosition = manaPoint.position;
 	manaPoint.position = position;
 	changeState(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
 		void ClickAttack.play();
@@ -240,7 +239,7 @@ const spawnMushroom = (player: Player, strength: 1 | 2, manaPoint: Mana) => {
 		throw new Error("IMPOSSIBLE");
 	}
 
-	manaPoint.tmpPosition = manaPoint.position;
+	manaPoint.prevPosition = manaPoint.position;
 	manaPoint.position = position;
 	changeState(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
 		void ClickMana.play();
@@ -267,7 +266,7 @@ const spawnRunes = (player: Player, manaPoint: Mana, runeCount: number) => {
 		}
 	}
 
-	manaPoint.tmpPosition = manaPoint.position;
+	manaPoint.prevPosition = manaPoint.position;
 	manaPoint.position = position;
 	changeState(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
 		void ClickDefense.play({ volume: 0.7 });
@@ -376,7 +375,7 @@ const spawnManaPoint = (
 	}
 
 	if (mushroom) {
-		manaPoint.tmpPosition = mushroom.position;
+		manaPoint.prevPosition = mushroom.position;
 		void flow(function* () {
 			yield doTransition(
 				mushroom,
@@ -829,28 +828,7 @@ const tickMushroom = makeTick<Mushroom>();
 
 const manaSpawnDuration = 0.5;
 
-const tickManaPoint = makeTickOld<ManaState, Mana>((item) => {
-	return {
-		visible: () => {
-			item.tmpPosition = undefined;
-		},
-		spawning: () => {
-			const nt = Math.max((item.lt - 0.2) / (manaSpawnDuration - 0.2), 0);
-			if (!item.previousItem) {
-				item.tmpPosition = item.position;
-			} else {
-				item.tmpPosition = {
-					x:
-						item.previousItem.position.x +
-						(item.position.x - item.previousItem.position.x) * nt,
-					y:
-						item.previousItem.position.y +
-						(item.position.y - item.previousItem.position.y) * nt,
-				};
-			}
-		},
-	};
-});
+const tickManaPoint = makeTickOld<ManaState, Mana>();
 
 const rebuildManaPoint = (player: Player) => {
 	if (player.manaPoints.length < initialMana) {

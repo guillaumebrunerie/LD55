@@ -216,12 +216,12 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 				/>
 			);
 		case "traveling": {
-			if (!item.tmpPosition) {
-				console.error("No tmpPosition in traveling");
+			if (!item.prevPosition) {
+				console.error("No prevPosition in traveling");
 				return null;
 			}
-			const dx = item.tmpPosition.x - item.position.x;
-			const dy = item.tmpPosition.y - item.position.y;
+			const dx = item.prevPosition.x - item.position.x;
+			const dy = item.prevPosition.y - item.position.y;
 			const angle = Math.atan2(dy, dx);
 			const scaleX = item.scale;
 			const scaleY = Math.min(1, 5 * (0.5 - Math.abs(0.5 - item.nt)));
@@ -234,11 +234,11 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 					alpha={Math.min(item.nt * 3, 1)}
 					texture={ManaPointBlurred}
 					x={
-						item.tmpPosition.x * (1 - item.nt) +
+						item.prevPosition.x * (1 - item.nt) +
 						item.position.x * item.nt
 					}
 					y={
-						item.tmpPosition.y * (1 - item.nt) +
+						item.prevPosition.y * (1 - item.nt) +
 						item.position.y * item.nt
 					}
 				/>
@@ -256,47 +256,18 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 				/>
 			);
 		case "spawning": {
-			if (item.previousItem) {
-				return (
-					<>
-						<Sprite
-							anchor={0.5}
-							scale={1}
-							rotation={0}
-							blendMode={BLEND_MODES.NORMAL}
-							texture={getNtFrame(
-								manaEndAnimations[item.previousItem.strength],
-								item.nt,
-							)}
-							position={item.previousItem.position}
-						/>
-						<Sprite
-							anchor={0.5}
-							scale={item.scale}
-							rotation={lt * 3 + item.offset}
-							blendMode={BLEND_MODES.NORMAL}
-							alpha={
-								item.nt < 0.2 ? 0 : Math.min(item.lt / 0.2, 1)
-							}
-							texture={ManaPoint}
-							position={item.tmpPosition || item.position}
-						/>
-					</>
-				);
-			} else {
-				return (
-					<>
-						<Sprite
-							anchor={0.5}
-							scale={item.scale}
-							rotation={lt * 3 + item.offset}
-							blendMode={BLEND_MODES.NORMAL}
-							texture={getNtFrame(ManaPointStart, item.nt)}
-							position={item.position}
-						/>
-					</>
-				);
-			}
+			return (
+				<>
+					<Sprite
+						anchor={0.5}
+						scale={item.scale}
+						rotation={lt * 3 + item.offset}
+						blendMode={BLEND_MODES.NORMAL}
+						texture={getNtFrame(ManaPointStart, item.nt)}
+						position={item.position}
+					/>
+				</>
+			);
 		}
 	}
 };
