@@ -1202,11 +1202,11 @@ const unlockManaPoint = (manaPoint: Mana) => {
 	idleStateOld(manaPoint, "visible");
 };
 
-export const buyMushroom = async (
+export const buyMushroom = flow(async function* (
 	app: AppT,
 	player: Player,
 	buyMushroomMutation: ReactMutation<typeof api.player.buyMushroom>,
-) => {
+) {
 	const manaPoint = lockManaPoint(player);
 	const {
 		credentials,
@@ -1220,20 +1220,18 @@ export const buyMushroom = async (
 		return;
 	}
 	const strength = result.strength;
-	runInAction(() => {
-		if (!manaPoint) {
-			console.error("No mana point in buyMonster");
-			return;
-		}
+	if (!manaPoint) {
+		console.error("No mana point in buyMonster");
+		return;
+	}
 
-		if (player == app.game.player) {
-			spawnMushroom(player, strength, manaPoint);
-		} else {
-			addMushroom(player.mushrooms, manaBounds, strength);
-		}
-		player.boughtSomething = true;
-	});
-};
+	if (player == app.game.player) {
+		spawnMushroom(player, strength, manaPoint);
+	} else {
+		addMushroom(player.mushrooms, manaBounds, strength);
+	}
+	player.boughtSomething = true;
+});
 
 const getPlayerData = (player: Player): PlayerData => {
 	return {
@@ -1252,13 +1250,13 @@ const getPlayerData = (player: Player): PlayerData => {
 	};
 };
 
-export const buyMonster = async (
+export const buyMonster = flow(async function* (
 	app: AppT,
 	player: Player,
 	buyMonsterMutation: (
 		credentials: Credentials,
 	) => Promise<{ strength: 1 | 2 | 3; position: Point } | null>,
-) => {
+) {
 	const manaPoint = lockManaPoint(player);
 	const {
 		credentials,
@@ -1271,22 +1269,20 @@ export const buyMonster = async (
 	if (!result) {
 		return;
 	}
-	runInAction(() => {
-		const { strength, position } = result;
-		if (!manaPoint) {
-			console.error("No mana point in buyMonster");
-			return;
-		}
-		spawnMonster(player, strength, position, manaPoint);
-		player.boughtSomething = true;
-	});
-};
+	const { strength, position } = result;
+	if (!manaPoint) {
+		console.error("No mana point in buyMonster");
+		return;
+	}
+	spawnMonster(player, strength, position, manaPoint);
+	player.boughtSomething = true;
+});
 
-export const buyDefense = async (
+export const buyDefense = flow(async function* (
 	app: AppT,
 	player: Player,
 	buyDefenseMutation: ReactMutation<typeof api.player.buyDefense>,
-) => {
+) {
 	const manaPoint = lockManaPoint(player);
 	if (!manaPoint) {
 		console.error("No mana point");
@@ -1300,13 +1296,11 @@ export const buyDefense = async (
 		gameId && credentials ?
 			await buyDefenseMutation(credentials)
 		:	pickDefenseData(getPlayerData(player));
-	runInAction(() => {
-		if (!result) {
-			unlockManaPoint(manaPoint);
-			return;
-		}
-		const { strength } = result;
-		spawnRunes(player, manaPoint, strength);
-		player.boughtSomething = true;
-	});
-};
+	if (!result) {
+		unlockManaPoint(manaPoint);
+		return;
+	}
+	const { strength } = result;
+	spawnRunes(player, manaPoint, strength);
+	player.boughtSomething = true;
+});

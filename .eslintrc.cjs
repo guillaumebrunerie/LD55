@@ -44,6 +44,7 @@ module.exports = {
 		"no-unused-vars": ["off"],
 		"prefer-const": ["warn", { destructuring: "all" }],
 		"no-warning-comments": ["warn"],
+		"require-yield": "off",
 
 		"react/display-name": "off",
 		"react/prop-types": "off",
