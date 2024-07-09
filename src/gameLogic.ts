@@ -51,7 +51,7 @@ import {
 	schedule as scheduleOld,
 	makeTick2 as makeTick2Old,
 	clearTransitions as clearTransitionsOld,
-} from "./entities";
+} from "./entitiesOld";
 import {
 	areIdle2,
 	scheduleX,
@@ -60,7 +60,7 @@ import {
 	idleState,
 	makeTick,
 	doTransition,
-} from "./entities2";
+} from "./entities";
 import { smartStrategy, type Strategy } from "./strategies";
 import {
 	appearWizard,

@@ -1,6 +1,6 @@
 import { getDuration } from "./Animation";
 import { LogoStart } from "./assets";
-import { makeTick, newEntity, type Entity } from "./entities2";
+import { makeTick, newEntity, type Entity } from "./entities";
 import {
 	newLinearToggle,
 	setTarget,

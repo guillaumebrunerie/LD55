@@ -5,7 +5,7 @@ import {
 	makeTick,
 	newEntity,
 	type Entity,
-} from "./entities2";
+} from "./entities";
 
 export type Curtain = Entity<"hidden" | "appearing" | "idle" | "disappearing">;
 

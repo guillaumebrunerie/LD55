@@ -1,4 +1,4 @@
-import { makeTick, newEntity, type Entity } from "./entities2";
+import { makeTick, newEntity, type Entity } from "./entities";
 import {
 	newExponentialToggle,
 	setTarget,

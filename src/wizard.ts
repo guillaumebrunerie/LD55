@@ -17,7 +17,7 @@ import {
 	newEntity,
 	waitUntilFullLoop,
 	type Entity,
-} from "./entities2";
+} from "./entities";
 import type { Player } from "./gameLogic";
 
 type WizardState =
