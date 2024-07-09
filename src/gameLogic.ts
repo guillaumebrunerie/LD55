@@ -101,6 +101,7 @@ type ManaState =
 	| "traveling"
 	| "spawningOut";
 export type Mana = EntityOld<ManaState> & {
+	id: string;
 	position: Point;
 	tmpPosition?: Point;
 	scale: number;
@@ -297,6 +298,7 @@ const addManaPoint = (
 ) => {
 	const position = pickPosition(array, bounds, delta);
 	array.push({
+		id: generateId(),
 		lt: 0,
 		nt: 0,
 		position,
@@ -330,6 +332,7 @@ const addMushroom = (array: Mushroom[], bounds: Bounds, strength: 1 | 2) => {
 
 const newPlayer = (): Player => ({
 	...newEntityOld("idle"),
+	boughtSomething: false,
 	wizard: newWizard(),
 	manaPoints: [],
 	protection: {
@@ -345,36 +348,57 @@ const newPlayer = (): Player => ({
 
 const spawnManaPoint = (
 	player: Player,
-	previousItem: Mushroom | undefined = undefined,
+	mushroom: Mushroom | undefined = undefined,
 	silent = false,
-	callback?: () => void,
 ) => {
 	const position = pickPosition(player.manaPoints, manaPointsBounds, delta);
 
-	const manaPoint: Mana = {
-		...newEntityOld<ManaState>("spawning"),
+	const id = generateId();
+	player.manaPoints.push({
+		...newEntityOld<ManaState>("visible"),
+		id,
 		position,
 		scale: 0.7 + Math.random() * 0.3,
 		offset: Math.random() * 2 * Math.PI,
 		rotationSpeed: pickManaPointRotation(),
-		previousItem,
-	};
+	});
+	const manaPoint = player.manaPoints.find((m) => m.id == id);
+	if (!manaPoint) {
+		throw new Error("IMPOSSIBLE");
+	}
+
 	if (!silent) {
-		if (previousItem) {
+		if (!mushroom) {
 			void Flower5Mana.play({ volume: 1 });
 		} else {
 			void ManaCreated.play({ volume: 0.5 });
 		}
 	}
-	changeState(manaPoint, "spawning", manaSpawnDuration, (manaPoint) => {
-		if (!silent && previousItem) {
-			void ManaCreated.play({ volume: 0.5 });
-		}
-		idleStateOld(manaPoint, "visible");
-		callback?.();
-	});
 
-	player.manaPoints.push(manaPoint);
+	if (mushroom) {
+		manaPoint.tmpPosition = mushroom.position;
+		void flow(function* () {
+			yield doTransition(
+				mushroom,
+				fightDuration,
+				"disappearing",
+				"hidden",
+			);
+			player.mushrooms = player.mushrooms.filter(
+				(m) => m.id !== mushroom.id,
+			);
+		})();
+		changeState(manaPoint, "traveling", manaSpawnDuration, (manaPoint) => {
+			if (!silent) {
+				void ManaCreated.play({ volume: 0.5 });
+			}
+			idleStateOld(manaPoint, "visible");
+		});
+	} else {
+		changeState(manaPoint, "spawning", manaSpawnDuration, (manaPoint) => {
+			idleStateOld(manaPoint, "visible");
+		});
+	}
 };
 
 const spawnManaPointSilent = (player: Player) => {
@@ -833,7 +857,7 @@ const rebuildManaPoint = (player: Player) => {
 		spawnManaPoint(player);
 		return;
 	}
-	const item = player.mushrooms.pop();
+	const item = player.mushrooms.at(-1);
 	if (item) {
 		void ManaCreated.play({ volume: 0.5 });
 		for (let i = 0; i < item.strength; i++) {
@@ -867,9 +891,6 @@ const rebuildPlayerMana = (player: Player) => {
 				player,
 				i * rebuildDuration + 4 * rebuildDuration,
 				(player) => {
-					player.mushrooms = player.mushrooms.filter(
-						(m) => m.id !== mushroom.id,
-					);
 					spawnManaPoint(player, mushroom, j != 0);
 				},
 			);

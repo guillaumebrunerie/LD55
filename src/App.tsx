@@ -40,7 +40,6 @@ import {
 	InviteButtonAccept,
 	InviteButtonDefault,
 	InviteButtonOn,
-	Logo,
 	LogoStart,
 	Moon,
 	PoofedAwayPost,

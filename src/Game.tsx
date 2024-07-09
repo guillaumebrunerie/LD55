@@ -99,6 +99,7 @@ export const Wizard = ({
 	const props = {
 		x: -15,
 		y: 230,
+		blendMode: BLEND_MODES.NORMAL,
 		filters: player == game.opponent ? [opponentFilter] : [],
 	};
 
@@ -222,10 +223,12 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 			const dx = item.tmpPosition.x - item.position.x;
 			const dy = item.tmpPosition.y - item.position.y;
 			const angle = Math.atan2(dy, dx);
+			const scaleX = item.scale;
+			const scaleY = Math.min(1, 5 * (0.5 - Math.abs(0.5 - item.nt)));
 			return (
 				<Sprite
 					anchor={0.5}
-					scale={item.scale}
+					scale={[scaleX, scaleY]}
 					rotation={angle + Math.PI / 2}
 					blendMode={BLEND_MODES.NORMAL}
 					alpha={Math.min(item.nt * 3, 1)}
