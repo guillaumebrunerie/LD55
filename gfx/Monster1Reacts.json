@@ -1,0 +1,151 @@
+{"frames": {
+
+"Monster1Reacts_027.png":
+{
+	"frame": {"x":1892,"y":1,"w":113,"h":119},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":105,"y":83,"w":113,"h":119},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_028.png":
+{
+	"frame": {"x":1424,"y":1,"w":115,"h":121},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":103,"y":81,"w":115,"h":121},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_029.png":
+{
+	"frame": {"x":1306,"y":1,"w":116,"h":121},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":101,"y":79,"w":116,"h":121},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_030.png":
+{
+	"frame": {"x":120,"y":1,"w":117,"h":122},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":99,"y":78,"w":117,"h":122},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_031.png":
+{
+	"frame": {"x":239,"y":1,"w":117,"h":122},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":99,"y":78,"w":117,"h":122},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_032.png":
+{
+	"frame": {"x":358,"y":1,"w":117,"h":122},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":99,"y":78,"w":117,"h":122},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_033.png":
+{
+	"frame": {"x":477,"y":1,"w":117,"h":122},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":99,"y":79,"w":117,"h":122},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_034.png":
+{
+	"frame": {"x":596,"y":1,"w":117,"h":122},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":99,"y":79,"w":117,"h":122},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_035.png":
+{
+	"frame": {"x":715,"y":1,"w":117,"h":122},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":99,"y":80,"w":117,"h":122},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_036.png":
+{
+	"frame": {"x":834,"y":1,"w":117,"h":122},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":99,"y":81,"w":117,"h":122},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_037.png":
+{
+	"frame": {"x":1,"y":1,"w":117,"h":123},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":99,"y":81,"w":117,"h":123},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_038.png":
+{
+	"frame": {"x":953,"y":1,"w":116,"h":122},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":99,"y":82,"w":116,"h":122},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_039.png":
+{
+	"frame": {"x":1071,"y":1,"w":116,"h":122},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":99,"y":83,"w":116,"h":122},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_040.png":
+{
+	"frame": {"x":1189,"y":1,"w":115,"h":122},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":100,"y":84,"w":115,"h":122},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_041.png":
+{
+	"frame": {"x":1541,"y":1,"w":115,"h":121},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":100,"y":85,"w":115,"h":121},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_042.png":
+{
+	"frame": {"x":1658,"y":1,"w":115,"h":121},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":102,"y":84,"w":115,"h":121},
+	"sourceSize": {"w":300,"h":300}
+},
+"Monster1Reacts_043.png":
+{
+	"frame": {"x":1775,"y":1,"w":115,"h":120},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":103,"y":84,"w":115,"h":120},
+	"sourceSize": {"w":300,"h":300}
+}},
+"animations": {
+	"Monster1Reacts": ["Monster1Reacts_027.png","Monster1Reacts_028.png","Monster1Reacts_029.png","Monster1Reacts_030.png","Monster1Reacts_031.png","Monster1Reacts_032.png","Monster1Reacts_033.png","Monster1Reacts_034.png","Monster1Reacts_035.png","Monster1Reacts_036.png","Monster1Reacts_037.png","Monster1Reacts_038.png","Monster1Reacts_039.png","Monster1Reacts_040.png","Monster1Reacts_041.png","Monster1Reacts_042.png","Monster1Reacts_043.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.1",
+	"image": "Monster1Reacts.png",
+	"format": "RGBA8888",
+	"size": {"w":2006,"h":125},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:3e25b0b61a458ba790d59abb3c6cc6eb:d48ff14c4b199cd32feab5a4e4e8416b:515147b24cd29ed68fdb4f0fe5668fde$"
+}
+}
