@@ -309,7 +309,8 @@ const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 				console.error("No destination");
 				item.destination = item.position;
 			}
-			const nt = wave(item.nt);
+			const nt =
+				item.finalApproach ? Math.pow(item.nt, 3) : wave(item.nt);
 			const position = {
 				x: (1 - nt) * item.position.x + nt * item.destination.x,
 				y: (1 - nt) * item.position.y + nt * item.destination.y,

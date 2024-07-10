@@ -34,6 +34,7 @@ import {
 	attackApproachDuration,
 	feetBounds,
 	chestBounds,
+	lastAttackApproachDuration,
 } from "./configuration";
 import {
 	showCurtain,
@@ -117,7 +118,7 @@ type ShieldState =
 	| "hidden"
 	| "fadeOut"
 	| "fighting";
-export type Shield = EntityOld<ShieldState>;
+export type Shield = Entity<ShieldState>;
 
 type RuneState =
 	| "waitingToAppear"
@@ -134,10 +135,11 @@ export type Mushroom = Entity<"hidden" | "visible" | "disappearing"> & {
 };
 
 type MonsterState = "waitingToAppear" | "visible" | "approach" | "fighting";
-export type Monster = EntityOld<MonsterState> & {
+export type Monster = Entity<MonsterState> & {
 	id: string;
 	position: Point;
 	destination?: Point;
+	finalApproach?: boolean;
 	strength: 1 | 2 | 3;
 	hp: number;
 };
@@ -150,7 +152,7 @@ export type Protection = Entity<"idle" | "tombola"> & {
 const resetProtection = (protection: Protection) => {
 	idleState(protection, "idle");
 	protection.runes = [];
-	fadeOutShield(protection.shield);
+	void fadeOutShield(protection.shield);
 };
 
 export type Player = EntityOld<"idle"> & {
@@ -199,7 +201,7 @@ const spawnMonster = (
 ) => {
 	const id = generateId();
 	player.monsters.push({
-		...newEntityOld("waitingToAppear"),
+		...newEntity("waitingToAppear"),
 		id,
 		position,
 		strength,
@@ -220,7 +222,7 @@ const spawnMonster = (
 			);
 			void maybeEndWizardMagic(player);
 		});
-		idleStateOld(monster, "visible");
+		idleState(monster, "visible");
 	});
 };
 
@@ -276,7 +278,7 @@ const spawnRunes = (player: Player, manaPoint: Mana, runeCount: number) => {
 			void maybeEndWizardMagic(player);
 		});
 		if (shield.state == "waitingToAppear") {
-			appearShield(shield);
+			void appearShield(shield);
 		}
 		for (const rune of runes) {
 			if (rune.state == "waitingToAppear") {
@@ -332,7 +334,7 @@ const newPlayer = (): Player => ({
 	manaPoints: [],
 	protection: {
 		...newEntity<"idle" | "tombola">("idle"),
-		shield: newEntityOld<ShieldState>("hidden"),
+		shield: newEntity<ShieldState>("hidden"),
 		runes: [],
 	},
 	mushrooms: [],
@@ -519,8 +521,8 @@ export const startGame = (app: AppT) => {
 
 	for (let i = 0; i < initialDefense; i++) {
 		if (i == 0) {
-			appearShield(game.player.protection.shield);
-			appearShield(game.opponent.protection.shield);
+			void appearShield(game.player.protection.shield);
+			void appearShield(game.opponent.protection.shield);
 		} else {
 			void appearRune(game.player);
 			void appearRune(game.opponent);
@@ -528,38 +530,33 @@ export const startGame = (app: AppT) => {
 	}
 };
 
-const appearShield = (shield: Shield) => {
-	changeStateOld(
+const appearShield = flow(function* (shield: Shield) {
+	yield doTransition(
 		shield,
-		"appearing",
 		getDuration(ShieldStart, 20),
-		(shield) => {
-			idleStateOld(shield, "visible");
-		},
+		"appearing",
+		"visible",
 	);
-};
+});
 
 const makeWaitToAppearShield = (shield: Shield) => {
-	idleStateOld(shield, "waitingToAppear");
+	idleState(shield, "waitingToAppear");
 };
 
-const disappearShield = (shield: Shield) => {
-	changeStateOld(
+const disappearShield = flow(function* (shield: Shield) {
+	yield doTransition(shield, fightDuration, "fighting", "visible");
+	yield doTransition(
 		shield,
-		"disappearing",
 		getDuration(ShieldEnd, 20),
-		(shield) => {
-			idleStateOld(shield, "hidden");
-		},
+		"disappearing",
+		"hidden",
 	);
-};
+});
 
 const fadeOutDuration = 0.2;
-const fadeOutShield = (shield: Shield) => {
-	changeStateOld(shield, "fadeOut", fadeOutDuration, (shield) => {
-		idleStateOld(shield, "hidden");
-	});
-};
+const fadeOutShield = flow(function* (shield: Shield) {
+	yield doTransition(shield, fadeOutDuration, "fadeOut", "hidden");
+});
 
 const hasShield = (shield: Shield) => {
 	return ["waitingToAppear", "visible", "appearing", "fighting"].includes(
@@ -600,7 +597,7 @@ export const setupFight = (app: AppT, lastFight: LastFight) => {
 	for (const monsterData of lastFight.opponent.monsters) {
 		const { hp, strength, position } = monsterData;
 		const monster: Monster = {
-			...newEntityOld("visible"),
+			...newEntity("visible"),
 			id: generateId(),
 			position,
 			strength,
@@ -610,10 +607,10 @@ export const setupFight = (app: AppT, lastFight: LastFight) => {
 	}
 	// Set up defense
 	game.opponent.protection.runes = [];
-	idleStateOld(game.opponent.protection.shield, "hidden");
+	idleState(game.opponent.protection.shield, "hidden");
 	for (let i = 0; i < lastFight.opponent.defense; i++) {
 		if (i == 0) {
-			idleStateOld(game.opponent.protection.shield, "visible");
+			idleState(game.opponent.protection.shield, "visible");
 		} else {
 			addRune(game.opponent.protection.runes);
 		}
@@ -676,7 +673,7 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 					getPlayerData(opponent),
 				);
 				const monster: Monster = {
-					...newEntityOld("visible"),
+					...newEntity("visible"),
 					id: generateId(),
 					position,
 					strength: strength,
@@ -694,10 +691,7 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 
 				const add = () => {
 					if (!hasShield(game.opponent.protection.shield)) {
-						idleStateOld(
-							game.opponent.protection.shield,
-							"visible",
-						);
+						idleState(game.opponent.protection.shield, "visible");
 					} else {
 						addRune(game.opponent.protection.runes);
 					}
@@ -807,7 +801,7 @@ const areAllItemsVisible = (player: Player) => {
 const manaTravelDuration = 0.2;
 const spawnDuration = 0.3;
 
-const tickMonster = makeTickOld<MonsterState, Monster>((_item) => {
+const tickMonster = makeTick<Monster>((_item) => {
 	// if (item.state == "waitingForFight") {
 	// 	item.position.x += delta * 25;
 	// }
@@ -815,7 +809,7 @@ const tickMonster = makeTickOld<MonsterState, Monster>((_item) => {
 	return {};
 });
 
-const tickShield = makeTickOld<ShieldState, Shield>();
+const tickShield = makeTick<Shield>();
 
 const tickRune = makeTick<Rune>();
 
@@ -890,7 +884,9 @@ const rebuildMana = (game: GameT, callback: () => void) => {
 	// rebuildOne(game);
 };
 
-const pickAttackOrDefensePair = (app: AppT) => {
+const pickAttackOrDefensePair = flow(function* (
+	app: AppT,
+): Generator<unknown, void, void> {
 	const { game } = app;
 	const playerMonsters = game.player.monsters.filter(
 		(m) => m.state == "visible",
@@ -898,23 +894,23 @@ const pickAttackOrDefensePair = (app: AppT) => {
 	const opponentMonsters = game.opponent.monsters.filter(
 		(m) => m.state == "visible",
 	).length;
+
 	if (playerMonsters == 0 && opponentMonsters == 0) {
 		// No monsters, we move to the next round
 		rebuildMana(game, () => {
 			idleStateOld(game, "buildUp");
 			nextRound(game);
 		});
-		return;
+	} else if (playerMonsters > 0 && opponentMonsters > 0) {
+		// Monsters on both sides, two monsters attack each other
+		yield pickAttackPair(app);
+	} else {
+		// Monsters on one side, a monster attacks the other player
+		yield pickDefensePair(app);
 	}
-	if (playerMonsters > 0 && opponentMonsters > 0) {
-		// Monsters on both sides, we attack
-		pickAttackPair(app);
-		return;
-	}
-	pickDefensePair(app);
-};
+});
 
-const pickAttackPair = (app: AppT) => {
+const pickAttackPair = flow(function* (app: AppT) {
 	const { game } = app;
 	const playerAttacker = pickFighter(game.player.monsters);
 	const opponentAttacker = pickFighter(game.opponent.monsters);
@@ -936,42 +932,50 @@ const pickAttackPair = (app: AppT) => {
 
 	void MonsterAttacks.play({ volume: 0.5 });
 
-	let count = 2;
-	changeStateOld(playerAttacker, "approach", attackApproachDuration, () => {
-		void MonstersClash.play({ volume: 1 });
-		playerAttacker.position = { ...destination };
-		changeStateOld(playerAttacker, "fighting", fightDuration, () => {
+	yield Promise.all([
+		flow(function* () {
+			yield doTransition(
+				playerAttacker,
+				attackApproachDuration,
+				"approach",
+				"fighting",
+			);
+			playerAttacker.position = { ...destination };
+			yield doTransition(
+				playerAttacker,
+				fightDuration,
+				"fighting",
+				"visible",
+			);
 			if (playerAttacker.hp == 0) {
 				game.player.monsters = game.player.monsters.filter(
 					(item) => item != playerAttacker,
 				);
-			} else {
-				idleStateOld(playerAttacker, "visible");
 			}
-			count--;
-			if (count == 0) {
-				pickAttackOrDefensePair(app);
-			}
-		});
-	});
-
-	changeStateOld(opponentAttacker, "approach", attackApproachDuration, () => {
-		opponentAttacker.position = { ...destination2 };
-		changeStateOld(opponentAttacker, "fighting", fightDuration, () => {
+		})(),
+		flow(function* () {
+			yield doTransition(
+				opponentAttacker,
+				attackApproachDuration,
+				"approach",
+				"fighting",
+			);
+			opponentAttacker.position = { ...destination2 };
+			yield doTransition(
+				opponentAttacker,
+				fightDuration,
+				"fighting",
+				"visible",
+			);
 			if (opponentAttacker.hp == 0) {
 				game.opponent.monsters = game.opponent.monsters.filter(
 					(item) => item != opponentAttacker,
 				);
-			} else {
-				idleStateOld(opponentAttacker, "visible");
 			}
-			count--;
-			if (count == 0) {
-				pickAttackOrDefensePair(app);
-			}
-		});
-	});
-};
+		})(),
+	]);
+	yield pickAttackOrDefensePair(app);
+});
 
 const doWin = (app: AppT, winner: Player, loser: Player) => {
 	const { game } = app;
@@ -1009,14 +1013,11 @@ const removeRune = flow(function* (player: Player, rune: Rune) {
 	);
 });
 
-const removeMonster = (player: Player, monster: Monster) => {
+const removeMonster = flow(function* (player: Player, monster: Monster) {
 	monster.hp = 0;
-	changeStateOld(monster, "fighting", fightDuration, (monster) => {
-		player.monsters = player.monsters.filter(
-			(item) => item.id != monster.id,
-		);
-	});
-};
+	yield doTransition(monster, fightDuration, "fighting", "visible");
+	player.monsters = player.monsters.filter((item) => item.id != monster.id);
+});
 
 const removeMushroom = flow(function* (
 	player: Player,
@@ -1033,7 +1034,7 @@ const removeMushroom = flow(function* (
 	);
 });
 
-const pickDefensePair = (app: AppT) => {
+const pickDefensePair = flow(function* (app: AppT) {
 	const { game } = app;
 	const attacker =
 		game.player.monsters.length > 0 ? game.player : game.opponent;
@@ -1048,58 +1049,70 @@ const pickDefensePair = (app: AppT) => {
 	).length;
 	const shield = defender.protection.shield;
 	void MonsterAttacks.play({ volume: 0.5 });
+
 	if (!hasShield(shield)) {
-		// Attack the player
-		const destination = pickPosition([], chestBounds, 0);
-		destination.x = 1920 - destination.x;
-		fighter.destination = destination;
-		changeStateOld(fighter, "approach", attackApproachDuration, () => {
+		const doAttack = flow(function* (fighter: Monster) {
+			const destination = pickPosition([], chestBounds, 0);
+			destination.x = 1920 - destination.x;
+			fighter.destination = destination;
+			fighter.finalApproach = true;
+			yield doTransition(
+				fighter,
+				lastAttackApproachDuration,
+				"approach",
+				"visible",
+			);
 			fighter.position = { ...destination };
-			removeMonster(attacker, fighter);
-			doWin(app, attacker, defender);
+			void removeMonster(attacker, fighter);
 		});
+		// Attack the player
+		yield Promise.all(
+			attacker.monsters.filter((m) => m.state == "visible").map(doAttack),
+		);
+		doWin(app, attacker, defender);
 		return; // Do not continue the fight
 	} else if (runes == 0) {
 		// Destroy shield
 		const destination = pickPosition([], shieldImpactBounds, 0);
 		destination.x = 1920 - destination.x;
 		fighter.destination = destination;
-		changeStateOld(fighter, "approach", attackApproachDuration, () => {
-			fighter.position = { ...destination };
-			removeMonster(attacker, fighter);
-			disappearShield(shield);
-			void ShieldDown.play();
-		});
+		yield doTransition(
+			fighter,
+			attackApproachDuration,
+			"approach",
+			"visible",
+		);
+		fighter.position = { ...destination };
+		void removeMonster(attacker, fighter);
+		yield disappearShield(shield);
+		void ShieldDown.play();
 	} else {
 		// Destroy runes
 		const destination = pickPosition([], shieldImpactBounds, 0);
 		destination.x = 1920 - destination.x;
 		fighter.destination = destination;
-		changeStateOld(fighter, "approach", attackApproachDuration, () => {
-			fighter.position = { ...destination };
-			defender.protection.runes
-				.toReversed()
-				.slice(0, Math.min(fighter.hp, runes))
-				.forEach((rune) => {
-					void removeRune(defender, rune);
-				});
-			removeMonster(attacker, fighter);
-			changeStateOld(shield, "fighting", fightDuration, () => {
-				idleStateOld(shield, "visible");
+		yield doTransition(
+			fighter,
+			attackApproachDuration,
+			"approach",
+			"visible",
+		);
+		fighter.position = { ...destination };
+		defender.protection.runes
+			.toReversed()
+			.slice(0, Math.min(fighter.hp, runes))
+			.forEach((rune) => {
+				void removeRune(defender, rune);
 			});
-			void ShieldDefends.play({ volume: 0.4 });
-		});
+		void ShieldDefends.play({ volume: 0.4 });
+		yield Promise.all([
+			removeMonster(attacker, fighter),
+			doTransition(shield, fightDuration, "fighting", "visible"),
+		]);
 	}
 
-	changeStateOld(
-		game,
-		"defense",
-		attackApproachDuration + fightDuration,
-		() => {
-			pickAttackOrDefensePair(app);
-		},
-	);
-};
+	yield pickAttackOrDefensePair(app);
+});
 
 const pickTombola = (previous: number[]) => {
 	const next = [];
