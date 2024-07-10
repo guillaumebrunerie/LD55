@@ -1,4 +1,4 @@
-/** Generated on Tue Jul  9 00:04:45 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Thu Jul 11 00:17:42 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -75,11 +75,14 @@ import Mana2End_ from "../gfx/Mana2End.png?spritesheet";
 import ManaPointStart_ from "../gfx/ManaPointStart.png?spritesheet";
 import Monster1Die_ from "../gfx/Monster1Die.png?spritesheet";
 import Monster1Idle_ from "../gfx/Monster1Idle.png?spritesheet";
+import Monster1Reacts_ from "../gfx/Monster1Reacts.png?spritesheet";
 import Monster2Die_ from "../gfx/Monster2Die.png?spritesheet";
 import Monster2Idle_ from "../gfx/Monster2Idle.png?spritesheet";
+import Monster2Reacts_ from "../gfx/Monster2Reacts.png?spritesheet";
 import Monster3Die_ from "../gfx/Monster3Die.png?spritesheet";
 import Monster3Dies_ from "../gfx/Monster3Dies.png?spritesheet";
 import Monster3Idle_ from "../gfx/Monster3Idle.png?spritesheet";
+import Monster3Reacts_ from "../gfx/Monster3Reacts.png?spritesheet";
 import RestartButtonComputer_ from "../gfx/RestartButtonComputer.png?spritesheet";
 import RestartButtonIdle_ from "../gfx/RestartButtonIdle.png?spritesheet";
 import Runes_ from "../gfx/Runes.png?spritesheet";
@@ -202,16 +205,22 @@ export const [
 	{ animations: { Monster1Die } },
 	Monster1IdleSheet,
 	{ animations: { Monster1Idle } },
+	Monster1ReactsSheet,
+	{ animations: { Monster1Reacts } },
 	Monster2DieSheet,
 	{ animations: { Monster2Die } },
 	Monster2IdleSheet,
 	{ animations: { Monster2Idle } },
+	Monster2ReactsSheet,
+	{ animations: { Monster2Reacts } },
 	Monster3DieSheet,
 	{ animations: { Monster3Die } },
 	Monster3DiesSheet,
 	{ animations: { Monster3Dies } },
 	Monster3IdleSheet,
 	{ animations: { Monster3Idle } },
+	Monster3ReactsSheet,
+	{ animations: { Monster3Reacts } },
 	RestartButtonComputerSheet,
 	{ animations: { RestartButtonComputer } },
 	RestartButtonIdleSheet,
@@ -350,16 +359,22 @@ export const [
 	Monster1Die_,
 	Monster1Idle_,
 	Monster1Idle_,
+	Monster1Reacts_,
+	Monster1Reacts_,
 	Monster2Die_,
 	Monster2Die_,
 	Monster2Idle_,
 	Monster2Idle_,
+	Monster2Reacts_,
+	Monster2Reacts_,
 	Monster3Die_,
 	Monster3Die_,
 	Monster3Dies_,
 	Monster3Dies_,
 	Monster3Idle_,
 	Monster3Idle_,
+	Monster3Reacts_,
+	Monster3Reacts_,
 	RestartButtonComputer_,
 	RestartButtonComputer_,
 	RestartButtonIdle_,

@@ -5,6 +5,7 @@ import {
 	ClickMana,
 	Flower5Mana,
 	ManaCreated,
+	Monster1Reacts,
 	MonsterAttacks,
 	MonstersClash,
 	Music,
@@ -134,7 +135,12 @@ export type Mushroom = Entity<"hidden" | "visible" | "disappearing"> & {
 	strength: 1 | 2;
 };
 
-type MonsterState = "waitingToAppear" | "visible" | "approach" | "fighting";
+type MonsterState =
+	| "waitingToAppear"
+	| "visible"
+	| "approach"
+	| "fighting"
+	| "winning";
 export type Monster = Entity<MonsterState> & {
 	id: string;
 	position: Point;
@@ -542,16 +548,6 @@ const appearShield = flow(function* (shield: Shield) {
 const makeWaitToAppearShield = (shield: Shield) => {
 	idleState(shield, "waitingToAppear");
 };
-
-const disappearShield = flow(function* (shield: Shield) {
-	yield doTransition(shield, fightDuration, "fighting", "visible");
-	yield doTransition(
-		shield,
-		getDuration(ShieldEnd, 20),
-		"disappearing",
-		"hidden",
-	);
-});
 
 const fadeOutDuration = 0.2;
 const fadeOutShield = flow(function* (shield: Shield) {
@@ -1077,7 +1073,27 @@ const pickDefensePair = flow(function* (app: AppT) {
 		);
 		fighter.position = { ...destination };
 		void removeMonster(attacker, fighter);
-		yield disappearShield(shield);
+		yield doTransition(shield, fightDuration, "fighting", "visible");
+		yield Promise.all([
+			doTransition(
+				shield,
+				getDuration(ShieldEnd, 20),
+				"disappearing",
+				"hidden",
+			),
+			attacker.monsters
+				.filter((m) => m.state == "visible")
+				.map(
+					flow(function* (monster: Monster) {
+						yield doTransition(
+							monster,
+							getDuration(Monster1Reacts, 40),
+							"winning",
+							"visible",
+						);
+					}),
+				),
+		]);
 		void ShieldDown.play();
 	} else {
 		// Destroy runes

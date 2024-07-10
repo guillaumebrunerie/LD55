@@ -32,6 +32,9 @@ import {
 	Monster1Die,
 	Monster2Die,
 	Monster3Die,
+	Monster1Reacts,
+	Monster2Reacts,
+	Monster3Reacts,
 	WizardWin,
 	ShieldStart,
 	ShieldEnd,
@@ -290,6 +293,12 @@ const MonsterDie = {
 	3: Monster3Die,
 } as const;
 
+const MonsterReacts = {
+	1: Monster1Reacts,
+	2: Monster2Reacts,
+	3: Monster3Reacts,
+} as const;
+
 const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 	const gt = useGlobalTime();
 	const visible = (
@@ -311,6 +320,10 @@ const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 			}
 			const nt =
 				item.finalApproach ? Math.pow(item.nt, 3) : wave(item.nt);
+			const texture =
+				item.finalApproach ?
+					getNtFrame(MonsterReacts[item.strength], 0.5)
+				:	getFrame(MonsterIdle[item.strength], 20, gt);
 			const position = {
 				x: (1 - nt) * item.position.x + nt * item.destination.x,
 				y: (1 - nt) * item.position.y + nt * item.destination.y,
@@ -322,7 +335,7 @@ const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 					rotation={0}
 					scale={1}
 					blendMode={BLEND_MODES.ADD}
-					texture={getFrame(MonsterIdle[item.strength], 20, gt)}
+					texture={texture}
 					position={position}
 				/>
 			);
@@ -340,14 +353,26 @@ const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 					rotation={0}
 					scale={1}
 					blendMode={BLEND_MODES.ADD}
-					texture={getNtFrame(
-						MonsterDie[item.strength],
-						item.nt || 0,
-					)}
+					texture={getNtFrame(MonsterDie[item.strength], item.nt)}
 					position={item.position}
 				/>
 			);
 		}
+		case "winning":
+			return (
+				<Sprite
+					anchor={0.5}
+					tint={tint}
+					rotation={0}
+					scale={1}
+					blendMode={BLEND_MODES.ADD}
+					texture={getNtFrame(
+						MonsterReacts[item.strength],
+						item.nt / 2,
+					)}
+					position={item.position}
+				/>
+			);
 	}
 };
 
