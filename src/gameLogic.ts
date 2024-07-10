@@ -989,13 +989,6 @@ const doWin = (app: AppT, winner: Player, loser: Player) => {
 	disappearButton(game.defenseButton);
 	idleState(winner.protection, "tombola");
 	runeTombola()(winner);
-	for (const item of winner.monsters) {
-		if (item.state == "visible") {
-			changeStateOld(item, "visible", fightDuration * 2, () => {
-				removeMonster(winner, item);
-			});
-		}
-	}
 	for (const item of winner.mushrooms) {
 		void removeMushroom(winner, item, fightDuration * 2);
 	}
