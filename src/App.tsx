@@ -917,7 +917,17 @@ const usePoofedAway = (app: AppT) => {
 		playerId: app.opponentId,
 	});
 	const inLobby = app.lobby.alpha.value > 0.01;
-	return app.opponentId !== undefined && !playerExists && !inLobby;
+
+	const lastPing =
+		useQuery(api.player.lastPing, { playerId: app.opponentId }) || 0;
+	const dateNow = useDateNow(1000);
+	const timeSinceLastPing = lastPing == 0 ? 0 : dateNow - lastPing;
+
+	return (
+		!inLobby &&
+		((app.opponentId !== undefined && !playerExists) ||
+			timeSinceLastPing > 15_000)
+	);
 };
 
 const useApp = () => {

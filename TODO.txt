@@ -1,14 +1,13 @@
 # Prio 1
 
-- Posting when opponent disconnected
 - Restart game against player
-- Clean up a lot of things
+- Fix glitches with start/exit/restart
+- Start/restart buttons should trigger on click, not pointerdown
 
 # Prio 2
 
-- Fix glitches with start/exit/restart
-- Start/restart buttons should trigger on click, not pointerdown
+- Show current mana points of opponent when playing online
 - Use subclasses
 - Write MobX plugin for subclasses
 - Remove all uses of old entities
-- Show current mana points of opponent when playing online
+- Use new version of PIXI React
