@@ -1,6 +1,6 @@
 import { useState, useEffect, useReducer } from "react";
 import {
-	FederatedPointerEvent,
+	type FederatedPointerEvent,
 	Filter,
 	SpriteMaskFilter,
 	Rectangle,
@@ -83,6 +83,7 @@ import { Circle } from "./Circle";
 import { getFrame, getNtFrame } from "./Animation";
 import { useButton } from "./useButton";
 import type { LogoT } from "./logo";
+import { useDateNow } from "./useDateNow";
 
 const left = 420;
 const top = 105;
@@ -98,6 +99,24 @@ const WaitingDots = ({ lt }: { lt: number }) => {
 				<Sprite key={i} texture={WaitingDot} x={-25 + i * 25} y={2} />
 			);
 		});
+};
+
+const OnlineDot = ({
+	timeSinceLastPing,
+	...props
+}: {
+	timeSinceLastPing: number;
+	x: number;
+	y: number;
+}) => {
+	let color = 0x00ff00;
+	if (timeSinceLastPing > 15_000) {
+		color = 0xff0000;
+	} else if (timeSinceLastPing > 2_000) {
+		color = 0xffff44;
+	}
+
+	return <Circle {...props} radius={8} color={color} />;
 };
 
 const PlayerLine = ({
@@ -121,7 +140,6 @@ const PlayerLine = ({
 		waiting: InviteButtonOn,
 		requested: InviteButtonAccept,
 	}[type];
-	const color = timeSinceLastPing < 5_000 ? 0x00ff00 : 0xffff00;
 	return (
 		<>
 			<CustomText
@@ -140,7 +158,7 @@ const PlayerLine = ({
 					}[type]
 				}
 			/>
-			<Circle x={-20} y={5} radius={8} color={color} />
+			<OnlineDot x={-20} y={5} timeSinceLastPing={timeSinceLastPing} />
 			<Container x={x + (icon.width * 0.75) / 2 + 15} y={5}>
 				<Sprite
 					texture={icon}
@@ -741,24 +759,28 @@ const PlayerName = ({ playerId }: { playerId: Id<"players"> }) => {
 	const playerName = useQuery(api.player.playerName, { playerId });
 	return (
 		playerName && (
-			<CustomText
-				text={playerName}
-				position={{ x: 20, y: 1080 - 11 }}
-				anchor={[0, 1]}
-			/>
+			<Container x={40} y={1080 - 40}>
+				<OnlineDot x={-20} y={5} timeSinceLastPing={0} />
+				<CustomText text={playerName} anchor={[0, 0.5]} />
+			</Container>
 		)
 	);
 };
 
 const OpponentName = ({ playerId }: { playerId: Id<"players"> }) => {
 	const playerName = useQuery(api.player.playerName, { playerId });
+	const lastPing = useQuery(api.player.lastPing, { playerId }) || 0;
+	const dateNow = useDateNow(1000);
+	const timeSinceLastPing = dateNow - lastPing;
 	return (
-		<CustomText
-			text={playerName ?? "(disconnected)"}
-			position={{ x: 1920 - 20, y: 1080 - 11 }}
-			anchor={[1, 1]}
-			color={playerName ? undefined : "#666"}
-		/>
+		<Container x={1920 - 40} y={1080 - 40}>
+			<CustomText
+				text={playerName ?? "(disconnected)"}
+				anchor={[1, 0.5]}
+				color={playerName ? undefined : "#666"}
+			/>
+			<OnlineDot x={20} y={5} timeSinceLastPing={timeSinceLastPing} />
+		</Container>
 	);
 };
 
@@ -819,12 +841,12 @@ const PoofedAway = ({ app }: { app: AppT }) => {
 			/>
 			<Container x={1920 / 2} y={1080 / 2}>
 				<CustomText
-					text={"Philosophical Salvatore"}
+					text={"Your opponent"}
 					position={{ x: 0, y: 10 }}
 					anchor={0.5}
 				/>
 				<CustomText
-					text={"poofed away!"}
+					text={"has poofed away!"}
 					position={{ x: 0, y: 70 }}
 					anchor={0.5}
 				/>
@@ -890,6 +912,14 @@ const useWarnBeforeClosing = (condition: boolean) => {
 	}, [condition]);
 };
 
+const usePoofedAway = (app: AppT) => {
+	const playerExists = useQuery(api.player.playerExists, {
+		playerId: app.opponentId,
+	});
+	const inLobby = app.lobby.alpha.value > 0.01;
+	return app.opponentId !== undefined && !playerExists && !inLobby;
+};
+
 const useApp = () => {
 	const [app] = useState(() => observable(newApp()));
 	useEffect(() => startApp(app), [app]);
@@ -904,6 +934,7 @@ export const App = () => {
 	usePing(app);
 	useConnection(app);
 	useWarnBeforeClosing(app.state != "intro");
+	const hasPoofedAway = usePoofedAway(app);
 
 	useEffect(() => {
 		const callback = action((event: KeyboardEvent) => {
@@ -1053,7 +1084,7 @@ export const App = () => {
 				{app.opponentId && <OpponentName playerId={app.opponentId} />}
 				<Menu app={app} />
 				{/* <PolygonShape polygon={manaBounds.polygon} alpha={0.4} /> */}
-				{/* <PoofedAway app={app} /> */}
+				{hasPoofedAway && <PoofedAway app={app} />}
 			</Container>
 		</GlobalTimeContext.Provider>
 	);

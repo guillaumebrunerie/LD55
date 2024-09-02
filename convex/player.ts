@@ -11,6 +11,19 @@ import {
 import type { GenericMutationCtx, GenericQueryCtx } from "convex/server";
 import { maybeFight } from "./fight";
 
+export const playerExists = query({
+	args: {
+		playerId: v.optional(v.id("players")),
+	},
+	handler: async (ctx, { playerId }) => {
+		if (!playerId) {
+			return false;
+		}
+		const player = await getPlayerMaybe(ctx, playerId);
+		return !!player;
+	},
+});
+
 export const playerName = query({
 	args: {
 		playerId: v.id("players"),
@@ -41,6 +54,19 @@ export const playerMana = query({
 	handler: async (ctx, { playerId }) => {
 		const player = await getPlayer(ctx, playerId);
 		return player.mana;
+	},
+});
+
+export const lastPing = query({
+	args: {
+		playerId: v.optional(v.id("players")),
+	},
+	handler: async (ctx, { playerId }) => {
+		if (!playerId) {
+			return;
+		}
+		const player = await getPlayerMaybe(ctx, playerId);
+		return player?.lastPing;
 	},
 });
 

@@ -32,7 +32,7 @@ export const getFrame = (
 
 export const getNtFrame = (animation: Texture[], nt: number) => {
 	if (!animation) {
-		debugger;
+		throw new Error("no animation");
 	}
 	const i = Math.min(
 		Math.max(Math.floor(nt * animation.length), 0),

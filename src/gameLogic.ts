@@ -7,7 +7,6 @@ import {
 	ManaCreated,
 	Monster1Reacts,
 	MonsterAttacks,
-	MonstersClash,
 	Music,
 	ShieldDefends,
 	ShieldDown,
@@ -511,7 +510,7 @@ export const startGame = (app: AppT) => {
 			opponentWizard.state == ">die" ||
 			opponentWizard.state == "hidden"
 		) {
-			yield appearWizard(opponentWizard);
+			yield appearWizard(opponentWizard, 0);
 		} else {
 			idleWizard(opponentWizard);
 		}

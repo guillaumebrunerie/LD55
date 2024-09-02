@@ -8,7 +8,7 @@
 		"dev": "vite --host",
 		"build": "vite build",
 		"pack": "cd dist; sed -i 's#/assets#assets#' index.html; zip -r WizzyWizzy.zip *; mv WizzyWizzy.zip ..",
-		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+		"lint": "eslint . --ext ts,tsx --max-warnings 0",
 		"typecheck": "tsc",
 		"preview": "vite preview --host"
 	},
@@ -26,11 +26,11 @@
 	},
 	"devDependencies": {
 		"@babel/helper-module-imports": "^7.22.15",
-		"@types/node": "^20.11.30",
+		"@types/node": "^22.5.0",
 		"@types/react": "^18.2.56",
 		"@types/react-dom": "^18.2.19",
-		"@typescript-eslint/eslint-plugin": "^7.0.2",
-		"@typescript-eslint/parser": "^7.0.2",
+		"@typescript-eslint/eslint-plugin": "^8.2.0",
+		"@typescript-eslint/parser": "^8.2.0",
 		"@vitejs/plugin-react": "^4.2.1",
 		"eslint": "^8.56.0",
 		"eslint-plugin-import": "^2.29.1",

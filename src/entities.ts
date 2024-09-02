@@ -125,10 +125,7 @@ export const scheduleX = <E extends Entity>(
 	});
 };
 
-export const scheduleP = <E extends Entity>(
-	entity: E,
-	lt: number,
-): Promise<void> =>
+export const scheduleP = (entity: Entity, lt: number): Promise<void> =>
 	new Promise((resolve) => {
 		entity.delayedCallbacks.push({
 			lt,
@@ -138,7 +135,7 @@ export const scheduleP = <E extends Entity>(
 		});
 	});
 
-export const schedule0 = <E extends Entity>(entity: E): Promise<void> =>
+export const schedule0 = (entity: Entity): Promise<void> =>
 	new Promise((resolve) => {
 		entity.callbacks.push(resolve);
 	});

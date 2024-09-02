@@ -108,8 +108,8 @@ export const schedule = <E extends Entity<string>>(
 	});
 };
 
-export const scheduleP = <E extends Entity<string>>(
-	entity: E,
+export const scheduleP = (
+	entity: Entity<string>,
 	duration: number,
 ): Promise<void> =>
 	new Promise((resolve) => {
@@ -157,6 +157,6 @@ export const doTransition = <E extends Entity<string>>(
 	});
 };
 
-export const clearTransitions = <E extends Entity<string>>(entity: E) => {
+export const clearTransitions = (entity: Entity<string>) => {
 	entity.transitions = [];
 };

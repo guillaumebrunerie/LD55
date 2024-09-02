@@ -1,6 +1,5 @@
 # Prio 1
 
-- ShieldHit then ShieldEnd, and make all remaining monsters attack at the same time
 - Posting when opponent disconnected
 - Restart game against player
 - Clean up a lot of things
@@ -8,5 +7,8 @@
 # Prio 2
 
 - Fix glitches with start/exit/restart
-- Show current mana points of opponent when playing online
 - Start/restart buttons should trigger on click, not pointerdown
+- Use subclasses
+- Write MobX plugin for subclasses
+- Remove all uses of old entities
+- Show current mana points of opponent when playing online

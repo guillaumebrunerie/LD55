@@ -40,7 +40,7 @@ export const newWizard = (): WizardT => newEntity<WizardState>("hidden");
 
 export const tickWizard = makeTick<WizardT>();
 
-export const appearWizard = flow(function* (wizard: WizardT, delay = 0) {
+export const appearWizard = flow(function* (wizard: WizardT, delay: number) {
 	yield doTransition(wizard, delay, "hidden", "hidden");
 	yield doTransition(
 		wizard,
