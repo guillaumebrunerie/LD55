@@ -65,12 +65,7 @@ import {
 } from "./gameLogic";
 import { Game, Wizard } from "./Game";
 import { wave } from "./ease";
-import {
-	appearButton,
-	disappearButton,
-	isButtonOn,
-	type ButtonT,
-} from "./button";
+import { Button } from "./button";
 import { GlobalTimeContext } from "./globalTimeContext";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
@@ -82,7 +77,7 @@ import { useInterval } from "usehooks-ts";
 import { Circle } from "./Circle";
 import { getFrame, getNtFrame } from "./Animation";
 import { useButton } from "./useButton";
-import type { LogoT } from "./logo";
+import { Logo } from "./logo";
 import { useDateNow } from "./useDateNow";
 
 const left = 420;
@@ -196,7 +191,7 @@ const clickOutsideLobby = (
 	app: AppT,
 	disconnect: (credentials: Credentials) => Promise<null>,
 ) => {
-	disappearButton(app.lobby);
+	app.lobby.disappear();
 	const { credentials } = app;
 	if (credentials) {
 		void disconnect(credentials);
@@ -346,7 +341,7 @@ const Lobby = ({ app }: { app: AppT }) => {
 const clickOpenLobby = (app: AppT, createNewPlayer: () => void) => {
 	void ClickStart.play();
 	void TextBoxAppear.play();
-	appearButton(app.lobby);
+	app.lobby.appear();
 	createNewPlayer();
 };
 
@@ -363,18 +358,18 @@ const StartButtons = ({ app }: { app: AppT }) => {
 
 	const startVsComputer = useButton({
 		onClick: () => {
-			disappearButton(app.lobby);
+			app.lobby.disappear();
 			void ClickStart.play();
 			startNewGameAgainstComputer(app);
 		},
-		enabled: isButtonOn(buttons),
+		enabled: buttons.isOn,
 	});
 
 	const startVsPlayer = useButton({
 		onClick: () => {
 			clickOpenLobby(app, createNewPlayer);
 		},
-		enabled: isButtonOn(buttons),
+		enabled: buttons.isOn,
 	});
 
 	return (
@@ -453,8 +448,8 @@ const backToMenu = (
 ) => {
 	void ClickStart.play();
 	exitGame(app, disconnect);
-	disappearButton(app.restartButtons);
-	appearButton(app.startButtons, 0.4);
+	app.restartButtons.disappear();
+	app.startButtons.appear(0.4);
 };
 
 const BackToMenuLeft = ({ app }: { app: AppT }) => {
@@ -565,7 +560,7 @@ const exitGame = (
 	app.state = "intro";
 	resetGame(app);
 	// app.game = newGame("intro", false);
-	disappearButton(app.menuButton);
+	app.menuButton.disappear();
 	if (app.credentials) {
 		void disconnect(app.credentials);
 		delete app.credentials;
@@ -577,8 +572,8 @@ const clickExitGame = (
 	app: AppT,
 	disconnect: (credentials: Credentials) => Promise<null>,
 ) => {
-	disappearButton(app.restartButtons);
-	appearButton(app.startButtons);
+	app.restartButtons.disappear();
+	app.startButtons.appear();
 	exitGame(app, disconnect);
 };
 
@@ -613,7 +608,7 @@ const Menu = ({ app }: { app: AppT }) => {
 					alpha={alpha * 0.5}
 					eventMode="static"
 					pointerdown={action(() => {
-						disappearButton(button);
+						button.disappear();
 					})}
 				/>
 			)}
@@ -633,9 +628,9 @@ const Menu = ({ app }: { app: AppT }) => {
 				eventMode="static"
 				pointerdown={action(() => {
 					if (button.alpha.target == 1) {
-						disappearButton(button);
+						button.disappear();
 					} else {
-						appearButton(button);
+						button.appear();
 					}
 				})}
 			/>
@@ -676,7 +671,7 @@ const UIButton = ({
 	textureOn,
 	x,
 }: {
-	button: ButtonT;
+	button: Button;
 	onClick: () => void;
 	textureOff: Texture;
 	textureOn: Texture;
@@ -789,7 +784,7 @@ const LogoMoon = ({
 	filters = [],
 	alpha = 1,
 }: {
-	logo: LogoT;
+	logo: Logo;
 	filters?: Filter[];
 	alpha?: number;
 }) => {
@@ -969,21 +964,7 @@ export const App = () => {
 		}
 	}, [app, game.player]);
 
-	let screenAlpha = 0;
-	switch (game.curtain.state) {
-		case "hidden":
-			screenAlpha = 0;
-			break;
-		case "appearing":
-			screenAlpha = wave(game.curtain.nt);
-			break;
-		case "disappearing":
-			screenAlpha = wave(1 - game.curtain.nt);
-			break;
-		case "idle":
-			screenAlpha = 1;
-			break;
-	}
+	const screenAlpha = wave(game.curtain.alpha.value);
 
 	const cloud1 = {
 		x: mod(21 * app.gt, 2800) - 800,

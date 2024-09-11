@@ -1,4 +1,5 @@
 import * as t from "@babel/types";
+import * as c from "@babel/core";
 import { addNamed } from "@babel/helper-module-imports";
 
 /**
@@ -41,7 +42,7 @@ const isAnonymousComponentDeclarator = (node) =>
 	!!getArrowExpression(node.init);
 
 /**
- * @returns {t.PluginObj}
+ * @returns {c.PluginObj}
  */
 // eslint-disable-next-line import/no-unused-modules
 export default () => ({

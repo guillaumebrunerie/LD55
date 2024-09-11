@@ -1,37 +1,26 @@
 import { getDuration } from "./Animation";
 import { LogoStart } from "./assets";
-import { makeTick, newEntity, type Entity } from "./entities";
-import {
-	newLinearToggle,
-	setTarget,
-	tickLinearToggle,
-	type LinearToggle,
-} from "./linearToggle";
+import { EntityC } from "./entitiesC";
+import { LinearToggle } from "./linearToggle";
 
-export type LogoT = Entity<"idle"> & {
-	progress: LinearToggle;
-	logoAppear: LinearToggle;
-};
+export class Logo extends EntityC {
+	progress = new LinearToggle(0);
+	logoAppear = new LinearToggle(0);
 
-export const newLogo = (): LogoT => ({
-	...newEntity("idle"),
-	progress: newLinearToggle(0),
-	logoAppear: newLinearToggle(0),
-});
+	constructor() {
+		super();
+		this.addChildren(this.progress, this.logoAppear);
+	}
 
-export const tickLogo = makeTick<LogoT>((logo, delta) => {
-	tickLinearToggle(logo.progress, delta);
-	tickLinearToggle(logo.logoAppear, delta);
-});
+	hide() {
+		this.progress.setTarget(1, 0.5);
+	}
 
-export const hideLogo = (logo: LogoT) => {
-	setTarget(logo.progress, 1, 0.5);
-};
+	show() {
+		this.progress.setTarget(0, 0.5);
+	}
 
-export const showLogo = (logo: LogoT) => {
-	setTarget(logo.progress, 0, 0.5);
-};
-
-export const showLogoAppear = (logo: LogoT, delay?: number) => {
-	setTarget(logo.logoAppear, 1, getDuration(LogoStart, 20), delay);
-};
+	appear(delay = 0) {
+		this.logoAppear.setTarget(1, getDuration(LogoStart, 20), delay);
+	}
+}

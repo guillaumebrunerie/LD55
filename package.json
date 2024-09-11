@@ -13,6 +13,10 @@
 		"preview": "vite preview --host"
 	},
 	"dependencies": {
+		"@babel/cli": "^7.25.6",
+		"@babel/core": "^7.25.2",
+		"@babel/preset-react": "^7.24.7",
+		"@babel/preset-typescript": "^7.24.7",
 		"@pixi/react": "^7.1.1",
 		"@pixi/sound": "^5.2.3",
 		"convex": "^1.11.2",

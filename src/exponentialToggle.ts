@@ -1,41 +1,35 @@
-export type ExponentialToggle = {
+import { EntityC } from "./entitiesC";
+
+export class ExponentialToggle extends EntityC {
 	value: number;
 	target: number;
-	speed: number;
-	delay: number;
-};
+	speed = 0;
+	delay = 0;
 
-export const newExponentialToggle = (
-	value: number,
-	target = value,
-): ExponentialToggle => ({
-	value,
-	target,
-	speed: 0,
-	delay: 0,
-});
+	constructor(value: number, target = value) {
+		super();
+		this.value = value;
+		this.target = target;
 
-export const setTarget = (
-	toggle: ExponentialToggle,
-	target: number,
-	speed: number,
-	delay = 0,
-) => {
-	toggle.target = target;
-	toggle.speed = speed;
-	toggle.delay = delay;
-};
-
-export const tickExponentialToggle = (
-	toggle: ExponentialToggle,
-	delta: number,
-) => {
-	if (toggle.delay > 0) {
-		toggle.delay = Math.max(0, toggle.delay - delta);
+		this.addTickers((delta) => {
+			if (this.delay > 0) {
+				this.delay = Math.max(0, this.delay - delta);
+			}
+			if (this.delay == 0) {
+				this.value +=
+					(this.target - this.value) *
+					(1 - Math.exp(-this.speed * delta));
+			}
+		});
 	}
-	if (toggle.delay == 0) {
-		toggle.value +=
-			(toggle.target - toggle.value) *
-			(1 - Math.exp(-toggle.speed * delta));
+
+	setTarget(target: number, speed: number, delay = 0) {
+		this.target = target;
+		this.speed = speed;
+		this.delay = delay;
 	}
-};
+
+	get isIdle() {
+		return Math.abs(this.value - this.target) < 0.001;
+	}
+}

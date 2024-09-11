@@ -8,7 +8,10 @@ export default defineConfig({
 		pixiAssetPlugin(),
 		react({
 			babel: {
-				plugins: ["./tools/babel-plugin-auto-observe.js"],
+				plugins: [
+					"./tools/babel-plugin-auto-observe.js",
+					"./tools/babel-plugin-auto-make-observable.js",
+				],
 			},
 		}),
 	],

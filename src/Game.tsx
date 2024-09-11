@@ -6,7 +6,6 @@ import {
 	type Rune,
 	type Mushroom,
 	type Player,
-	type Shield,
 } from "./gameLogic";
 import {
 	Mana1,
@@ -48,6 +47,7 @@ import type { WizardT } from "./wizard";
 import { useGlobalTime } from "./useGlobalTime";
 import { wave } from "./ease";
 import { opponentFilter, opponentFilterAdd } from "./filters";
+import type { Shield } from "./shield";
 
 // const DisconnectOnClose = ({ game }: { game: GameT }) => {
 // 	// Disconnect on close
@@ -167,7 +167,7 @@ const Player = ({
 	return (
 		<Container>
 			<Wizard game={game} player={player} wizard={player.wizard} />
-			<Shield shield={player.protection.shield} />
+			<ShieldC shield={player.protection.shield} />
 			<Runes runes={player.protection.runes} />
 			<Mushrooms items={player.mushrooms} />
 			<ManaPoints items={player.manaPoints} />
@@ -462,7 +462,7 @@ const RuneC = ({ item, i }: { item: Rune; i: number }) => {
 	}
 };
 
-const Shield = ({ shield }: { shield: Shield }) => {
+const ShieldC = ({ shield }: { shield: Shield }) => {
 	switch (shield.state) {
 		case "hidden":
 		case "waitingToAppear":
