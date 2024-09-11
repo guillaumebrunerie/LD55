@@ -25,7 +25,11 @@ export class EntityC {
 		this.tickers = this.tickers.filter((t) => !tickers.includes(t));
 	}
 
-	addChildren(...child: EntityC[]) {
-		this.children.push(...child);
+	addChildren(...children: EntityC[]) {
+		this.children.push(...children);
+	}
+
+	removeChildren(...children: EntityC[]) {
+		this.children = this.children.filter((c) => !children.includes(c));
 	}
 }

@@ -1,27 +1,21 @@
 import { App } from "./App.tsx";
 import { StrictMode } from "react";
-import { AppProvider, createRoot } from "@pixi/react";
-import { Application } from "pixi.js";
+import { Application, extend } from "@pixi/react";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { Container, Graphics, NineSliceSprite, Sprite, Text } from "pixi.js";
+import { createRoot } from "react-dom/client";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
 
-// Setup PIXI app
+extend({ Container, Sprite, Text, Graphics, NineSliceSprite });
 
-const app = new Application({
-	width: 1920,
-	height: 1080,
-	backgroundColor: 0x2d293f,
-	view: document.getElementById("canvas") as HTMLCanvasElement,
-});
-
-const root = createRoot(app.stage);
+const root = createRoot(document.getElementById("container") as never);
 root.render(
 	<StrictMode>
-		<AppProvider value={app}>
+		<Application width={1920} height={1080} backgroundColor={0x2d293f}>
 			<ConvexProvider client={convex}>
 				<App />
 			</ConvexProvider>
-		</AppProvider>
+		</Application>
 	</StrictMode>,
 );

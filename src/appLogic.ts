@@ -66,8 +66,8 @@ const initApp = (app: AppT) => {
 		}
 	}
 	sound.init();
-	const tick = action((delta: number) => {
-		tickApp(app, (delta / 60) * app.speed);
+	const tick = action((ticker: Ticker) => {
+		tickApp(app, (ticker.deltaTime / 60) * app.speed);
 	});
 	Ticker.shared.add(tick);
 	return () => {

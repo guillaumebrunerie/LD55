@@ -1,10 +1,7 @@
-import { Container, Sprite } from "@pixi/react";
 import {
 	type GameT as GameT,
 	type Mana,
 	type Monster,
-	type Rune,
-	type Mushroom,
 	type Player,
 } from "./gameLogic";
 import {
@@ -41,13 +38,15 @@ import {
 	WizardWaitingEnd,
 	WizardWaitingLoop,
 } from "./assets";
-import { BLEND_MODES, Texture } from "pixi.js";
+import { Texture } from "pixi.js";
 import { getFrame, getNtFrame } from "./Animation";
 import type { WizardT } from "./wizard";
 import { useGlobalTime } from "./useGlobalTime";
 import { wave } from "./ease";
 import { opponentFilter, opponentFilterAdd } from "./filters";
 import type { Shield } from "./shield";
+import type { Rune } from "./rune";
+import type { Mushroom } from "./mushroom";
 
 // const DisconnectOnClose = ({ game }: { game: GameT }) => {
 // 	// Disconnect on close
@@ -71,22 +70,22 @@ import type { Shield } from "./shield";
 
 export const Game = ({ game }: { game: GameT }) => {
 	return (
-		<Container>
-			<Container scale={[-1, 1]} x={1920}>
+		<container>
+			<container scale={{ x: -1, y: 1 }} x={1920}>
 				<Player
 					game={game}
 					player={game.opponent}
 					monsterTint={0xffff00}
 				/>
-			</Container>
-			<Container>
+			</container>
+			<container>
 				<Player
 					game={game}
 					player={game.player}
 					monsterTint={0xffffff}
 				/>
-			</Container>
-		</Container>
+			</container>
+		</container>
 	);
 };
 
@@ -102,13 +101,13 @@ export const Wizard = ({
 	const props = {
 		x: -15,
 		y: 230,
-		blendMode: BLEND_MODES.NORMAL,
+		blendMode: "normal" as const,
 		filters: player == game.opponent ? [opponentFilter] : [],
 	};
 
 	const transition = (animation: Texture[], props2 = {}) => {
 		return (
-			<Sprite
+			<sprite
 				texture={getNtFrame(animation, wizard.nt)}
 				{...props}
 				{...props2}
@@ -116,7 +115,7 @@ export const Wizard = ({
 		);
 	};
 	const looping = (animation: Texture[], fps = 20, time = wizard.lt) => {
-		return <Sprite texture={getFrame(animation, fps, time)} {...props} />;
+		return <sprite texture={getFrame(animation, fps, time)} {...props} />;
 	};
 
 	switch (wizard.state) {
@@ -139,7 +138,7 @@ export const Wizard = ({
 		case ">appear": {
 			const addMode = wizard.nt <= 14 / 23;
 			return transition(WizardAppear, {
-				blendMode: addMode ? BLEND_MODES.ADD : BLEND_MODES.NORMAL,
+				blendMode: addMode ? "add" : "normal",
 				filters:
 					player == game.opponent ?
 						[addMode ? opponentFilterAdd : opponentFilter]
@@ -165,14 +164,14 @@ const Player = ({
 	monsterTint: number;
 }) => {
 	return (
-		<Container>
+		<container>
 			<Wizard game={game} player={player} wizard={player.wizard} />
 			<ShieldC shield={player.protection.shield} />
-			<Runes runes={player.protection.runes} />
-			<Mushrooms items={player.mushrooms} />
+			<Runes runes={player.protection.runes.entities} />
+			<Mushrooms items={player.mushrooms.entities} />
 			<ManaPoints items={player.manaPoints} />
 			<MonsterItems items={player.monsters} tint={monsterTint} />
-		</Container>
+		</container>
 	);
 };
 
@@ -192,11 +191,11 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 			const dx = (Math.random() - 0.5) * 20;
 			const dy = (Math.random() - 0.5) * 20;
 			return (
-				<Sprite
+				<sprite
 					anchor={0.5}
 					scale={item.scale}
 					rotation={lt * 3 + item.offset}
-					blendMode={BLEND_MODES.NORMAL}
+					blendMode={"normal"}
 					texture={ManaPoint}
 					alpha={1}
 					position={{
@@ -208,11 +207,11 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 		}
 		case "visible":
 			return (
-				<Sprite
+				<sprite
 					anchor={0.5}
 					scale={item.scale}
 					rotation={lt * item.rotationSpeed + item.offset}
-					blendMode={BLEND_MODES.NORMAL}
+					blendMode={"normal"}
 					texture={ManaPoint}
 					alpha={1}
 					position={item.position}
@@ -229,11 +228,11 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 			const scaleX = item.scale;
 			const scaleY = Math.min(1, 5 * (0.5 - Math.abs(0.5 - item.nt)));
 			return (
-				<Sprite
+				<sprite
 					anchor={0.5}
-					scale={[scaleX, scaleY]}
+					scale={{ x: scaleX, y: scaleY }}
 					rotation={angle + Math.PI / 2}
-					blendMode={BLEND_MODES.NORMAL}
+					blendMode={"normal"}
 					alpha={Math.min(item.nt * 3, 1)}
 					texture={ManaPointBlurred}
 					x={
@@ -249,10 +248,10 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 		}
 		case "spawningOut":
 			return (
-				<Sprite
+				<sprite
 					anchor={0.5}
 					scale={0.5}
-					blendMode={BLEND_MODES.ADD}
+					blendMode={"add"}
 					texture={getFrame(Spawn, 30, item.lt)}
 					alpha={1}
 					position={item.position}
@@ -261,11 +260,11 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 		case "spawning": {
 			return (
 				<>
-					<Sprite
+					<sprite
 						anchor={0.5}
 						scale={item.scale}
 						rotation={lt * 3 + item.offset}
-						blendMode={BLEND_MODES.NORMAL}
+						blendMode={"normal"}
 						texture={getNtFrame(ManaPointStart, item.nt)}
 						position={item.position}
 					/>
@@ -302,12 +301,12 @@ const MonsterReacts = {
 const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 	const gt = useGlobalTime();
 	const visible = (
-		<Sprite
+		<sprite
 			anchor={0.5}
 			tint={tint}
 			rotation={0}
 			scale={1}
-			blendMode={BLEND_MODES.ADD}
+			blendMode={"add"}
 			texture={getFrame(MonsterIdle[item.strength], 20, gt)}
 			position={{ ...item.position }}
 		/>
@@ -329,12 +328,12 @@ const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 				y: (1 - nt) * item.position.y + nt * item.destination.y,
 			};
 			return (
-				<Sprite
+				<sprite
 					anchor={0.5}
 					tint={tint}
 					rotation={0}
 					scale={1}
-					blendMode={BLEND_MODES.ADD}
+					blendMode={"add"}
 					texture={texture}
 					position={position}
 				/>
@@ -347,12 +346,12 @@ const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 				return visible;
 			}
 			return (
-				<Sprite
+				<sprite
 					anchor={0.5}
 					tint={tint}
 					rotation={0}
 					scale={1}
-					blendMode={BLEND_MODES.ADD}
+					blendMode={"add"}
 					texture={getNtFrame(MonsterDie[item.strength], item.nt)}
 					position={item.position}
 				/>
@@ -360,12 +359,12 @@ const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 		}
 		case "winning":
 			return (
-				<Sprite
+				<sprite
 					anchor={0.5}
 					tint={tint}
 					rotation={0}
 					scale={1}
-					blendMode={BLEND_MODES.ADD}
+					blendMode={"add"}
 					texture={getNtFrame(
 						MonsterReacts[item.strength],
 						item.nt / 2,
@@ -379,7 +378,7 @@ const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
 const Mushrooms = ({ items }: { items: Mushroom[] }) => {
 	return items
 		.toSorted((a, b) => a.position.y - b.position.y)
-		.map((item, i) => <Mushroom key={i} item={item} />);
+		.map((item, i) => <MushroomC key={i} item={item} />);
 };
 
 const ManaTexture = {
@@ -387,35 +386,15 @@ const ManaTexture = {
 	2: Mana2,
 } as const;
 
-const Mushroom = ({ item }: { item: Mushroom }) => {
-	switch (item.state) {
-		case "visible":
-			return (
-				<Sprite
-					texture={ManaTexture[item.strength]}
-					rotation={0}
-					blendMode={BLEND_MODES.NORMAL}
-					scale={1}
-					anchor={0.5}
-					position={item.position}
-				/>
-			);
-		case "disappearing":
-			return (
-				<Sprite
-					anchor={0.5}
-					scale={1}
-					rotation={0}
-					blendMode={BLEND_MODES.NORMAL}
-					texture={getNtFrame(
-						manaEndAnimations[item.strength],
-						item.nt,
-					)}
-					position={item.position}
-				/>
-			);
+const MushroomC = ({ item }: { item: Mushroom }) => {
+	if (item.nt == 0) {
+		return null;
 	}
-	return null;
+	const texture =
+		item.nt == 1 ?
+			ManaTexture[item.strength]
+		:	getNtFrame(manaEndAnimations[item.strength], 1 - item.nt);
+	return <sprite texture={texture} anchor={0.5} position={item.position} />;
 };
 
 const Runes = ({ runes: items }: { runes: Rune[] }) => {
@@ -423,43 +402,14 @@ const Runes = ({ runes: items }: { runes: Rune[] }) => {
 };
 
 const RuneC = ({ item, i }: { item: Rune; i: number }) => {
-	switch (item.state) {
-		case "appearing":
-			return (
-				<Sprite
-					texture={RunesSheet.animations.Rune[i + 1]}
-					anchor={0}
-					rotation={0}
-					scale={1}
-					alpha={Math.min(item.nt * 2, 1)}
-					position={[-14, 613]}
-				/>
-			);
-
-		case "disappearing":
-			return (
-				<Sprite
-					texture={RunesSheet.animations.Rune[i + 1]}
-					anchor={0}
-					rotation={0}
-					scale={1}
-					alpha={1 - item.nt}
-					position={[-14, 613]}
-				/>
-			);
-
-		case "visible":
-			return (
-				<Sprite
-					texture={RunesSheet.animations.Rune[i + 1]}
-					anchor={0}
-					rotation={0}
-					scale={1}
-					alpha={1}
-					position={[-14, 613]}
-				/>
-			);
-	}
+	return (
+		<sprite
+			texture={RunesSheet.animations.Rune[i + 1]}
+			alpha={item.nt}
+			x={-14}
+			y={613}
+		/>
+	);
 };
 
 const ShieldC = ({ shield }: { shield: Shield }) => {
@@ -471,22 +421,17 @@ const ShieldC = ({ shield }: { shield: Shield }) => {
 		case "fadeOut":
 			return (
 				<>
-					<Sprite
+					<sprite
 						texture={RunesSheet.animations.Rune[0]}
-						anchor={0}
-						rotation={0}
-						scale={1}
-						alpha={1 - shield.nt}
-						blendMode={BLEND_MODES.NORMAL}
-						position={[-14, 613]}
+						alpha={shield.nt}
+						position={{ x: -14, y: 613 }}
 					/>
-					<Sprite
+					<sprite
 						texture={ShieldLoop}
-						blendMode={BLEND_MODES.ADD}
-						position={[18, -70]}
-						anchor={0}
+						blendMode={"add"}
+						position={{ x: 18, y: -70 }}
 						scale={2}
-						alpha={1 - shield.nt}
+						alpha={shield.nt}
 					/>
 				</>
 			);
@@ -494,20 +439,15 @@ const ShieldC = ({ shield }: { shield: Shield }) => {
 		case "appearing":
 			return (
 				<>
-					<Sprite
+					<sprite
 						texture={RunesSheet.animations.Rune[0]}
-						anchor={0}
-						rotation={0}
-						scale={1}
 						alpha={shield.nt}
-						blendMode={BLEND_MODES.NORMAL}
-						position={[-14, 613]}
+						position={{ x: -14, y: 613 }}
 					/>
-					<Sprite
+					<sprite
 						texture={getNtFrame(ShieldStart, shield.nt)}
-						blendMode={BLEND_MODES.ADD}
-						position={[-270, -149]}
-						anchor={0}
+						blendMode={"add"}
+						position={{ x: -270, y: -149 }}
 						scale={2}
 					/>
 				</>
@@ -516,20 +456,15 @@ const ShieldC = ({ shield }: { shield: Shield }) => {
 		case "disappearing":
 			return (
 				<>
-					<Sprite
+					<sprite
 						texture={RunesSheet.animations.Rune[0]}
-						anchor={0}
-						rotation={0}
-						scale={1}
 						alpha={1 - shield.nt}
-						blendMode={BLEND_MODES.NORMAL}
-						position={[-14, 613]}
+						position={{ x: -14, y: 613 }}
 					/>
-					<Sprite
+					<sprite
 						texture={getNtFrame(ShieldEnd, shield.nt)}
-						blendMode={BLEND_MODES.ADD}
-						position={[-270, -149]}
-						anchor={0}
+						blendMode={"add"}
+						position={{ x: -270, y: -149 }}
 						scale={2}
 					/>
 				</>
@@ -538,20 +473,14 @@ const ShieldC = ({ shield }: { shield: Shield }) => {
 		case "visible":
 			return (
 				<>
-					<Sprite
+					<sprite
 						texture={RunesSheet.animations.Rune[0]}
-						anchor={0}
-						rotation={0}
-						scale={1}
-						alpha={1}
-						blendMode={BLEND_MODES.NORMAL}
-						position={[-14, 613]}
+						position={{ x: -14, y: 613 }}
 					/>
-					<Sprite
+					<sprite
 						texture={ShieldLoop}
-						blendMode={BLEND_MODES.ADD}
-						position={[18, -70]}
-						anchor={0}
+						blendMode={"add"}
+						position={{ x: 18, y: -70 }}
 						scale={2}
 					/>
 				</>
@@ -560,26 +489,20 @@ const ShieldC = ({ shield }: { shield: Shield }) => {
 		case "fighting":
 			return (
 				<>
-					<Sprite
+					<sprite
 						texture={RunesSheet.animations.Rune[0]}
-						anchor={0}
-						rotation={0}
-						scale={1}
-						alpha={1}
-						blendMode={BLEND_MODES.NORMAL}
-						position={[-14, 613]}
+						position={{ x: -14, y: 613 }}
 					/>
-					<Sprite
+					<sprite
 						texture={ShieldLoop}
-						blendMode={BLEND_MODES.ADD}
-						position={[18, -70]}
-						anchor={0}
+						blendMode={"add"}
+						position={{ x: 18, y: -70 }}
 						scale={2}
 					/>
-					<Sprite
+					<sprite
 						texture={getNtFrame(ShieldHit, shield.nt)}
-						blendMode={BLEND_MODES.ADD}
-						position={[18, -70]}
+						blendMode={"add"}
+						position={{ x: 18, y: -70 }}
 						anchor={0}
 						scale={2}
 					/>

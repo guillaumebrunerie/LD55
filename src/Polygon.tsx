@@ -1,24 +1,22 @@
-import { Graphics } from "@pixi/react";
-import type { Polygon as PolygonT } from "pixi.js";
+import type { PointData } from "pixi.js";
 import { type ComponentProps, useCallback } from "react";
 
-type PolygonProps = Parameters<typeof Graphics>[0] & {
-	polygon: PolygonT;
+type PolygonProps = Omit<ComponentProps<"graphics">, "draw"> & {
+	polygon: PointData[];
 	alpha: number;
 };
 
-type Draw = NonNullable<ComponentProps<typeof Graphics>["draw"]>;
+type Draw = ComponentProps<"graphics">["draw"];
 
 export const PolygonShape = ({ polygon, alpha, ...rest }: PolygonProps) => {
 	const draw = useCallback<Draw>(
 		(g) => {
 			g.clear();
-			g.beginFill(0xff00ff, alpha);
-			g.drawPolygon(polygon);
-			g.endFill();
+			g.poly(polygon);
+			g.fill({ color: 0xff00ff, alpha });
 		},
 		[polygon, alpha],
 	);
 
-	return <Graphics draw={draw} {...rest} />;
+	return <graphics {...rest} draw={draw} />;
 };

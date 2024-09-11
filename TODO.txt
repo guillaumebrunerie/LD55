@@ -3,11 +3,9 @@
 - Restart game against player
 - Fix glitches with start/exit/restart
 - Start/restart buttons should trigger on click, not pointerdown
+- Fix delay when starting fight
 
 # Prio 2
 
-- Show current mana points of opponent when playing online
 - Use subclasses
-- Write MobX plugin for subclasses
-- Remove all uses of old entities
-- Use new version of PIXI React
+- Show current mana points of opponent when playing online

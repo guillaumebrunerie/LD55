@@ -1,7 +1,6 @@
-import { Graphics } from "@pixi/react";
 import { type ComponentProps, useCallback } from "react";
 
-type CircleProps = Parameters<typeof Graphics>[0] & {
+type CircleProps = Omit<ComponentProps<"graphics">, "draw"> & {
 	x: number;
 	y: number;
 	radius: number;
@@ -9,7 +8,7 @@ type CircleProps = Parameters<typeof Graphics>[0] & {
 	alpha?: number;
 };
 
-type Draw = NonNullable<ComponentProps<typeof Graphics>["draw"]>;
+type Draw = ComponentProps<"graphics">["draw"];
 
 export const Circle = ({
 	x,
@@ -22,12 +21,11 @@ export const Circle = ({
 	const draw = useCallback<Draw>(
 		(g) => {
 			g.clear();
-			g.beginFill(color, alpha);
-			g.drawCircle(x, y, radius);
-			g.endFill();
+			g.circle(x, y, radius);
+			g.fill({ color, alpha });
 		},
 		[x, y, radius, color, alpha],
 	);
 
-	return <Graphics draw={draw} {...rest} />;
+	return <graphics {...rest} draw={draw} />;
 };

@@ -6,7 +6,7 @@ export class LinearToggle extends EntityC {
 	speed = 0;
 	delay = 0;
 
-	constructor(value: number, target = value) {
+	constructor(value = 0, target = value) {
 		super();
 		this.value = value;
 		this.target = target;

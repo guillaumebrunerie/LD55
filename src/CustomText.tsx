@@ -1,27 +1,17 @@
-import { Text } from "@pixi/react";
-import { TextStyle, type Text as TextT } from "pixi.js";
-import type { Point } from "./utils";
-import type { Ref } from "react";
+import { TextStyle, type Text } from "pixi.js";
+import type { ComponentProps, Ref } from "react";
 
 export const CustomText = ({
-	text,
 	myRef,
-	position,
-	anchor,
 	color,
+	...rest
 }: {
-	text: string;
-	myRef?: Ref<TextT>;
-	position?: Point;
-	anchor?: [number, number] | number;
+	myRef?: Ref<Text>;
 	color?: string;
-}) => {
+} & ComponentProps<"text">) => {
 	return (
-		<Text
+		<text
 			ref={myRef}
-			text={text}
-			position={position || { x: 0, y: 0 }}
-			anchor={anchor}
 			style={
 				new TextStyle({
 					fontFamily: "roboto condensed",
@@ -31,6 +21,7 @@ export const CustomText = ({
 					fill: color || "#FFFFFF",
 				})
 			}
+			{...rest}
 		/>
 	);
 };

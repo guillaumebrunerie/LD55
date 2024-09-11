@@ -12,16 +12,16 @@ export const useButton = ({
 	const [isPressed, setIsPressed] = useState(false);
 	const [isHovered, setIsHovered] = useState(false);
 
-	const mouseover = useCallback(() => setIsHovered(true), []);
-	const mouseout = useCallback(() => setIsHovered(false), []);
-	const pointerdown = useCallback(() => setIsPressed(true), []);
-	const pointerup = useCallback(() => {
+	const onMouseOver = useCallback(() => setIsHovered(true), []);
+	const onMouseOut = useCallback(() => setIsHovered(false), []);
+	const onPointerDown = useCallback(() => setIsPressed(true), []);
+	const onPointerUp = useCallback(() => {
 		setIsPressed(false);
 		runInAction(() => {
 			onClick();
 		});
 	}, [onClick]);
-	const pointerupoutside = useCallback(() => setIsPressed(false), []);
+	const onPointerUpOutside = useCallback(() => setIsPressed(false), []);
 	const eventMode: EventMode = "static";
 
 	return {
@@ -34,11 +34,11 @@ export const useButton = ({
 				{
 					eventMode,
 					cursor: "pointer",
-					mouseover,
-					mouseout,
-					pointerdown,
-					pointerup,
-					pointerupoutside,
+					onMouseOver,
+					onMouseOut,
+					onPointerDown,
+					onPointerUp,
+					onPointerUpOutside,
 				}
 			:	{},
 	};

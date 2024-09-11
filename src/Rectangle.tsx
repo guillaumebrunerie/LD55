@@ -1,7 +1,6 @@
-import { Graphics } from "@pixi/react";
 import { type ComponentProps, useCallback } from "react";
 
-type RectangleProps = Parameters<typeof Graphics>[0] & {
+type RectangleProps = ComponentProps<"graphics"> & {
 	x: number;
 	y: number;
 	width: number;
@@ -9,7 +8,7 @@ type RectangleProps = Parameters<typeof Graphics>[0] & {
 	alpha?: number;
 };
 
-type Draw = NonNullable<ComponentProps<typeof Graphics>["draw"]>;
+type Draw = ComponentProps<"graphics">["draw"];
 
 export const Rectangle = ({
 	x,
@@ -22,12 +21,11 @@ export const Rectangle = ({
 	const draw = useCallback<Draw>(
 		(g) => {
 			g.clear();
-			g.beginFill(0x222222, alpha);
-			g.drawRect(x, y, width, height);
-			g.endFill();
+			g.rect(x, y, width, height);
+			g.fill({ color: 0x222222, alpha });
 		},
 		[x, y, width, height, alpha],
 	);
 
-	return <Graphics draw={draw} {...rest} />;
+	return <graphics {...rest} draw={draw} />;
 };

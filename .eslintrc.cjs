@@ -49,6 +49,7 @@ module.exports = {
 		"react/display-name": "off",
 		"react/prop-types": "off",
 		"react/react-in-jsx-scope": "off",
+		"react/no-unknown-property": "off",
 
 		"react-hooks/exhaustive-deps": "error",
 		"react-hooks/rules-of-hooks": "error",

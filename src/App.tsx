@@ -1,12 +1,11 @@
-import { useState, useEffect, useReducer } from "react";
+import { useState, useEffect, useReducer, type ComponentProps } from "react";
 import {
 	type FederatedPointerEvent,
 	Filter,
-	SpriteMaskFilter,
 	Rectangle,
+	Sprite,
 	Texture,
 } from "pixi.js";
-import { Container, NineSlicePlane, Sprite } from "@pixi/react";
 import {
 	startNewGameAgainstPlayer,
 	startNewGameAgainstComputer,
@@ -91,7 +90,7 @@ const WaitingDots = ({ lt }: { lt: number }) => {
 		.fill(true)
 		.map((_, i) => {
 			return (
-				<Sprite key={i} texture={WaitingDot} x={-25 + i * 25} y={2} />
+				<sprite key={i} texture={WaitingDot} x={-25 + i * 25} y={2} />
 			);
 		});
 };
@@ -144,7 +143,7 @@ const PlayerLine = ({
 					}
 				}}
 				text={name}
-				anchor={[0, 0.5]}
+				anchor={{ x: 0, y: 0.5 }}
 				color={
 					{
 						waiting: "white",
@@ -154,8 +153,8 @@ const PlayerLine = ({
 				}
 			/>
 			<OnlineDot x={-20} y={5} timeSinceLastPing={timeSinceLastPing} />
-			<Container x={x + (icon.width * 0.75) / 2 + 15} y={5}>
-				<Sprite
+			<container x={x + (icon.width * 0.75) / 2 + 15} y={5}>
+				<sprite
 					texture={icon}
 					scale={
 						type === "requested" ?
@@ -165,7 +164,7 @@ const PlayerLine = ({
 					anchor={0.5}
 					cursor="pointer"
 					eventMode="static"
-					pointerdown={action(() => {
+					onPointerDown={action(() => {
 						void ClickStart.play();
 						if (!credentials) {
 							return;
@@ -182,7 +181,7 @@ const PlayerLine = ({
 					})}
 				/>
 				{type === "waiting" && <WaitingDots lt={app.lt} />}
-			</Container>
+			</container>
 		</>
 	);
 };
@@ -259,6 +258,7 @@ const Lobby = ({ app }: { app: AppT }) => {
 	return (
 		<>
 			<Box
+				draw={() => {}}
 				x={0}
 				y={0}
 				width={1920}
@@ -266,37 +266,38 @@ const Lobby = ({ app }: { app: AppT }) => {
 				alpha={app.lobby.alpha.value * 0.5}
 				cursor="pointer"
 				eventMode="static"
-				pointerdown={action(() => {
+				onPointerDown={action(() => {
 					clickOutsideLobby(app, disconnect);
 				})}
 			/>
-			<Container
+			<container
 				position={{ x: 0, y: -(1 - app.lobby.alpha.value) * 1000 }}
 			>
-				<Sprite
+				<sprite
 					texture={TextBox}
-					position={[1920 / 2, 1080 / 2]}
+					x={1920 / 2}
+					y={1080 / 2}
 					anchor={0.5}
 					eventMode="static"
 				/>
 				{!availablePlayers && (
 					<CustomText
 						text="Loading…"
-						anchor={[0, 0.5]}
+						anchor={{ x: 0, y: 0.5 }}
 						position={{ x: left, y: top + lineHeight }}
 					/>
 				)}
 				{players.length == 0 && (
 					<CustomText
 						text="(no wizard available, check again later)"
-						anchor={[0, 0.5]}
+						anchor={{ x: 0, y: 0.5 }}
 						position={{ x: left, y: top + lineHeight }}
 						color="#666"
 					/>
 				)}
 				{visiblePlayers.map(
 					({ id, name, type, timeSinceLastPing }, i) => (
-						<Container
+						<container
 							key={id}
 							x={left}
 							y={top + (i + 1) * lineHeight}
@@ -308,32 +309,32 @@ const Lobby = ({ app }: { app: AppT }) => {
 								type={type}
 								timeSinceLastPing={timeSinceLastPing}
 							/>
-						</Container>
+						</container>
 					),
 				)}
 				{hasPrevPage && (
-					<Sprite
+					<sprite
 						texture={ArrowUp}
 						x={1440}
 						y={210}
 						anchor={0.5}
 						cursor="pointer"
 						eventMode="static"
-						pointerdown={() => setPage((page) => page - 1)}
+						onPointerDown={() => setPage((page) => page - 1)}
 					/>
 				)}
 				{hasNextPage && (
-					<Sprite
+					<sprite
 						texture={ArrowDown}
 						x={1440}
 						y={870}
 						anchor={0.5}
 						cursor="pointer"
 						eventMode="static"
-						pointerdown={() => setPage((page) => page + 1)}
+						onPointerDown={() => setPage((page) => page + 1)}
 					/>
 				)}
-			</Container>
+			</container>
 		</>
 	);
 };
@@ -374,7 +375,7 @@ const StartButtons = ({ app }: { app: AppT }) => {
 
 	return (
 		<>
-			<Sprite
+			<sprite
 				texture={StartVsComputerDefault}
 				anchor={0.5}
 				position={{
@@ -385,7 +386,7 @@ const StartButtons = ({ app }: { app: AppT }) => {
 				hitArea={new Rectangle(-100, -100, 200, 200)}
 				{...startVsComputer.props}
 			/>
-			<Sprite
+			<sprite
 				texture={StartVsHumanOffDefault}
 				anchor={0.5}
 				position={{
@@ -404,7 +405,7 @@ const StartButtons = ({ app }: { app: AppT }) => {
 const RestartVsComputer = ({ app }: { app: AppT }) => {
 	const buttons = app.restartButtons;
 	return (
-		<Sprite
+		<sprite
 			texture={getFrame(RestartButtonComputer, 20, buttons.lt)}
 			anchor={0.5}
 			position={{
@@ -415,7 +416,7 @@ const RestartVsComputer = ({ app }: { app: AppT }) => {
 			hitArea={new Rectangle(-100, -100, 200, 200)}
 			cursor="pointer"
 			eventMode="static"
-			pointerdown={action(() => {
+			onPointerDown={action(() => {
 				void ClickStart.play();
 				startNewGameAgainstComputer(app);
 			})}
@@ -426,7 +427,7 @@ const RestartVsComputer = ({ app }: { app: AppT }) => {
 const RestartVsPlayer = ({ app }: { app: AppT }) => {
 	const buttons = app.restartButtons;
 	return (
-		<Sprite
+		<sprite
 			texture={RestartBtnDefault}
 			anchor={0.5}
 			position={{
@@ -437,7 +438,7 @@ const RestartVsPlayer = ({ app }: { app: AppT }) => {
 			hitArea={new Rectangle(-100, -100, 200, 200)}
 			cursor="pointer"
 			eventMode="static"
-			pointerdown={action(() => {})}
+			onPointerDown={action(() => {})}
 		/>
 	);
 };
@@ -457,7 +458,7 @@ const BackToMenuLeft = ({ app }: { app: AppT }) => {
 	const buttons = app.restartButtons;
 
 	return (
-		<Sprite
+		<sprite
 			texture={BackToMenuDefaultLeft}
 			anchor={0.5}
 			position={{
@@ -468,7 +469,7 @@ const BackToMenuLeft = ({ app }: { app: AppT }) => {
 			hitArea={new Rectangle(-100, -100, 200, 200)}
 			cursor="pointer"
 			eventMode="static"
-			pointerdown={action(() => {
+			onPointerDown={action(() => {
 				backToMenu(app, disconnect);
 			})}
 		/>
@@ -480,7 +481,7 @@ const BackToMenuRight = ({ app }: { app: AppT }) => {
 	const buttons = app.restartButtons;
 
 	return (
-		<Sprite
+		<sprite
 			texture={BackToMenuDefault}
 			anchor={0.5}
 			position={{
@@ -491,7 +492,7 @@ const BackToMenuRight = ({ app }: { app: AppT }) => {
 			hitArea={new Rectangle(-100, -100, 200, 200)}
 			cursor="pointer"
 			eventMode="static"
-			pointerdown={action(() => {
+			onPointerDown={action(() => {
 				backToMenu(app, disconnect);
 			})}
 		/>
@@ -534,7 +535,7 @@ const useSetVolumeAll = () => {
 	};
 };
 
-type SpriteProps = Parameters<typeof Sprite>[0];
+type SpriteProps = ComponentProps<"sprite">;
 
 const SoundButton = (props: SpriteProps) => {
 	const setVolumeAll = useSetVolumeAll();
@@ -543,12 +544,12 @@ const SoundButton = (props: SpriteProps) => {
 	};
 
 	return (
-		<Sprite
+		<sprite
 			{...props}
 			texture={sound.volumeAll === 1 ? SoundOnTxt : SoundOffTxt}
 			cursor="pointer"
 			eventMode="static"
-			pointerdown={toggleSound}
+			onPointerDown={toggleSound}
 		/>
 	);
 };
@@ -581,12 +582,12 @@ const ExitButton = (props: SpriteProps & { app: AppT }) => {
 	const { app, ...spriteProps } = props;
 	const disconnect = useMutation(api.lobby.disconnect);
 	return (
-		<Sprite
+		<sprite
 			{...spriteProps}
 			texture={ExitGameBtn}
 			cursor="pointer"
 			eventMode="static"
-			pointerdown={action(() => {
+			onPointerDown={action(() => {
 				clickExitGame(app, disconnect);
 			})}
 		/>
@@ -598,43 +599,45 @@ const Menu = ({ app }: { app: AppT }) => {
 	const alpha = button.alpha.value;
 	const hasExitGame = app.state != "intro" && app.game.state != "gameover";
 	return (
-		<Container>
+		<container>
 			{alpha > 0.1 && (
 				<Box
+					draw={() => {}}
 					x={0}
 					y={0}
 					width={1920}
 					height={1080}
 					alpha={alpha * 0.5}
+					cursor="pointer"
 					eventMode="static"
-					pointerdown={action(() => {
+					onPointerDown={action(() => {
 						button.disappear();
 					})}
 				/>
 			)}
-			<Sprite
+			<sprite
 				texture={SettingsDefault}
-				anchor={[1, 0]}
+				anchor={{ x: 1, y: 0 }}
 				x={1920 - 30}
 				y={30}
 			/>
-			<Sprite
+			<sprite
 				texture={SettingsOn}
 				x={1920 - 30}
 				y={30}
-				anchor={[1, 0]}
+				anchor={{ x: 1, y: 0 }}
 				alpha={alpha}
 				cursor="pointer"
 				eventMode="static"
-				pointerdown={action(() => {
+				onPointerDown={() => {
 					if (button.alpha.target == 1) {
 						button.disappear();
 					} else {
 						button.appear();
 					}
-				})}
+				}}
 			/>
-			<NineSlicePlane
+			<nineSliceSprite
 				texture={SettingsBoxDefault}
 				x={1920 - 25 - 190 * alpha * 1.5}
 				y={25}
@@ -643,7 +646,7 @@ const Menu = ({ app }: { app: AppT }) => {
 				scale={1.5}
 				alpha={alpha}
 			/>
-			<Container x={1920 - 30} y={30} scale={alpha} alpha={alpha}>
+			<container x={1920 - 30} y={30} scale={alpha} alpha={alpha}>
 				<SoundButton
 					x={-280 + 282 / 2}
 					y={13 + 85 / 2}
@@ -659,8 +662,8 @@ const Menu = ({ app }: { app: AppT }) => {
 						app={app}
 					/>
 				)}
-			</Container>
-		</Container>
+			</container>
+		</container>
 	);
 };
 
@@ -681,17 +684,17 @@ const UIButton = ({
 	const [isPressed, setIsPressed] = useState(false);
 
 	return (
-		<Container x={x} y={1080 - 120}>
-			<Sprite
+		<container x={x} y={1080 - 120}>
+			<sprite
 				texture={isPressed ? textureOn : textureOff}
 				anchor={0.5}
 				cursor={enabled ? "pointer" : "auto"}
 				eventMode="static"
 				tint={0xffffff}
-				pointerup={() => {
+				onPointerUp={() => {
 					setIsPressed(false);
 				}}
-				pointerdown={() => {
+				onPointerDown={() => {
 					if (enabled) {
 						onClick();
 						setIsPressed(true);
@@ -699,13 +702,13 @@ const UIButton = ({
 				}}
 				alpha={button.alpha.value < button.fade.value ? 0 : 1}
 			/>
-			<Sprite
+			<sprite
 				texture={isPressed ? textureOn : textureOff}
 				anchor={0.5}
 				tint={0x333333}
 				alpha={button.fade.value * button.alpha.value}
 			/>
-		</Container>
+		</container>
 	);
 };
 
@@ -754,10 +757,10 @@ const PlayerName = ({ playerId }: { playerId: Id<"players"> }) => {
 	const playerName = useQuery(api.player.playerName, { playerId });
 	return (
 		playerName && (
-			<Container x={40} y={1080 - 40}>
+			<container x={40} y={1080 - 40}>
 				<OnlineDot x={-20} y={5} timeSinceLastPing={0} />
-				<CustomText text={playerName} anchor={[0, 0.5]} />
-			</Container>
+				<CustomText text={playerName} anchor={{ x: 0, y: 0.5 }} />
+			</container>
 		)
 	);
 };
@@ -768,40 +771,40 @@ const OpponentName = ({ playerId }: { playerId: Id<"players"> }) => {
 	const dateNow = useDateNow(1000);
 	const timeSinceLastPing = dateNow - lastPing;
 	return (
-		<Container x={1920 - 40} y={1080 - 40}>
+		<container x={1920 - 40} y={1080 - 40}>
 			<CustomText
 				text={playerName ?? "(disconnected)"}
-				anchor={[1, 0.5]}
+				anchor={{ x: 1, y: 0.5 }}
 				color={playerName ? undefined : "#666"}
 			/>
 			<OnlineDot x={20} y={5} timeSinceLastPing={timeSinceLastPing} />
-		</Container>
+		</container>
 	);
 };
 
 const LogoMoon = ({
 	logo,
-	filters = [],
 	alpha = 1,
+	...rest
 }: {
 	logo: Logo;
 	filters?: Filter[];
 	alpha?: number;
-}) => {
+} & ComponentProps<"sprite">) => {
 	return (
 		<>
-			<Sprite
+			<sprite
 				texture={Moon}
-				anchor={[0.5, 0.5]}
+				anchor={{ x: 0.5, y: 0.5 }}
 				x={1920 / 2}
 				y={300 - logo.progress.value * 400}
-				filters={filters}
 				alpha={logo.logoAppear.value < 1 ? 0 : alpha}
+				{...rest}
 			/>
 			{logo.logoAppear.value > 0 && (
-				<Sprite
+				<sprite
 					texture={getNtFrame(LogoStart, logo.logoAppear.value)}
-					anchor={[0.5, 0.5]}
+					anchor={{ x: 0.5, y: 0.5 }}
 					x={1920 / 2}
 					y={300 - logo.progress.value * 400}
 					alpha={1 - logo.progress.value}
@@ -817,6 +820,7 @@ const PoofedAway = ({ app }: { app: AppT }) => {
 	return (
 		<>
 			<Box
+				draw={() => {}}
 				x={0}
 				y={0}
 				width={1920}
@@ -824,17 +828,17 @@ const PoofedAway = ({ app }: { app: AppT }) => {
 				alpha={0.7}
 				cursor="pointer"
 				eventMode="static"
-				pointerdown={action(() => {
+				onPointerDown={action(() => {
 					backToMenu(app, disconnect);
 				})}
 			/>
-			<Sprite
+			<sprite
 				texture={PoofedAwayPost}
 				anchor={0.5}
 				x={1920 / 2}
 				y={1080 / 2}
 			/>
-			<Container x={1920 / 2} y={1080 / 2}>
+			<container x={1920 / 2} y={1080 / 2}>
 				<CustomText
 					text={"Your opponent"}
 					position={{ x: 0, y: 10 }}
@@ -845,7 +849,7 @@ const PoofedAway = ({ app }: { app: AppT }) => {
 					position={{ x: 0, y: 70 }}
 					anchor={0.5}
 				/>
-			</Container>
+			</container>
 		</>
 	);
 };
@@ -981,68 +985,70 @@ export const App = () => {
 		y: 50,
 	};
 
-	const [filter, setFilter] = useState<Filter>();
-	const filters = filter ? [filter, darkFilter] : [];
+	const [mask, setMask] = useState<Sprite>();
+	const filters = mask ? [darkFilter] : [];
 
 	return (
 		<GlobalTimeContext.Provider value={app.gt}>
-			<Container>
-				<Sprite
+			<container>
+				<sprite
 					texture={Bg}
 					x={0}
 					y={0}
 					eventMode="static"
-					pointerdown={(e: FederatedPointerEvent) => {
+					onPointerDown={(e: FederatedPointerEvent) => {
 						const { x, y } = e.global;
 						console.log(`${Math.round(x)}, ${Math.round(y)}`);
 					}}
 				/>
 				<LogoMoon logo={app.logo} />
-				<Sprite texture={Cloud3} position={cloud3} />
-				<Sprite texture={Cloud2} position={cloud2} />
-				<Sprite texture={Cloud1} position={cloud1} />
-				<Sprite texture={BgFront} x={0} y={0} />
+				<sprite texture={Cloud3} position={cloud3} />
+				<sprite texture={Cloud2} position={cloud2} />
+				<sprite texture={Cloud1} position={cloud1} />
+				<sprite texture={BgFront} x={0} y={0} />
 				<Game game={game} />
-				<Sprite
+				<sprite
 					texture={InactiveSideWhite}
-					anchor={[1, 0]}
+					anchor={{ x: 1, y: 0 }}
 					x={1920}
 					y={0}
 					alpha={1}
-					ref={(sprite) => {
-						if (sprite && !filter) {
-							const f = new SpriteMaskFilter(sprite);
-							setFilter(f);
+					ref={(sprite: Sprite) => {
+						if (sprite && !mask) {
+							setMask(sprite);
 						}
 					}}
 				/>
-				<Sprite
+				<sprite
 					texture={InactiveSide}
-					anchor={[1, 0]}
+					anchor={{ x: 1, y: 0 }}
 					x={1920}
 					y={0}
 					alpha={screenAlpha}
 				/>
-				<Sprite
+				<sprite
 					texture={Cloud3}
 					position={cloud3}
+					mask={mask}
 					filters={filters}
 					alpha={screenAlpha}
 				/>
-				<Sprite
+				<sprite
 					texture={Cloud2}
 					position={cloud2}
+					mask={mask}
 					filters={filters}
 					alpha={screenAlpha}
 				/>
-				<Sprite
+				<sprite
 					texture={Cloud1}
 					position={cloud1}
+					mask={mask}
 					filters={filters}
 					alpha={screenAlpha}
 				/>
-				<Container
-					scale={[-1, 1]}
+				<container
+					scale={{ x: -1, y: 1 }}
 					x={1920}
 					filters={[darkFilter]}
 					alpha={screenAlpha}
@@ -1052,17 +1058,18 @@ export const App = () => {
 						player={game.opponent}
 						wizard={game.opponent.wizard}
 					/>
-				</Container>
-				{/* <Container */}
+				</container>
+				{/* <container */}
 				{/* 	scale={[-1, 1]} */}
 				{/* 	x={1920} */}
 				{/* 	filters={[]} */}
 				{/* 	alpha={screenAlpha * 0.4} */}
 				{/* > */}
 				{/* 	<ManaPoints items={game.opponent.manaPoints} /> */}
-				{/* </Container> */}
+				{/* </container> */}
 				<LogoMoon
 					logo={app.logo}
+					mask={mask}
 					filters={filters}
 					alpha={screenAlpha}
 				/>
@@ -1076,7 +1083,7 @@ export const App = () => {
 				<Menu app={app} />
 				{/* <PolygonShape polygon={manaBounds.polygon} alpha={0.4} /> */}
 				{hasPoofedAway && <PoofedAway app={app} />}
-			</Container>
+			</container>
 		</GlobalTimeContext.Provider>
 	);
 };
