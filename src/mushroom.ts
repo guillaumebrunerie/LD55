@@ -22,8 +22,11 @@ export class Mushroom extends EntityC {
 		this.progress.value = 1;
 	}
 
-	async disappear(delay = 0) {
+	disappear(delay = 0) {
 		this.progress.setTarget(0, fightDuration, delay);
+	}
+
+	async wait() {
 		await this.progress.wait();
 	}
 

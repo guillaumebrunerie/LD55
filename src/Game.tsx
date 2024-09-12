@@ -1,9 +1,4 @@
-import {
-	type GameT as GameT,
-	type Mana,
-	type Monster,
-	type Player,
-} from "./gameLogic";
+import { type GameT as GameT, type Mana, type Player } from "./gameLogic";
 import {
 	Mana1,
 	ManaPoint,
@@ -47,6 +42,7 @@ import { opponentFilter, opponentFilterAdd } from "./filters";
 import type { Shield } from "./shield";
 import type { Rune } from "./rune";
 import type { Mushroom } from "./mushroom";
+import type { Monster } from "./monster";
 
 // const DisconnectOnClose = ({ game }: { game: GameT }) => {
 // 	// Disconnect on close
@@ -170,7 +166,7 @@ const Player = ({
 			<Runes runes={player.protection.runes.entities} />
 			<Mushrooms items={player.mushrooms.entities} />
 			<ManaPoints items={player.manaPoints} />
-			<MonsterItems items={player.monsters} tint={monsterTint} />
+			<Monsters items={player.monsters.entities} tint={monsterTint} />
 		</container>
 	);
 };
@@ -274,10 +270,8 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 	}
 };
 
-const MonsterItems = ({ items, tint }: { items: Monster[]; tint: number }) => {
-	return items.map((item, i) => (
-		<MonsterItem key={i} item={item} tint={tint} />
-	));
+const Monsters = ({ items, tint }: { items: Monster[]; tint: number }) => {
+	return items.map((item, i) => <MonsterC key={i} item={item} tint={tint} />);
 };
 
 const MonsterIdle = {
@@ -298,7 +292,7 @@ const MonsterReacts = {
 	3: Monster3Reacts,
 } as const;
 
-const MonsterItem = ({ item, tint }: { item: Monster; tint: number }) => {
+const MonsterC = ({ item, tint }: { item: Monster; tint: number }) => {
 	const gt = useGlobalTime();
 	const visible = (
 		<sprite

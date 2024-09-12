@@ -13,6 +13,9 @@ export class EntityArray<T extends EntityC> extends EntityC {
 	}
 
 	remove(t: T) {
+		if (!this.entities.includes(t)) {
+			debugger;
+		}
 		this.entities = this.entities.filter((e) => e != t);
 		this.removeChildren(t);
 	}

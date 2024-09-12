@@ -21,4 +21,8 @@ export class Curtain extends EntityC {
 	get isIdle() {
 		return this.alpha.isIdle;
 	}
+
+	async wait() {
+		await this.alpha.wait();
+	}
 }
