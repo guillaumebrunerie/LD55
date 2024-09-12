@@ -15,7 +15,6 @@ import {
 } from "./assets";
 import { Button } from "./button";
 import {
-	type Bounds,
 	shieldImpactBounds,
 	manaBounds,
 	manaPointsBounds,
@@ -29,27 +28,11 @@ import {
 	newEntity as newEntityOld,
 	makeTick as makeTickOld,
 	type Entity as EntityOld,
-	changeState as changeStateOld,
 	schedule as scheduleOld,
 	makeTick2 as makeTick2Old,
 	clearTransitions as clearTransitionsOld,
 } from "./entitiesOld";
-import { areIdle2, scheduleX } from "./entities";
 import { smartStrategy, type Strategy } from "./strategies";
-import {
-	appearWizard,
-	dieWizard,
-	hiddenWizard,
-	idleWizard,
-	maybeEndWizardMagic,
-	newWizard,
-	startWizardMagic,
-	tickWizard,
-	waitingEndWizard,
-	waitingStartWizard,
-	winWizard,
-	type WizardT,
-} from "./wizard";
 import type { Id } from "../convex/_generated/dataModel";
 import { pickPosition, type Point } from "./utils";
 import type { api } from "../convex/_generated/api";
@@ -70,26 +53,13 @@ import { Protection } from "./protection";
 import { Mushroom } from "./mushroom";
 import { EntityArray } from "./entitiesArray";
 import { Monster } from "./monster";
-
-type ManaState =
-	| "visible"
-	| "anticipating"
-	| "spawning"
-	| "traveling"
-	| "spawningOut";
-export type Mana = EntityOld<ManaState> & {
-	id: string;
-	position: Point;
-	prevPosition?: Point;
-	scale: number;
-	offset: number;
-	rotationSpeed: number;
-};
+import { Mana } from "./mana";
+import { Wizard } from "./wizard";
 
 export type Player = EntityOld<"idle"> & {
 	boughtSomething: boolean; // TODO: remove
-	wizard: WizardT;
-	manaPoints: Mana[];
+	wizard: Wizard;
+	manaPoints: EntityArray<Mana>;
 	protection: Protection;
 	mushrooms: EntityArray<Mushroom>;
 	monsters: EntityArray<Monster>;
@@ -101,11 +71,11 @@ const resetPlayer = (player: Player, doIdle: boolean) => {
 	player.boughtSomething = false;
 	clearTransitionsOld(player);
 	if (doIdle) {
-		idleWizard(player.wizard);
+		player.wizard.appear();
 	} else {
-		hiddenWizard(player.wizard);
+		player.wizard.disappear();
 	}
-	player.manaPoints = [];
+	player.manaPoints.clear();
 	player.mushrooms.clear();
 	player.protection.reset();
 	player.monsters.clear();
@@ -114,65 +84,64 @@ const resetPlayer = (player: Player, doIdle: boolean) => {
 };
 
 const tickPlayer = makeTick2Old((player: Player, delta) => {
-	tickWizard(player.wizard, delta);
+	player.wizard.tick(delta);
 	tickItems(player, delta);
 });
 
 const delta = 150;
 
-const generateId = () => Math.random().toString(36).slice(2);
-
-const spawnMonster = (
+const spawnMonster = async (
 	player: Player,
 	strength: 1 | 2 | 3,
 	position: Point,
 	manaPoint: Mana,
 ) => {
-	const id = generateId();
-	player.monsters.add(new Monster("waitingToAppear", id, position, strength));
-	const monster = player.monsters.entities.find((m) => m.id == id);
-	if (!monster) {
-		throw new Error("IMPOSSIBLE");
-	}
+	const monster = player.monsters.add(
+		new Monster("waitingToAppear", position, strength),
+	);
+	manaPoint.travel(position);
+	await manaPoint.wait();
 
-	manaPoint.prevPosition = manaPoint.position;
-	manaPoint.position = position;
-	changeStateOld(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
-		void ClickAttack.play();
-		changeStateOld(manaPoint, "spawningOut", spawnDuration, (manaPoint) => {
-			player.manaPoints = player.manaPoints.filter(
-				(item) => item != manaPoint,
-			);
-			void maybeEndWizardMagic(player);
-		});
-		monster.setVisible();
-	});
+	void ClickAttack.play();
+	manaPoint.spawnOut();
+	monster.setVisible();
+	await manaPoint.wait();
+
+	player.manaPoints.remove(manaPoint);
+	if (player.manaPoints.entities.length == 0) {
+		player.wizard.magicEnd();
+	}
 };
 
-const spawnMushroom = (player: Player, strength: 1 | 2, manaPoint: Mana) => {
+const spawnMushroom = async (
+	player: Player,
+	strength: 1 | 2,
+	manaPoint: Mana,
+) => {
 	const position = pickPosition(player.mushrooms.entities, manaBounds, delta);
-	const id = generateId();
-	player.mushrooms.add(new Mushroom(id, position, strength, false));
-	const mushroom = player.mushrooms.entities.find((m) => m.id == id);
-	if (!mushroom) {
-		throw new Error("IMPOSSIBLE");
-	}
+	const mushroom = player.mushrooms.add(
+		new Mushroom(position, strength, false),
+	);
 
-	manaPoint.prevPosition = manaPoint.position;
-	manaPoint.position = position;
-	changeStateOld(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
-		void ClickMana.play();
-		changeStateOld(manaPoint, "spawningOut", spawnDuration, (manaPoint) => {
-			player.manaPoints = player.manaPoints.filter(
-				(item) => item != manaPoint,
-			);
-			void maybeEndWizardMagic(player);
-		});
-		mushroom.setVisible();
-	});
+	manaPoint.travel(position);
+	await manaPoint.wait();
+
+	void ClickMana.play();
+	manaPoint.spawnOut();
+	mushroom.setVisible();
+	await manaPoint.wait();
+
+	player.manaPoints.remove(manaPoint);
+	if (player.manaPoints.entities.length == 0) {
+		player.wizard.magicEnd();
+	}
 };
 
-const spawnRunes = (player: Player, manaPoint: Mana, runeCount: number) => {
+const spawnRunes = async (
+	player: Player,
+	manaPoint: Mana,
+	runeCount: number,
+) => {
 	const { protection } = player;
 	const { shield } = protection;
 	const position = pickPosition([], feetBounds, delta);
@@ -184,47 +153,38 @@ const spawnRunes = (player: Player, manaPoint: Mana, runeCount: number) => {
 		}
 	}
 
-	manaPoint.prevPosition = manaPoint.position;
-	manaPoint.position = position;
-	changeStateOld(manaPoint, "traveling", manaTravelDuration, (manaPoint) => {
-		void ClickDefense.play({ volume: 0.7 });
-		changeStateOld(manaPoint, "spawningOut", spawnDuration, (manaPoint) => {
-			player.manaPoints = player.manaPoints.filter(
-				(item) => item != manaPoint,
-			);
-			void maybeEndWizardMagic(player);
-		});
-		protection.appearWaitingRunes();
-	});
+	manaPoint.travel(position);
+	await manaPoint.wait();
+
+	void ClickDefense.play({ volume: 0.7 });
+	manaPoint.spawnOut();
+	protection.appearWaitingRunes();
+	await manaPoint.wait();
+
+	player.manaPoints.remove(manaPoint);
+	if (player.manaPoints.entities.length == 0) {
+		player.wizard.magicEnd();
+	}
 };
 
-const pickManaPointRotation = () => (Math.random() > 0.5 ? 3 : -3);
-
-const addManaPoint = (
-	array: Mana[],
-	bounds: Bounds,
-	scale: number,
-	offset: number,
-) => {
-	const position = pickPosition(array, bounds, delta);
-	array.push({
-		id: generateId(),
-		lt: 0,
-		nt: 0,
-		position,
-		state: "visible",
-		transitions: [],
-		scale,
-		offset,
-		rotationSpeed: pickManaPointRotation(),
-	});
+const addManaPoint = (manaPoints: EntityArray<Mana>) => {
+	const position = pickPosition(manaPoints.entities, manaPointsBounds, delta);
+	return manaPoints.add(
+		new Mana(
+			"visible",
+			position,
+			0.7 + Math.random() * 0.3,
+			Math.random() * 2 * Math.PI,
+			Math.random() > 0.5 ? 3 : -3,
+		),
+	);
 };
 
 const newPlayer = (): Player => ({
 	...newEntityOld("idle"),
 	boughtSomething: false,
-	wizard: newWizard(),
-	manaPoints: [],
+	wizard: new Wizard(),
+	manaPoints: new EntityArray<Mana>(),
 	protection: new Protection(),
 	mushrooms: new EntityArray<Mushroom>(),
 	monsters: new EntityArray<Monster>(),
@@ -232,90 +192,61 @@ const newPlayer = (): Player => ({
 	previousEndData: emptyPlayerData(),
 });
 
-const spawnManaPointFromNothing = (player: Player, silent = false) => {
-	const position = pickPosition(player.manaPoints, manaPointsBounds, delta);
-
-	const id = generateId();
-	player.manaPoints.push({
-		...newEntityOld<ManaState>("visible"),
-		id,
-		position,
-		scale: 0.7 + Math.random() * 0.3,
-		offset: Math.random() * 2 * Math.PI,
-		rotationSpeed: pickManaPointRotation(),
-	});
-	const manaPoint = player.manaPoints.find((m) => m.id == id);
-	if (!manaPoint) {
-		throw new Error("IMPOSSIBLE");
-	}
+const spawnManaPointFromNothing = async (player: Player, silent = false) => {
+	const manaPoint = addManaPoint(player.manaPoints);
 
 	if (!silent) {
 		void Flower5Mana.play({ volume: 1 });
 	}
 
-	changeStateOld(manaPoint, "spawning", manaSpawnDuration, (manaPoint) => {
-		idleStateOld(manaPoint, "visible");
-	});
+	manaPoint.spawn();
+	await manaPoint.wait();
+	manaPoint.setVisible();
 };
 
-const spawnManaPointFromMushroom = (
+const spawnManaPointFromNothingSilent = async (player: Player) => {
+	await spawnManaPointFromNothing(player, true);
+};
+
+const spawnManaPointFromMushroom = async (
 	player: Player,
 	mushroom: Mushroom,
 	silent = false,
 ) => {
-	const position = pickPosition(player.manaPoints, manaPointsBounds, delta);
-
-	const id = generateId();
-	player.manaPoints.push({
-		...newEntityOld<ManaState>("visible"),
-		id,
-		position,
-		scale: 0.7 + Math.random() * 0.3,
-		offset: Math.random() * 2 * Math.PI,
-		rotationSpeed: pickManaPointRotation(),
-	});
-	const manaPoint = player.manaPoints.find((m) => m.id == id);
-	if (!manaPoint) {
-		throw new Error("IMPOSSIBLE");
-	}
+	const manaPoint = addManaPoint(player.manaPoints);
 
 	if (!silent) {
 		void ManaCreated.play({ volume: 0.5 });
 	}
 
-	manaPoint.prevPosition = mushroom.position;
-	changeStateOld(manaPoint, "traveling", manaSpawnDuration, (manaPoint) => {
-		if (!silent) {
-			void ManaCreated.play({ volume: 0.5 });
-		}
-		idleStateOld(manaPoint, "visible");
-	});
-};
-
-const spawnManaPointFromNothingSilent = (player: Player) => {
-	spawnManaPointFromNothing(player, true);
+	manaPoint.travelFrom(mushroom.position);
+	await manaPoint.wait();
+	if (!silent) {
+		void ManaCreated.play({ volume: 0.5 });
+	}
+	manaPoint.setVisible();
 };
 
 const addManaPoints = (player: Player) => {
 	for (let i = 0; i < initialMana; i++) {
-		addManaPoint(
-			player.manaPoints,
-			manaPointsBounds,
-			0.7 + Math.random() * 0.3,
-			Math.random() * 2 * Math.PI,
-		);
+		addManaPoint(player.manaPoints);
 	}
 	for (const item of player.mushrooms.entities) {
 		for (let i = 0; i < item.strength; i++) {
-			addManaPoint(
-				player.manaPoints,
-				manaPointsBounds,
-				0.7 + Math.random() * 0.3,
-				Math.random() * 2 * Math.PI,
-			);
+			addManaPoint(player.manaPoints);
 		}
 	}
 	player.mushrooms.clear();
+};
+
+const appearRune = async (player: Player) => {
+	player.protection.addRune(new Rune(false));
+	const rune = player.protection.runes.entities.at(-1);
+	if (!rune) {
+		throw new Error("IMPOSSIBLE");
+	}
+	rune.appear();
+	await rune.wait();
 };
 
 type GameState =
@@ -384,16 +315,11 @@ export const startGame = (app: AppT) => {
 	// for (const player of [game.player, game.opponent]) {
 	// }
 	const opponentWizard = game.opponent.wizard;
-	void flow(function* () {
-		if (
-			opponentWizard.state == ">die" ||
-			opponentWizard.state == "hidden"
-		) {
-			yield appearWizard(opponentWizard, 0);
-		} else {
-			idleWizard(opponentWizard);
-		}
-		scheduleX(opponentWizard, 0.5, waitingStartWizard);
+	void (async function () {
+		opponentWizard.appear();
+		await opponentWizard.wait();
+		opponentWizard.waitingStart(0.5);
+		await opponentWizard.wait();
 	})();
 
 	let t = 1;
@@ -413,16 +339,6 @@ export const startGame = (app: AppT) => {
 		}
 	}
 };
-
-const appearRune = flow(function* (player: Player) {
-	player.protection.addRune(new Rune(false));
-	const rune = player.protection.runes.entities.at(-1);
-	if (!rune) {
-		throw new Error("IMPOSSIBLE");
-	}
-	rune.appear();
-	yield rune.wait();
-});
 
 type LastFight = {
 	round: number;
@@ -447,13 +363,7 @@ export const setupFight = (app: AppT, lastFight: LastFight) => {
 	game.opponent.monsters.clear();
 	for (const monsterData of lastFight.opponent.monsters) {
 		const { hp, strength, position } = monsterData;
-		const monster = new Monster(
-			"visible",
-			generateId(),
-			position,
-			strength,
-			hp,
-		);
+		const monster = new Monster("visible", position, strength, hp);
 		game.opponent.monsters.add(monster);
 	}
 	// Set up defense
@@ -472,7 +382,6 @@ export const setupFight = (app: AppT, lastFight: LastFight) => {
 		const { strength } = mushroomData;
 		game.opponent.mushrooms.add(
 			new Mushroom(
-				generateId(),
 				pickPosition(
 					game.opponent.mushrooms.entities,
 					manaBounds,
@@ -484,7 +393,7 @@ export const setupFight = (app: AppT, lastFight: LastFight) => {
 		);
 	}
 	// Set up mana points
-	game.opponent.manaPoints = [];
+	game.opponent.manaPoints.clear();
 	// Clear round data
 	game.round = lastFight.round;
 
@@ -495,14 +404,15 @@ export const setupFight = (app: AppT, lastFight: LastFight) => {
 const startFight = flow(function* (app: AppT) {
 	const { game } = app;
 	idleStateOld(game, "attack");
-	yield waitingEndWizard(game.opponent.wizard);
+	game.opponent.wizard.waitingEnd();
+	yield game.opponent.wizard.wait();
 	game.curtain.hide();
 	yield game.curtain.wait();
 	yield pickAttackOrDefensePair(app);
 });
 
 const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
-	while (opponent.manaPoints.some((p) => p.state == "visible")) {
+	while (opponent.manaPoints.entities.some((p) => p.state == "visible")) {
 		const type = strategy(
 			getPlayerData(game.opponent),
 			game.player.previousStartData,
@@ -514,7 +424,6 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 				const { strength } = pickMushroomData(getPlayerData(opponent));
 				game.opponent.mushrooms.add(
 					new Mushroom(
-						generateId(),
 						pickPosition(
 							game.opponent.mushrooms.entities,
 							manaBounds,
@@ -530,12 +439,7 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 				const { strength, position } = pickMonsterData(
 					getPlayerData(opponent),
 				);
-				const monster = new Monster(
-					"visible",
-					generateId(),
-					position,
-					strength,
-				);
+				const monster = new Monster("visible", position, strength);
 				game.opponent.monsters.add(monster);
 				break;
 			}
@@ -564,12 +468,14 @@ const opponentMove = (game: GameT, opponent: Player, strategy: Strategy) => {
 			}
 		}
 
-		const manaPoint = opponent.manaPoints.find(
+		const manaPoint = opponent.manaPoints.entities.find(
 			(item) => item.state == "visible",
 		);
-		opponent.manaPoints = opponent.manaPoints.filter(
-			(item) => item != manaPoint,
-		);
+		if (manaPoint) {
+			opponent.manaPoints.remove(manaPoint);
+		} else {
+			console.error("No mana point found");
+		}
 	}
 
 	// Save the end data before the fight starts
@@ -589,7 +495,8 @@ export const tickGame = makeTickOld<GameState, GameT, [AppT]>(
 		game.attackButton.tick(delta);
 		game.defenseButton.tick(delta);
 		const idle =
-			areIdle2(game.player.wizard, game.opponent.wizard) &&
+			game.player.wizard.isIdle &&
+			game.opponent.wizard.isIdle &&
 			game.curtain.isIdle &&
 			game.manaButton.isIdle &&
 			game.attackButton.isIdle &&
@@ -607,7 +514,7 @@ export const tickGame = makeTickOld<GameState, GameT, [AppT]>(
 			},
 			buildUp: () => {
 				if (
-					game.player.manaPoints.length == 0 &&
+					game.player.manaPoints.entities.length == 0 &&
 					areAllItemsVisible(game.player)
 				) {
 					idleStateOld(game, "waiting");
@@ -617,7 +524,10 @@ export const tickGame = makeTickOld<GameState, GameT, [AppT]>(
 				}
 			},
 			waiting: () => {
-				if (!game.gameId && game.opponent.manaPoints.length == 0) {
+				if (
+					!game.gameId &&
+					game.opponent.manaPoints.entities.length == 0
+				) {
 					void startFight(app);
 				}
 			},
@@ -629,9 +539,7 @@ const tickItems = (player: Player, delta: number) => {
 	player.monsters.tick(delta);
 	player.mushrooms.tick(delta);
 	player.protection.tick(delta);
-	for (const item of player.manaPoints) {
-		tickManaPoint(item, delta);
-	}
+	player.manaPoints.tick(delta);
 };
 
 const areAllItemsVisible = (player: Player) => {
@@ -643,18 +551,13 @@ const areAllItemsVisible = (player: Player) => {
 	);
 };
 
-const manaTravelDuration = 0.2;
-const spawnDuration = 0.3;
-
 const manaSpawnDuration = 0.5;
-
-const tickManaPoint = makeTickOld<ManaState, Mana>();
 
 const rebuildPlayerMana = (player: Player) => {
 	let time = 0;
 	for (let i = 0; i < initialMana; i++) {
 		scheduleOld(player, i * rebuildDuration, (player) => {
-			spawnManaPointFromNothing(player);
+			void spawnManaPointFromNothing(player);
 		});
 		time = Math.max(time, i * rebuildDuration + manaSpawnDuration);
 	}
@@ -666,14 +569,14 @@ const rebuildPlayerMana = (player: Player) => {
 				i * rebuildDuration + 4 * rebuildDuration,
 				(player) => {
 					if (j == 0) {
-						spawnManaPointFromMushroom(player, mushroom);
+						void spawnManaPointFromMushroom(player, mushroom);
 						void flow(function* () {
 							mushroom.disappear();
 							yield mushroom.wait();
 							player.mushrooms.remove(mushroom);
 						})();
 					} else {
-						spawnManaPointFromMushroom(player, mushroom, true);
+						void spawnManaPointFromMushroom(player, mushroom, true);
 					}
 				},
 			);
@@ -689,7 +592,7 @@ const rebuildPlayerMana = (player: Player) => {
 const rebuildMana = (game: GameT, callback: () => void) => {
 	idleStateOld(game, "rebuild");
 	game.curtain.show();
-	scheduleX(game.opponent.wizard, 0.5, waitingStartWizard);
+	game.opponent.wizard.waitingStart(0.5);
 
 	let time = 0;
 	time = Math.max(time, rebuildPlayerMana(game.player));
@@ -777,8 +680,8 @@ const pickAttackPair = flow(function* (app: AppT) {
 
 const doWin = (app: AppT, winner: Player, loser: Player) => {
 	const { game } = app;
-	void dieWizard(loser.wizard);
-	winWizard(winner.wizard);
+	loser.wizard.die();
+	winner.wizard.win();
 	void WizardHit.play({ volume: 2 });
 	void Music.stop();
 	void WinMusic.play({ loop: true, volume: 0.5 });
@@ -899,10 +802,11 @@ const nextRound = (game: GameT) => {
 
 const updateButtons = (game: GameT) => {
 	const player = game.player;
-	const canBuy = player.manaPoints.some((p) => p.state == "visible");
+	const canBuy = player.manaPoints.entities.some((p) => p.state == "visible");
 	const canBuyDefense =
 		player.protection.defenseCount +
-			player.manaPoints.filter((p) => p.state == "anticipating").length <
+			player.manaPoints.entities.filter((p) => p.state == "anticipating")
+				.length <
 		16;
 	if (canBuy && canBuyDefense && game.state == "buildUp") {
 		game.defenseButton.fadeOn();
@@ -920,17 +824,19 @@ const updateButtons = (game: GameT) => {
 };
 
 const lockManaPoint = (player: Player) => {
-	void startWizardMagic(player);
-	const manaPoint = player.manaPoints.find((item) => item.state == "visible");
+	player.wizard.magicStart();
+	const manaPoint = player.manaPoints.entities.find(
+		(item) => item.state == "visible",
+	);
 	if (!manaPoint) {
 		return;
 	}
-	idleStateOld(manaPoint, "anticipating");
+	manaPoint.anticipate();
 	return manaPoint;
 };
 
 const unlockManaPoint = (manaPoint: Mana) => {
-	idleStateOld(manaPoint, "visible");
+	manaPoint.setVisible();
 };
 
 export const buyMushroom = flow(function* (
@@ -957,11 +863,10 @@ export const buyMushroom = flow(function* (
 	}
 
 	if (player == app.game.player) {
-		spawnMushroom(player, strength, manaPoint);
+		void spawnMushroom(player, strength, manaPoint);
 	} else {
 		player.mushrooms.add(
 			new Mushroom(
-				generateId(),
 				pickPosition(player.mushrooms.entities, manaBounds, delta),
 				strength,
 				true,
@@ -973,7 +878,7 @@ export const buyMushroom = flow(function* (
 
 const getPlayerData = (player: Player): PlayerData => {
 	return {
-		mana: player.manaPoints.length,
+		mana: player.manaPoints.entities.length,
 		monsters: player.monsters.entities.map((monster) => ({
 			strength: monster.strength,
 			hp: monster.hp,
@@ -1010,7 +915,7 @@ export const buyMonster = flow(function* (
 		console.error("No mana point in buyMonster");
 		return;
 	}
-	spawnMonster(player, strength, position, manaPoint);
+	void spawnMonster(player, strength, position, manaPoint);
 	player.boughtSomething = true;
 });
 
@@ -1037,6 +942,6 @@ export const buyDefense = flow(function* (
 		return;
 	}
 	const { strength } = result;
-	spawnRunes(player, manaPoint, strength);
+	void spawnRunes(player, manaPoint, strength);
 	player.boughtSomething = true;
 });

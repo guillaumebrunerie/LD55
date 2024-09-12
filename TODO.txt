@@ -1,5 +1,6 @@
 # Prio 1
 
+- Use subclasses (Player, Game, App)
 - Restart game against player
 - Fix glitches with start/exit/restart
 - Start/restart buttons should trigger on click, not pointerdown
@@ -7,5 +8,4 @@
 
 # Prio 2
 
-- Use subclasses
 - Show current mana points of opponent when playing online

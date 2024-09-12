@@ -10,6 +10,7 @@ export class EntityArray<T extends EntityC> extends EntityC {
 	add(t: T) {
 		this.entities.push(t);
 		this.addChildren(t);
+		return this.entities[this.entities.length - 1];
 	}
 
 	remove(t: T) {

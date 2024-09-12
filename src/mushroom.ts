@@ -7,7 +7,6 @@ export class Mushroom extends EntityC {
 	progress: LinearToggle;
 
 	constructor(
-		public id: string,
 		public position: Point,
 		public strength: 1 | 2,
 		visible: boolean,

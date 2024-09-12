@@ -21,7 +21,6 @@ export class Monster extends EntityC {
 
 	constructor(
 		public state: MonsterState,
-		public id: string,
 		public position: Point,
 		public strength: 1 | 2 | 3,
 		public hp: number = strength,

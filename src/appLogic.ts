@@ -11,7 +11,6 @@ import {
 import { wave } from "./ease";
 import type { Id } from "../convex/_generated/dataModel";
 import { Button } from "./button";
-import { appearWizard } from "./wizard";
 import { Logo } from "./logo";
 
 export type Credentials = {
@@ -79,7 +78,7 @@ const initApp = (app: AppT) => {
 export const startApp = (app: AppT) => {
 	initApp(app);
 	runInAction(() => {
-		void appearWizard(app.game.player.wizard, 1);
+		app.game.player.wizard.appear(1);
 		app.logo.appear(0.4);
 	});
 };

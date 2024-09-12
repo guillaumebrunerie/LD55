@@ -62,7 +62,7 @@ import {
 	setupFight,
 	resetGame,
 } from "./gameLogic";
-import { Game, Wizard } from "./Game";
+import { Game, WizardC } from "./Game";
 import { wave } from "./ease";
 import { Button } from "./button";
 import { GlobalTimeContext } from "./globalTimeContext";
@@ -1053,7 +1053,7 @@ export const App = () => {
 					filters={[darkFilter]}
 					alpha={screenAlpha}
 				>
-					<Wizard
+					<WizardC
 						game={game}
 						player={game.opponent}
 						wizard={game.opponent.wizard}

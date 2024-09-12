@@ -1,4 +1,4 @@
-import { type GameT as GameT, type Mana, type Player } from "./gameLogic";
+import { type GameT as GameT, type Player } from "./gameLogic";
 import {
 	Mana1,
 	ManaPoint,
@@ -35,7 +35,6 @@ import {
 } from "./assets";
 import { Texture } from "pixi.js";
 import { getFrame, getNtFrame } from "./Animation";
-import type { WizardT } from "./wizard";
 import { useGlobalTime } from "./useGlobalTime";
 import { wave } from "./ease";
 import { opponentFilter, opponentFilterAdd } from "./filters";
@@ -43,6 +42,8 @@ import type { Shield } from "./shield";
 import type { Rune } from "./rune";
 import type { Mushroom } from "./mushroom";
 import type { Monster } from "./monster";
+import type { Mana } from "./mana";
+import type { Wizard } from "./wizard";
 
 // const DisconnectOnClose = ({ game }: { game: GameT }) => {
 // 	// Disconnect on close
@@ -85,14 +86,14 @@ export const Game = ({ game }: { game: GameT }) => {
 	);
 };
 
-export const Wizard = ({
+export const WizardC = ({
 	game,
 	player,
 	wizard,
 }: {
 	game: GameT;
 	player: Player;
-	wizard: WizardT;
+	wizard: Wizard;
 }) => {
 	const props = {
 		x: -15,
@@ -101,20 +102,28 @@ export const Wizard = ({
 		filters: player == game.opponent ? [opponentFilter] : [],
 	};
 
+	const { state, nt = 0 } = wizard.getState();
+
 	const transition = (animation: Texture[], props2 = {}) => {
 		return (
 			<sprite
-				texture={getNtFrame(animation, wizard.nt)}
+				texture={getNtFrame(animation, nt)}
 				{...props}
 				{...props2}
 			/>
 		);
 	};
-	const looping = (animation: Texture[], fps = 20, time = wizard.lt) => {
-		return <sprite texture={getFrame(animation, fps, time)} {...props} />;
+	const looping = (animation: Texture[], fps = 20, props2 = {}) => {
+		return (
+			<sprite
+				texture={getFrame(animation, fps, wizard.lt)}
+				{...props}
+				{...props2}
+			/>
+		);
 	};
 
-	switch (wizard.state) {
+	switch (state) {
 		case "idle":
 			return looping(WizardIdle, 10);
 		case "win":
@@ -132,7 +141,7 @@ export const Wizard = ({
 		case ">waitingEnd":
 			return transition(WizardWaitingEnd);
 		case ">appear": {
-			const addMode = wizard.nt <= 14 / 23;
+			const addMode = nt <= 14 / 23;
 			return transition(WizardAppear, {
 				blendMode: addMode ? "add" : "normal",
 				filters:
@@ -143,10 +152,12 @@ export const Wizard = ({
 		}
 		case ">die":
 			return transition(WizardDie, { x: -80, y: 170 });
+		case ">disappear":
+			return looping(WizardIdle, 10, { alpha: 1 - nt });
 		case "hidden":
 			break;
 		default:
-			console.error("Unhandled state: ", wizard.state);
+			console.error("Unhandled state: ", state);
 	}
 };
 
@@ -161,11 +172,11 @@ const Player = ({
 }) => {
 	return (
 		<container>
-			<Wizard game={game} player={player} wizard={player.wizard} />
+			<WizardC game={game} player={player} wizard={player.wizard} />
 			<ShieldC shield={player.protection.shield} />
 			<Runes runes={player.protection.runes.entities} />
 			<Mushrooms items={player.mushrooms.entities} />
-			<ManaPoints items={player.manaPoints} />
+			<ManaPoints items={player.manaPoints.entities} />
 			<Monsters items={player.monsters.entities} tint={monsterTint} />
 		</container>
 	);
@@ -181,7 +192,6 @@ const manaEndAnimations = {
 } as const;
 
 const ManaPointC = ({ item }: { item: Mana }) => {
-	const lt = item.lt;
 	switch (item.state) {
 		case "anticipating": {
 			const dx = (Math.random() - 0.5) * 20;
@@ -190,10 +200,8 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 				<sprite
 					anchor={0.5}
 					scale={item.scale}
-					rotation={lt * 3 + item.offset}
-					blendMode={"normal"}
+					rotation={item.lt * item.rotationSpeed + item.offset}
 					texture={ManaPoint}
-					alpha={1}
 					position={{
 						x: item.position.x + dx,
 						y: item.position.y + dy,
@@ -206,10 +214,8 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 				<sprite
 					anchor={0.5}
 					scale={item.scale}
-					rotation={lt * item.rotationSpeed + item.offset}
-					blendMode={"normal"}
+					rotation={item.lt * item.rotationSpeed + item.offset}
 					texture={ManaPoint}
-					alpha={1}
 					position={item.position}
 				/>
 			);
@@ -228,7 +234,6 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 					anchor={0.5}
 					scale={{ x: scaleX, y: scaleY }}
 					rotation={angle + Math.PI / 2}
-					blendMode={"normal"}
 					alpha={Math.min(item.nt * 3, 1)}
 					texture={ManaPointBlurred}
 					x={
@@ -248,8 +253,7 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 					anchor={0.5}
 					scale={0.5}
 					blendMode={"add"}
-					texture={getFrame(Spawn, 30, item.lt)}
-					alpha={1}
+					texture={getNtFrame(Spawn, item.nt)}
 					position={item.position}
 				/>
 			);
@@ -259,8 +263,7 @@ const ManaPointC = ({ item }: { item: Mana }) => {
 					<sprite
 						anchor={0.5}
 						scale={item.scale}
-						rotation={lt * 3 + item.offset}
-						blendMode={"normal"}
+						rotation={item.lt * item.rotationSpeed + item.offset}
 						texture={getNtFrame(ManaPointStart, item.nt)}
 						position={item.position}
 					/>
