@@ -46,6 +46,7 @@ export class Protection extends EntityC {
 	}
 
 	removeAllRunes() {
+		this.removeChildren(...this.runes.entities);
 		this.runes.clear();
 	}
 

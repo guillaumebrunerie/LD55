@@ -11,7 +11,7 @@ export class LinearToggle extends EntityC {
 		this.value = value;
 		this.target = target;
 
-		this.addTickers((delta) => {
+		this.addTicker((delta) => {
 			if (this.delay > 0) {
 				this.delay = Math.max(0, this.delay - delta);
 			}
@@ -35,13 +35,12 @@ export class LinearToggle extends EntityC {
 
 	wait() {
 		return new Promise<void>((resolve) => {
-			const ticker = () => {
+			const ticker = this.addTicker(() => {
 				if (this.isIdle) {
+					this.removeTicker(ticker);
 					resolve();
-					this.removeTickers(ticker);
 				}
-			};
-			this.addTickers(ticker);
+			});
 		});
 	}
 

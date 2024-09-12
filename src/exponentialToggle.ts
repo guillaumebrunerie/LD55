@@ -11,7 +11,7 @@ export class ExponentialToggle extends EntityC {
 		this.value = value;
 		this.target = target;
 
-		this.addTickers((delta) => {
+		this.addTicker((delta) => {
 			if (this.delay > 0) {
 				this.delay = Math.max(0, this.delay - delta);
 			}

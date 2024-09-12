@@ -17,12 +17,16 @@ export class EntityC {
 		}
 	}
 
-	addTickers(...tickers: Ticker[]) {
-		this.tickers.push(...tickers);
+	addTicker(ticker: Ticker) {
+		this.tickers.push(ticker);
+		return this.tickers[this.tickers.length - 1];
 	}
 
-	removeTickers(...tickers: Ticker[]) {
-		this.tickers = this.tickers.filter((t) => !tickers.includes(t));
+	removeTicker(ticker: Ticker) {
+		if (!this.tickers.includes(ticker)) {
+			debugger;
+		}
+		this.tickers = this.tickers.filter((t) => t != ticker);
 	}
 
 	addChildren(...children: EntityC[]) {
