@@ -21,11 +21,11 @@ export class Mana extends EntityC {
 	}
 
 	constructor(
-		public state: ManaState,
 		public position: Point,
-		public scale: number,
-		public offset: number,
-		public rotationSpeed: number,
+		public state: ManaState = "visible",
+		public scale = 0.7 + Math.random() * 0.3,
+		public offset = Math.random() * 2 * Math.PI,
+		public rotationSpeed = Math.random() > 0.5 ? 3 : -3,
 		public prevPosition?: Point,
 	) {
 		super();
@@ -40,16 +40,16 @@ export class Mana extends EntityC {
 		this.state = "traveling";
 	}
 
-	travelFrom(position: Point) {
+	travelFrom(position: Point, delay = 0) {
 		this.prevPosition = position;
 		this.progress.value = 0;
-		this.progress.setTarget(1, manaSpawnDuration);
+		this.progress.setTarget(1, manaSpawnDuration, delay);
 		this.state = "traveling";
 	}
 
-	spawn() {
+	spawn(delay = 0) {
 		this.progress.value = 0;
-		this.progress.setTarget(1, manaSpawnDuration);
+		this.progress.setTarget(1, manaSpawnDuration, delay);
 		this.state = "spawning";
 	}
 

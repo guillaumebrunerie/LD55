@@ -1,4 +1,4 @@
-import { type GameT as GameT, type Player } from "./gameLogic";
+import { type GameT as GameT } from "./gameLogic";
 import {
 	Mana1,
 	ManaPoint,
@@ -44,6 +44,7 @@ import type { Mushroom } from "./mushroom";
 import type { Monster } from "./monster";
 import type { Mana } from "./mana";
 import type { Wizard } from "./wizard";
+import type { Player } from "./player";
 
 // const DisconnectOnClose = ({ game }: { game: GameT }) => {
 // 	// Disconnect on close
@@ -69,14 +70,14 @@ export const Game = ({ game }: { game: GameT }) => {
 	return (
 		<container>
 			<container scale={{ x: -1, y: 1 }} x={1920}>
-				<Player
+				<PlayerC
 					game={game}
 					player={game.opponent}
 					monsterTint={0xffff00}
 				/>
 			</container>
 			<container>
-				<Player
+				<PlayerC
 					game={game}
 					player={game.player}
 					monsterTint={0xffffff}
@@ -161,7 +162,7 @@ export const WizardC = ({
 	}
 };
 
-const Player = ({
+const PlayerC = ({
 	game,
 	player,
 	monsterTint,

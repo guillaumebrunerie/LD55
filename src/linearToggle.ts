@@ -33,6 +33,11 @@ export class LinearToggle extends EntityC {
 		this.delay = delay;
 	}
 
+	play(duration: number, delay = 0) {
+		this.value = 0;
+		this.setTarget(1, duration, delay);
+	}
+
 	wait() {
 		return new Promise<void>((resolve) => {
 			const ticker = this.addTicker(() => {

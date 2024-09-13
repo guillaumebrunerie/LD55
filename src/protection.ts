@@ -51,8 +51,8 @@ export class Protection extends EntityC {
 	}
 
 	addRune(rune: Rune) {
-		this.runes.add(rune);
 		this.children.push(rune);
+		return this.runes.add(rune);
 	}
 
 	startTombola() {

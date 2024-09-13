@@ -1,6 +1,6 @@
 # Prio 1
 
-- Use subclasses (Player, Game, App)
+- Use subclasses (Game, App)
 - Restart game against player
 - Fix glitches with start/exit/restart
 - Start/restart buttons should trigger on click, not pointerdown
