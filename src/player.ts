@@ -8,7 +8,6 @@ import {
 import { feetBounds, manaBounds, manaPointsBounds } from "./configuration";
 import { EntityArray } from "./entitiesArray";
 import { EntityC } from "./entitiesC";
-import { LinearToggle } from "./linearToggle";
 import { Mana } from "./mana";
 import { Monster } from "./monster";
 import { Mushroom } from "./mushroom";
@@ -29,7 +28,6 @@ export class Player extends EntityC {
 	monsters = new EntityArray<Monster>();
 	previousStartData = emptyPlayerData();
 	previousEndData = emptyPlayerData();
-	delay = new LinearToggle();
 
 	constructor() {
 		super();
@@ -39,7 +37,15 @@ export class Player extends EntityC {
 			this.protection,
 			this.mushrooms,
 			this.monsters,
-			this.delay,
+		);
+	}
+
+	get isIdle() {
+		return (
+			this.monsters.isIdle &&
+			this.protection.isIdle &&
+			this.mushrooms.isIdle &&
+			this.boughtSomething
 		);
 	}
 
@@ -163,22 +169,22 @@ export class Player extends EntityC {
 		this.mushrooms.remove(mushroom);
 	}
 
-	rebuildMana() {
-		const manaSpawnDuration = 0.5;
+	async rebuildMana() {
+		// const manaSpawnDuration = 0.5;
 		const rebuildDuration = 0.2;
+		const promises = [];
 		for (let i = 0; i < initialMana; i++) {
-			void this.spawnManaPointFromNothing(i * rebuildDuration);
+			promises.push(this.spawnManaPointFromNothing(i * rebuildDuration));
 		}
 		this.mushrooms.entities.forEach((mushroom, i) => {
-			void this.spawnManaPointsFromMushroom(
-				mushroom,
-				i * rebuildDuration + 4 * rebuildDuration,
+			promises.push(
+				this.spawnManaPointsFromMushroom(
+					mushroom,
+					i * rebuildDuration + 4 * rebuildDuration,
+				),
 			);
 		});
-		return (
-			(initialMana + this.mushrooms.entities.length) * rebuildDuration +
-			manaSpawnDuration
-		);
+		await Promise.all(promises);
 	}
 
 	async appearRune() {

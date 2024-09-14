@@ -1,4 +1,4 @@
-import { App } from "./App.tsx";
+import { AppC } from "./App.tsx";
 import { StrictMode } from "react";
 import { Application, extend } from "@pixi/react";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
@@ -14,7 +14,7 @@ root.render(
 	<StrictMode>
 		<Application width={1920} height={1080} backgroundColor={0x2d293f}>
 			<ConvexProvider client={convex}>
-				<App />
+				<AppC />
 			</ConvexProvider>
 		</Application>
 	</StrictMode>,

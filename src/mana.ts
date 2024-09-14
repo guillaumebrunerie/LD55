@@ -67,6 +67,10 @@ export class Mana extends EntityC {
 		this.state = "anticipating";
 	}
 
+	unlock() {
+		this.setVisible();
+	}
+
 	async wait() {
 		await this.progress.wait();
 	}

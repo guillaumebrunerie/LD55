@@ -6,14 +6,6 @@ import {
 	Sprite,
 	Texture,
 } from "pixi.js";
-import {
-	startNewGameAgainstPlayer,
-	startNewGameAgainstComputer,
-	type AppT,
-	type Credentials,
-	newApp,
-	startApp,
-} from "./appLogic";
 import { action, observable, runInAction } from "mobx";
 import { sound } from "@pixi/sound";
 import {
@@ -55,14 +47,7 @@ import {
 	TextBoxAppear,
 	WaitingDot,
 } from "./assets";
-import {
-	buyMonster,
-	buyDefense,
-	buyMushroom,
-	setupFight,
-	resetGame,
-} from "./gameLogic";
-import { Game, WizardC } from "./Game";
+import { GameC, WizardC } from "./Game";
 import { wave } from "./ease";
 import { Button } from "./button";
 import { GlobalTimeContext } from "./globalTimeContext";
@@ -78,6 +63,8 @@ import { getFrame, getNtFrame } from "./Animation";
 import { useButton } from "./useButton";
 import { Logo } from "./logo";
 import { useDateNow } from "./useDateNow";
+import { App } from "./app";
+import type { Credentials, Game } from "./game";
 
 const left = 420;
 const top = 105;
@@ -114,13 +101,13 @@ const OnlineDot = ({
 };
 
 const PlayerLine = ({
-	app,
+	game,
 	id,
 	name,
 	type,
 	timeSinceLastPing,
 }: {
-	app: AppT;
+	game: Game;
 	id: Id<"players">;
 	name: string;
 	type: "waiting" | "requested" | "default";
@@ -128,7 +115,6 @@ const PlayerLine = ({
 }) => {
 	const requestPlay = useMutation(api.lobby.requestPlay);
 	const [x, setX] = useState(0);
-	const { credentials } = app;
 	const icon = {
 		default: InviteButtonDefault,
 		waiting: InviteButtonOn,
@@ -158,7 +144,7 @@ const PlayerLine = ({
 					texture={icon}
 					scale={
 						type === "requested" ?
-							0.75 + Math.sin(app.lt * 6) * 0.02
+							0.75 + Math.sin(game.lt * 6) * 0.02
 						:	0.75
 					}
 					anchor={0.5}
@@ -166,67 +152,64 @@ const PlayerLine = ({
 					eventMode="static"
 					onPointerDown={action(() => {
 						void ClickStart.play();
-						if (!credentials) {
+						if (!game.credentials) {
 							return;
 						}
-						if (app.opponentId == id) {
-							app.opponentId = undefined;
+						if (game.opponentId == id) {
+							game.opponentId = undefined;
 						} else {
-							app.opponentId = id;
+							game.opponentId = id;
 						}
 						void requestPlay({
-							...credentials,
+							...game.credentials,
 							opponentId: id,
 						});
 					})}
 				/>
-				{type === "waiting" && <WaitingDots lt={app.lt} />}
+				{type === "waiting" && <WaitingDots lt={game.lt} />}
 			</container>
 		</>
 	);
 };
 
 const clickOutsideLobby = (
-	app: AppT,
+	game: Game,
 	disconnect: (credentials: Credentials) => Promise<null>,
 ) => {
-	app.lobby.disappear();
-	const { credentials } = app;
-	if (credentials) {
-		void disconnect(credentials);
-		delete app.credentials;
-		app.opponentId = undefined;
+	game.lobby.disappear();
+	if (game.credentials) {
+		void disconnect(game.credentials);
+		delete game.credentials;
+		game.opponentId = undefined;
 	}
 	void ClickStart.play();
 	void TextBoxAppear.play();
 };
 
-const Lobby = ({ app }: { app: AppT }) => {
-	const { credentials, opponentId } = app;
-
+const Lobby = ({ game }: { game: Game }) => {
 	const gameId = useQuery(api.player.currentGameId, {
-		playerId: credentials?.playerId,
+		playerId: game.credentials?.playerId,
 	});
 	useEffect(() => {
 		if (gameId) {
 			runInAction(() => {
-				startNewGameAgainstPlayer(app, gameId);
+				game.startNewGameAgainstPlayer(gameId);
 			});
 		}
-	}, [gameId, app]);
+	}, [gameId, game]);
 
 	const availablePlayers = useQuery(api.lobby.availablePlayers);
 	const players =
-		(credentials &&
+		(game.credentials &&
 			availablePlayers
-				?.filter(({ id }) => id !== credentials.playerId)
+				?.filter(({ id }) => id !== game.credentials?.playerId)
 				.map(({ id, name, opponentId: theirOpponentId, lastPing }) => {
 					return {
 						id,
 						name,
 						type:
-							id == opponentId ? ("waiting" as const)
-							: theirOpponentId == credentials.playerId ?
+							id == game.opponentId ? ("waiting" as const)
+							: theirOpponentId == game.credentials?.playerId ?
 								("requested" as const)
 							:	("default" as const),
 						timeSinceLastPing: Date.now() - lastPing,
@@ -263,15 +246,15 @@ const Lobby = ({ app }: { app: AppT }) => {
 				y={0}
 				width={1920}
 				height={1080}
-				alpha={app.lobby.alpha.value * 0.5}
+				alpha={game.lobby.alpha.value * 0.5}
 				cursor="pointer"
 				eventMode="static"
 				onPointerDown={action(() => {
-					clickOutsideLobby(app, disconnect);
+					clickOutsideLobby(game, disconnect);
 				})}
 			/>
 			<container
-				position={{ x: 0, y: -(1 - app.lobby.alpha.value) * 1000 }}
+				position={{ x: 0, y: -(1 - game.lobby.alpha.value) * 1000 }}
 			>
 				<sprite
 					texture={TextBox}
@@ -303,7 +286,7 @@ const Lobby = ({ app }: { app: AppT }) => {
 							y={top + (i + 1) * lineHeight}
 						>
 							<PlayerLine
-								app={app}
+								game={game}
 								id={id}
 								name={name}
 								type={type}
@@ -339,10 +322,10 @@ const Lobby = ({ app }: { app: AppT }) => {
 	);
 };
 
-const clickOpenLobby = (app: AppT, createNewPlayer: () => void) => {
+const clickOpenLobby = (game: Game, createNewPlayer: () => void) => {
 	void ClickStart.play();
 	void TextBoxAppear.play();
-	app.lobby.appear();
+	game.lobby.appear();
 	createNewPlayer();
 };
 
@@ -350,25 +333,25 @@ const buttonsLeftX = 1920 / 2 - 200;
 const buttonsRightX = 1920 / 2 + 200;
 const buttonsY = 730;
 
-const StartButtons = ({ app }: { app: AppT }) => {
-	const inLobby = app.lobby.alpha.value > 0.01;
+const StartButtons = ({ game }: { game: Game }) => {
+	const inLobby = game.lobby.alpha.value > 0.01;
 
-	const createNewPlayer = useCreateNewPlayer(app);
+	const createNewPlayer = useCreateNewPlayer(game);
 
-	const buttons = app.startButtons;
+	const buttons = game.startButtons;
 
 	const startVsComputer = useButton({
 		onClick: () => {
-			app.lobby.disappear();
+			game.lobby.disappear();
 			void ClickStart.play();
-			startNewGameAgainstComputer(app);
+			game.startNewGameAgainstComputer();
 		},
 		enabled: buttons.isOn,
 	});
 
 	const startVsPlayer = useButton({
 		onClick: () => {
-			clickOpenLobby(app, createNewPlayer);
+			clickOpenLobby(game, createNewPlayer);
 		},
 		enabled: buttons.isOn,
 	});
@@ -397,13 +380,13 @@ const StartButtons = ({ app }: { app: AppT }) => {
 				hitArea={new Rectangle(-100, -100, 200, 200)}
 				{...startVsPlayer.props}
 			/>
-			{inLobby && <Lobby app={app} />}
+			{inLobby && <Lobby game={game} />}
 		</>
 	);
 };
 
-const RestartVsComputer = ({ app }: { app: AppT }) => {
-	const buttons = app.restartButtons;
+const RestartVsComputer = ({ game }: { game: Game }) => {
+	const buttons = game.restartButtons;
 	return (
 		<sprite
 			texture={getFrame(RestartButtonComputer, 20, buttons.lt)}
@@ -418,14 +401,14 @@ const RestartVsComputer = ({ app }: { app: AppT }) => {
 			eventMode="static"
 			onPointerDown={action(() => {
 				void ClickStart.play();
-				startNewGameAgainstComputer(app);
+				game.startNewGameAgainstComputer();
 			})}
 		/>
 	);
 };
 
-const RestartVsPlayer = ({ app }: { app: AppT }) => {
-	const buttons = app.restartButtons;
+const RestartVsPlayer = ({ game }: { game: Game }) => {
+	const buttons = game.restartButtons;
 	return (
 		<sprite
 			texture={RestartBtnDefault}
@@ -444,18 +427,18 @@ const RestartVsPlayer = ({ app }: { app: AppT }) => {
 };
 
 const backToMenu = (
-	app: AppT,
+	game: Game,
 	disconnect: (credentials: Credentials) => Promise<null>,
 ) => {
 	void ClickStart.play();
-	exitGame(app, disconnect);
-	app.restartButtons.disappear();
-	app.startButtons.appear(0.4);
+	exitGame(game, disconnect);
+	game.restartButtons.disappear();
+	game.startButtons.appear(0.4);
 };
 
-const BackToMenuLeft = ({ app }: { app: AppT }) => {
+const BackToMenuLeft = ({ game }: { game: Game }) => {
 	const disconnect = useMutation(api.lobby.disconnect);
-	const buttons = app.restartButtons;
+	const buttons = game.restartButtons;
 
 	return (
 		<sprite
@@ -470,15 +453,15 @@ const BackToMenuLeft = ({ app }: { app: AppT }) => {
 			cursor="pointer"
 			eventMode="static"
 			onPointerDown={action(() => {
-				backToMenu(app, disconnect);
+				backToMenu(game, disconnect);
 			})}
 		/>
 	);
 };
 
-const BackToMenuRight = ({ app }: { app: AppT }) => {
+const BackToMenuRight = ({ game }: { game: Game }) => {
 	const disconnect = useMutation(api.lobby.disconnect);
-	const buttons = app.restartButtons;
+	const buttons = game.restartButtons;
 
 	return (
 		<sprite
@@ -493,30 +476,30 @@ const BackToMenuRight = ({ app }: { app: AppT }) => {
 			cursor="pointer"
 			eventMode="static"
 			onPointerDown={action(() => {
-				backToMenu(app, disconnect);
+				backToMenu(game, disconnect);
 			})}
 		/>
 	);
 };
 
-const RestartButtons = ({ app }: { app: AppT }) => {
-	const buttons = app.restartButtons;
+const RestartButtons = ({ game }: { game: Game }) => {
+	const buttons = game.restartButtons;
 	if (buttons.alpha.value < 0.01) {
 		return null;
 	}
 
-	if (app.credentials) {
+	if (game.credentials) {
 		return (
 			<>
-				<BackToMenuLeft app={app} />
-				<RestartVsPlayer app={app} />
+				<BackToMenuLeft game={game} />
+				<RestartVsPlayer game={game} />
 			</>
 		);
 	} else {
 		return (
 			<>
-				<RestartVsComputer app={app} />
-				<BackToMenuRight app={app} />
+				<RestartVsComputer game={game} />
+				<BackToMenuRight game={game} />
 			</>
 		);
 	}
@@ -555,31 +538,31 @@ const SoundButton = (props: SpriteProps) => {
 };
 
 const exitGame = (
-	app: AppT,
+	game: Game,
 	disconnect: (credentials: Credentials) => Promise<null>,
 ) => {
-	app.state = "intro";
-	resetGame(app);
+	game.state = "intro";
+	game.reset();
 	// app.game = newGame("intro", false);
-	app.menuButton.disappear();
-	if (app.credentials) {
-		void disconnect(app.credentials);
-		delete app.credentials;
-		delete app.opponentId;
+	game.menuButton.disappear();
+	if (game.credentials) {
+		void disconnect(game.credentials);
+		delete game.credentials;
+		delete game.opponentId;
 	}
 };
 
 const clickExitGame = (
-	app: AppT,
+	game: Game,
 	disconnect: (credentials: Credentials) => Promise<null>,
 ) => {
-	app.restartButtons.disappear();
-	app.startButtons.appear();
-	exitGame(app, disconnect);
+	game.restartButtons.disappear();
+	game.startButtons.appear();
+	exitGame(game, disconnect);
 };
 
-const ExitButton = (props: SpriteProps & { app: AppT }) => {
-	const { app, ...spriteProps } = props;
+const ExitButton = (props: SpriteProps & { game: Game }) => {
+	const { game, ...spriteProps } = props;
 	const disconnect = useMutation(api.lobby.disconnect);
 	return (
 		<sprite
@@ -588,16 +571,16 @@ const ExitButton = (props: SpriteProps & { app: AppT }) => {
 			cursor="pointer"
 			eventMode="static"
 			onPointerDown={action(() => {
-				clickExitGame(app, disconnect);
+				clickExitGame(game, disconnect);
 			})}
 		/>
 	);
 };
 
-const Menu = ({ app }: { app: AppT }) => {
-	const button = app.menuButton;
+const Menu = ({ game }: { game: Game }) => {
+	const button = game.menuButton;
 	const alpha = button.alpha.value;
-	const hasExitGame = app.state != "intro" && app.game.state != "gameover";
+	const hasExitGame = game.state != "intro" && game.state != "gameover";
 	return (
 		<container>
 			{alpha > 0.1 && (
@@ -659,7 +642,7 @@ const Menu = ({ app }: { app: AppT }) => {
 						y={85 + 85 / 2}
 						anchor={0.5}
 						scale={0.85}
-						app={app}
+						game={game}
 					/>
 				)}
 			</container>
@@ -712,11 +695,10 @@ const UIButton = ({
 	);
 };
 
-const UIButtons = ({ app }: { app: AppT }) => {
+const UIButtons = ({ game }: { game: Game }) => {
 	const buyDefenseMutation = useMutation(api.player.buyDefense);
 	const buyMushroomMutation = useMutation(api.player.buyMushroom);
 	const buyMonsterMutation = useMutation(api.player.buyMonster);
-	const { game } = app;
 	return (
 		<>
 			<UIButton
@@ -726,7 +708,7 @@ const UIButtons = ({ app }: { app: AppT }) => {
 				x={600}
 				onClick={action(() => {
 					void ClickStart.play();
-					void buyDefense(app, game.player, buyDefenseMutation);
+					void game.buyDefense(game.player, buyDefenseMutation);
 				})}
 			/>
 			<UIButton
@@ -736,7 +718,7 @@ const UIButtons = ({ app }: { app: AppT }) => {
 				x={960}
 				onClick={action(() => {
 					void ClickStart.play();
-					void buyMushroom(app, game.player, buyMushroomMutation);
+					void game.buyMushroom(game.player, buyMushroomMutation);
 				})}
 			/>
 			<UIButton
@@ -746,7 +728,7 @@ const UIButtons = ({ app }: { app: AppT }) => {
 				x={1320}
 				onClick={action(() => {
 					void ClickStart.play();
-					void buyMonster(app, game.player, buyMonsterMutation);
+					void game.buyMonster(game.player, buyMonsterMutation);
 				})}
 			/>
 		</>
@@ -815,7 +797,7 @@ const LogoMoon = ({
 	);
 };
 
-const PoofedAway = ({ app }: { app: AppT }) => {
+const PoofedAway = ({ game }: { game: Game }) => {
 	const disconnect = useMutation(api.lobby.disconnect);
 	return (
 		<>
@@ -829,7 +811,7 @@ const PoofedAway = ({ app }: { app: AppT }) => {
 				cursor="pointer"
 				eventMode="static"
 				onPointerDown={action(() => {
-					backToMenu(app, disconnect);
+					backToMenu(game, disconnect);
 				})}
 			/>
 			<sprite
@@ -856,10 +838,10 @@ const PoofedAway = ({ app }: { app: AppT }) => {
 
 const mod = (a: number, b: number) => (b + (a % b)) % b;
 
-const useCreateNewPlayer = (app: AppT) => {
+const useCreateNewPlayer = (game: Game) => {
 	const createNewPlayer = useMutation(api.lobby.createNewPlayer);
 	return () => {
-		if (app.credentials) {
+		if (game.credentials) {
 			console.error(
 				"Should not create new player when we already have credentials",
 			);
@@ -867,7 +849,7 @@ const useCreateNewPlayer = (app: AppT) => {
 		createNewPlayer()
 			.then((credentials) => {
 				runInAction(() => {
-					app.credentials = credentials;
+					game.credentials = credentials;
 				});
 			})
 			.catch(() => {
@@ -876,25 +858,25 @@ const useCreateNewPlayer = (app: AppT) => {
 	};
 };
 
-const usePing = (app: AppT) => {
+const usePing = (game: Game) => {
 	const ping = useMutation(api.lobby.ping);
 	useInterval(() => {
-		const { credentials } = app;
+		const { credentials } = game;
 		if (credentials) {
 			void ping(credentials);
 		}
 	}, 2000);
 };
 
-const useConnection = (app: AppT) => {
-	const lastFight = useQuery(api.fight.lastFight, app.credentials || {});
+const useConnection = (game: Game) => {
+	const lastFight = useQuery(api.fight.lastFight, game.credentials || {});
 	useEffect(() => {
 		runInAction(() => {
-			if (lastFight && app.game.gameId) {
-				setupFight(app, lastFight);
+			if (lastFight && game.gameId) {
+				game.setupFight(lastFight);
 			}
 		});
-	}, [lastFight, app]);
+	}, [lastFight, game]);
 };
 
 const useWarnBeforeClosing = (condition: boolean) => {
@@ -911,39 +893,38 @@ const useWarnBeforeClosing = (condition: boolean) => {
 	}, [condition]);
 };
 
-const usePoofedAway = (app: AppT) => {
+const usePoofedAway = (game: Game) => {
 	const playerExists = useQuery(api.player.playerExists, {
-		playerId: app.opponentId,
+		playerId: game.opponentId,
 	});
-	const inLobby = app.lobby.alpha.value > 0.01;
+	const inLobby = game.lobby.alpha.value > 0.01;
 
 	const lastPing =
-		useQuery(api.player.lastPing, { playerId: app.opponentId }) || 0;
+		useQuery(api.player.lastPing, { playerId: game.opponentId }) || 0;
 	const dateNow = useDateNow(1000);
 	const timeSinceLastPing = lastPing == 0 ? 0 : dateNow - lastPing;
 
 	return (
 		!inLobby &&
-		((app.opponentId !== undefined && !playerExists) ||
+		((game.opponentId !== undefined && !playerExists) ||
 			timeSinceLastPing > 15_000)
 	);
 };
 
 const useApp = () => {
-	const [app] = useState(() => observable(newApp()));
-	useEffect(() => startApp(app), [app]);
+	const [app] = useState(() => new App());
 	return app;
 };
 
-export const App = () => {
+export const AppC = () => {
 	const app = useApp();
 
 	const { game } = app;
 
-	usePing(app);
-	useConnection(app);
-	useWarnBeforeClosing(app.state != "intro");
-	const hasPoofedAway = usePoofedAway(app);
+	usePing(game);
+	useConnection(game);
+	useWarnBeforeClosing(game.state != "intro" && game.state != "gameover");
+	const hasPoofedAway = usePoofedAway(game);
 
 	useEffect(() => {
 		const callback = action((event: KeyboardEvent) => {
@@ -971,17 +952,17 @@ export const App = () => {
 	const screenAlpha = wave(game.curtain.alpha.value);
 
 	const cloud1 = {
-		x: mod(21 * app.gt, 2800) - 800,
+		x: mod(21 * app.lt, 2800) - 800,
 		y: 500,
 	};
 
 	const cloud2 = {
-		x: mod(16 * app.gt + (2800 * 2) / 3, 2800) - 800,
+		x: mod(16 * app.lt + (2800 * 2) / 3, 2800) - 800,
 		y: 200,
 	};
 
 	const cloud3 = {
-		x: mod(13 * app.gt + 2800 / 3, 2800) - 800,
+		x: mod(13 * app.lt + 2800 / 3, 2800) - 800,
 		y: 50,
 	};
 
@@ -989,7 +970,7 @@ export const App = () => {
 	const filters = mask ? [darkFilter] : [];
 
 	return (
-		<GlobalTimeContext.Provider value={app.gt}>
+		<GlobalTimeContext.Provider value={app.lt}>
 			<container>
 				<sprite
 					texture={Bg}
@@ -1001,12 +982,12 @@ export const App = () => {
 						console.log(`${Math.round(x)}, ${Math.round(y)}`);
 					}}
 				/>
-				<LogoMoon logo={app.logo} />
+				<LogoMoon logo={game.logo} />
 				<sprite texture={Cloud3} position={cloud3} />
 				<sprite texture={Cloud2} position={cloud2} />
 				<sprite texture={Cloud1} position={cloud1} />
 				<sprite texture={BgFront} x={0} y={0} />
-				<Game game={game} />
+				<GameC game={game} />
 				<sprite
 					texture={InactiveSideWhite}
 					anchor={{ x: 1, y: 0 }}
@@ -1068,21 +1049,21 @@ export const App = () => {
 				{/* 	<ManaPoints items={game.opponent.manaPoints} /> */}
 				{/* </container> */}
 				<LogoMoon
-					logo={app.logo}
+					logo={game.logo}
 					mask={mask}
 					filters={filters}
 					alpha={screenAlpha}
 				/>
-				<UIButtons app={app} />
-				<StartButtons app={app} />
-				<RestartButtons app={app} />
-				{app.credentials && (
-					<PlayerName playerId={app.credentials.playerId} />
+				<UIButtons game={game} />
+				<StartButtons game={game} />
+				<RestartButtons game={game} />
+				{game.credentials && (
+					<PlayerName playerId={game.credentials.playerId} />
 				)}
-				{app.opponentId && <OpponentName playerId={app.opponentId} />}
-				<Menu app={app} />
+				{game.opponentId && <OpponentName playerId={game.opponentId} />}
+				<Menu game={game} />
 				{/* <PolygonShape polygon={manaBounds.polygon} alpha={0.4} /> */}
-				{hasPoofedAway && <PoofedAway app={app} />}
+				{hasPoofedAway && <PoofedAway game={game} />}
 			</container>
 		</GlobalTimeContext.Provider>
 	);

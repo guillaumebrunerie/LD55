@@ -29,6 +29,10 @@ export class Mushroom extends EntityC {
 		await this.progress.wait();
 	}
 
+	get isIdle() {
+		return this.progress.isIdle;
+	}
+
 	get nt() {
 		return this.progress.value;
 	}

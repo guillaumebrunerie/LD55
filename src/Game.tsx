@@ -1,4 +1,3 @@
-import { type GameT as GameT } from "./gameLogic";
 import {
 	Mana1,
 	ManaPoint,
@@ -45,6 +44,7 @@ import type { Monster } from "./monster";
 import type { Mana } from "./mana";
 import type { Wizard } from "./wizard";
 import type { Player } from "./player";
+import type { Game } from "./game";
 
 // const DisconnectOnClose = ({ game }: { game: GameT }) => {
 // 	// Disconnect on close
@@ -66,7 +66,7 @@ import type { Player } from "./player";
 // 	return null;
 // };
 
-export const Game = ({ game }: { game: GameT }) => {
+export const GameC = ({ game }: { game: Game }) => {
 	return (
 		<container>
 			<container scale={{ x: -1, y: 1 }} x={1920}>
@@ -92,7 +92,7 @@ export const WizardC = ({
 	player,
 	wizard,
 }: {
-	game: GameT;
+	game: Game;
 	player: Player;
 	wizard: Wizard;
 }) => {
@@ -167,7 +167,7 @@ const PlayerC = ({
 	player,
 	monsterTint,
 }: {
-	game: GameT;
+	game: Game;
 	player: Player;
 	monsterTint: number;
 }) => {

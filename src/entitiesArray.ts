@@ -7,6 +7,10 @@ export class EntityArray<T extends EntityC> extends EntityC {
 		super();
 	}
 
+	get isIdle() {
+		return this.entities.every((entity) => entity.isIdle);
+	}
+
 	add(t: T) {
 		this.entities.push(t);
 		this.addChildren(t);

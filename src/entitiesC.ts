@@ -7,6 +7,10 @@ export class EntityC {
 
 	constructor() {}
 
+	// get isIdle() {
+	// 	return 0 == 0;
+	// }
+
 	tick(delta: number) {
 		this.lt += delta;
 		for (const child of this.children) {
