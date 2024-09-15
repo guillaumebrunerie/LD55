@@ -25,8 +25,8 @@ export class Mushroom extends EntityC {
 		this.progress.setTarget(0, fightDuration, delay);
 	}
 
-	async wait() {
-		await this.progress.wait();
+	async wait(delay = 0) {
+		await this.progress.wait(delay);
 	}
 
 	get isIdle() {

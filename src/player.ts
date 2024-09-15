@@ -54,7 +54,7 @@ export class Player extends EntityC {
 		if (doIdle) {
 			this.wizard.appear();
 		} else {
-			this.wizard.disappear();
+			this.wizard.die();
 		}
 		this.manaPoints.clear();
 		this.protection.reset();
@@ -78,7 +78,7 @@ export class Player extends EntityC {
 
 		this.manaPoints.remove(manaPoint);
 		if (this.manaPoints.entities.length == 0) {
-			this.wizard.magicEnd();
+			void this.wizard.magicEnd();
 		}
 	}
 
@@ -102,7 +102,7 @@ export class Player extends EntityC {
 
 		this.manaPoints.remove(manaPoint);
 		if (this.manaPoints.entities.length == 0) {
-			this.wizard.magicEnd();
+			void this.wizard.magicEnd();
 		}
 	}
 
@@ -127,7 +127,7 @@ export class Player extends EntityC {
 
 		this.manaPoints.remove(manaPoint);
 		if (this.manaPoints.entities.length == 0) {
-			this.wizard.magicEnd();
+			void this.wizard.magicEnd();
 		}
 	}
 
@@ -141,10 +141,12 @@ export class Player extends EntityC {
 
 	async spawnManaPointFromNothing(delay: number, silent = false) {
 		const manaPoint = this.addManaPoint();
+		await manaPoint.wait(delay);
+
 		if (!silent) {
 			void Flower5Mana.play({ volume: 1 });
 		}
-		manaPoint.spawn(delay);
+		manaPoint.spawn();
 		await manaPoint.wait();
 
 		manaPoint.setVisible();
@@ -159,12 +161,14 @@ export class Player extends EntityC {
 	}
 
 	async spawnManaPointsFromMushroom(mushroom: Mushroom, delay: number) {
-		void ManaCreated.play({ volume: 0.5 });
+		await mushroom.wait(delay);
+		void ManaCreated.play({ volume: 1 });
+		// void Flower5Mana.play({ volume: 1 });
 
 		for (let j = 0; j < mushroom.strength; j++) {
-			void this.spawnSingleManaPointFromMushroom(mushroom, delay);
+			void this.spawnSingleManaPointFromMushroom(mushroom);
 		}
-		mushroom.disappear(delay);
+		mushroom.disappear();
 		await mushroom.wait();
 		this.mushrooms.remove(mushroom);
 	}
@@ -187,6 +191,18 @@ export class Player extends EntityC {
 		await Promise.all(promises);
 	}
 
+	rebuildManaInstant() {
+		for (let i = 0; i < initialMana; i++) {
+			this.addManaPoint().setVisible();
+		}
+		this.mushrooms.entities.forEach((mushroom) => {
+			for (let i = 0; i < mushroom.strength; i++) {
+				this.addManaPoint().setVisible();
+			}
+			this.mushrooms.remove(mushroom);
+		});
+	}
+
 	async appearRune() {
 		const rune = this.protection.addRune(new Rune(false));
 		rune.appear();
@@ -207,7 +223,7 @@ export class Player extends EntityC {
 	}
 
 	lockManaPoint() {
-		this.wizard.magicStart();
+		void this.wizard.magicStart();
 		const manaPoint = this.manaPoints.entities.find(
 			(item) => item.state == "visible",
 		);

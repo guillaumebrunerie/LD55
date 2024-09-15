@@ -1,12 +1,11 @@
 import { useState, useEffect, useReducer, type ComponentProps } from "react";
 import {
 	type FederatedPointerEvent,
-	Filter,
 	Rectangle,
 	Sprite,
 	Texture,
 } from "pixi.js";
-import { action, observable, runInAction } from "mobx";
+import { action, runInAction } from "mobx";
 import { sound } from "@pixi/sound";
 import {
 	ArrowDown,
@@ -179,7 +178,7 @@ const clickOutsideLobby = (
 	game.lobby.disappear();
 	if (game.credentials) {
 		void disconnect(game.credentials);
-		delete game.credentials;
+		game.credentials = undefined;
 		game.opponentId = undefined;
 	}
 	void ClickStart.play();
@@ -547,8 +546,8 @@ const exitGame = (
 	game.menuButton.disappear();
 	if (game.credentials) {
 		void disconnect(game.credentials);
-		delete game.credentials;
-		delete game.opponentId;
+		game.credentials = undefined;
+		game.opponentId = undefined;
 	}
 };
 
@@ -556,6 +555,7 @@ const clickExitGame = (
 	game: Game,
 	disconnect: (credentials: Credentials) => Promise<null>,
 ) => {
+	void ClickStart.play();
 	game.restartButtons.disappear();
 	game.startButtons.appear();
 	exitGame(game, disconnect);
@@ -594,6 +594,7 @@ const Menu = ({ game }: { game: Game }) => {
 					cursor="pointer"
 					eventMode="static"
 					onPointerDown={action(() => {
+						void ClickStart.play();
 						button.disappear();
 					})}
 				/>
@@ -613,6 +614,7 @@ const Menu = ({ game }: { game: Game }) => {
 				cursor="pointer"
 				eventMode="static"
 				onPointerDown={() => {
+					void ClickStart.play();
 					if (button.alpha.target == 1) {
 						button.disappear();
 					} else {
@@ -764,36 +766,21 @@ const OpponentName = ({ playerId }: { playerId: Id<"players"> }) => {
 	);
 };
 
-const LogoMoon = ({
-	logo,
-	alpha = 1,
-	...rest
-}: {
-	logo: Logo;
-	filters?: Filter[];
-	alpha?: number;
-} & ComponentProps<"sprite">) => {
+type LogoMoonProps = { logo: Logo } & ComponentProps<"sprite">;
+
+const LogoMoon = ({ logo, ...rest }: LogoMoonProps) => {
+	const moonAlpha = logo.progress.value == 0 ? 0 : logo.logoAppear.value;
+	const logoAlpha = logo.logoAppear.value > 0 ? 1 - logo.progress.value : 0;
 	return (
-		<>
+		<container x={1920 / 2} y={300 - logo.progress.value * 400} {...rest}>
+			<sprite texture={Moon} anchor={0.5} alpha={moonAlpha} />
 			<sprite
-				texture={Moon}
-				anchor={{ x: 0.5, y: 0.5 }}
-				x={1920 / 2}
-				y={300 - logo.progress.value * 400}
-				alpha={logo.logoAppear.value < 1 ? 0 : alpha}
-				{...rest}
+				texture={getNtFrame(LogoStart, logo.logoAppear.value)}
+				anchor={0.5}
+				alpha={logoAlpha}
+				scale={1.7}
 			/>
-			{logo.logoAppear.value > 0 && (
-				<sprite
-					texture={getNtFrame(LogoStart, logo.logoAppear.value)}
-					anchor={{ x: 0.5, y: 0.5 }}
-					x={1920 / 2}
-					y={300 - logo.progress.value * 400}
-					alpha={1 - logo.progress.value}
-					scale={1.7}
-				/>
-			)}
-		</>
+		</container>
 	);
 };
 

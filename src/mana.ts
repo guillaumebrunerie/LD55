@@ -3,6 +3,7 @@ import { LinearToggle } from "./linearToggle";
 import type { Point } from "./utils";
 
 type ManaState =
+	| "hidden"
 	| "visible"
 	| "anticipating"
 	| "spawning"
@@ -15,6 +16,7 @@ const manaSpawnDuration = 0.5;
 
 export class Mana extends EntityC {
 	progress = new LinearToggle();
+	state: ManaState = "hidden";
 
 	get nt() {
 		return this.progress.value;
@@ -22,7 +24,6 @@ export class Mana extends EntityC {
 
 	constructor(
 		public position: Point,
-		public state: ManaState = "visible",
 		public scale = 0.7 + Math.random() * 0.3,
 		public offset = Math.random() * 2 * Math.PI,
 		public rotationSpeed = Math.random() > 0.5 ? 3 : -3,
@@ -71,7 +72,7 @@ export class Mana extends EntityC {
 		this.setVisible();
 	}
 
-	async wait() {
-		await this.progress.wait();
+	async wait(delay = 0) {
+		await this.progress.wait(delay);
 	}
 }

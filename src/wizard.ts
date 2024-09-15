@@ -2,6 +2,7 @@ import { getDuration } from "./Animation";
 import {
 	WizardAppear,
 	WizardDie,
+	WizardIdle,
 	WizardMagicEnd,
 	WizardMagicLoop,
 	WizardMagicStart,
@@ -27,7 +28,7 @@ type WizardState =
 	| ">disappear";
 
 export class Wizard extends EntityC {
-	state: WizardState = "hidden";
+	state: "hidden" | "magic" | "waiting" | "idle" = "hidden";
 
 	isWinning = false;
 	appearProgress = new LinearToggle();
@@ -104,41 +105,77 @@ export class Wizard extends EntityC {
 		this.isDying = false;
 	}
 
-	magicStart() {
-		this.magicProgress.setTarget(1, getDuration(WizardMagicStart, 20));
+	async magicStart() {
+		this.state = "magic";
+		await this.magicProgress.ensureTarget(
+			1,
+			getDuration(WizardMagicStart, 20),
+			0, // fullLoopDelay(this.lt, getDuration(WizardIdle, 10)), // Too long
+			() => {
+				this.magicLoop();
+			},
+		);
 	}
 
-	magicEnd() {
-		this.magicProgress.setTarget(
+	private magicLoop() {
+		this.lt = 0;
+	}
+
+	async magicEnd() {
+		await this.magicProgress.ensureTarget(
 			0,
 			getDuration(WizardMagicEnd, 20),
 			fullLoopDelay(this.lt, getDuration(WizardMagicLoop, 20)),
+			() => {
+				this.idle();
+			},
 		);
 	}
 
-	waitingStart(delay = 0) {
-		this.waitingProgress.setTarget(
+	async waitingStart(delay = 0) {
+		this.state = "waiting";
+		await this.waitingProgress.ensureTarget(
 			1,
 			getDuration(WizardWaitingStart, 20),
 			delay,
+			() => {
+				this.waitingLoop();
+			},
 		);
 	}
 
-	waitingEnd() {
-		this.waitingProgress.setTarget(
+	private waitingLoop() {
+		this.lt = 0;
+	}
+
+	async waitingEnd() {
+		await this.waitingProgress.ensureTarget(
 			0,
 			getDuration(WizardWaitingEnd, 20),
 			fullLoopDelay(this.lt, getDuration(WizardWaitingLoop, 20)),
+			() => {
+				this.idle();
+			},
 		);
+	}
+
+	private idle() {
+		this.lt = 0;
+		this.state = "idle";
 	}
 
 	die() {
 		this.appearProgress.setTarget(0, getDuration(WizardDie, 20));
+		this.waitingProgress.setTarget(0, 0);
+		this.magicProgress.setTarget(0, 0);
+		this.isWinning = false;
 		this.isDying = true;
 	}
 
 	disappear() {
-		this.appearProgress.setTarget(0, 0.5);
+		this.appearProgress.setTarget(0, 0);
+		this.waitingProgress.setTarget(0, 0);
+		this.magicProgress.setTarget(0, 0);
 		this.isWinning = false;
 		this.isDying = false;
 	}

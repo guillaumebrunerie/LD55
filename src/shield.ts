@@ -1,10 +1,9 @@
 import { getDuration } from "./Animation";
-import { ShieldEnd, ShieldStart } from "./assets";
+import { ShieldDefends, ShieldDown, ShieldEnd, ShieldStart } from "./assets";
 import { EntityC } from "./entitiesC";
 import { LinearToggle } from "./linearToggle";
 
 type ShieldState =
-	| "waitingToAppear"
 	| "appearing"
 	| "visible"
 	| "disappearing"
@@ -48,13 +47,14 @@ export class Shield extends EntityC {
 		this.progress.value = 0;
 		const fightDuration = 0.15;
 		this.progress.setTarget(1, fightDuration);
+		void ShieldDefends.play({ volume: 0.4 });
 	}
 
 	disappear() {
 		this.state = "disappearing";
 		this.isPresent = false;
-		this.progress.value = 0;
-		this.progress.setTarget(1, getDuration(ShieldEnd, 20));
+		this.progress.setTarget(0, getDuration(ShieldEnd, 20));
+		void ShieldDown.play();
 	}
 
 	setVisible() {

@@ -3,8 +3,6 @@ import type { Id } from "../convex/_generated/dataModel";
 import {
 	MonsterAttacks,
 	Music,
-	ShieldDefends,
-	ShieldDown,
 	WinMusic,
 	WizardHit,
 	WizardStart,
@@ -68,9 +66,9 @@ export class Game extends EntityC {
 	lobby = new Button(false);
 	menuButton = new Button(false);
 
-	credentials?: Credentials;
-	opponentId?: Id<"players">;
-	gameId?: Id<"games">;
+	credentials: Credentials | undefined;
+	opponentId: Id<"players"> | undefined;
+	gameId: Id<"games"> | undefined;
 	round = 0;
 
 	constructor() {
@@ -140,7 +138,9 @@ export class Game extends EntityC {
 
 	startGame() {
 		void WinMusic.stop();
-		void Music.play({ loop: true, volume: 0.5 });
+		if (!Music.isPlaying) {
+			void Music.play({ loop: true, volume: 0.5 });
+		}
 		this.logo.hide();
 		this.lobby.disappear();
 		this.startButtons.disappear();
@@ -155,8 +155,7 @@ export class Game extends EntityC {
 		void (async function () {
 			opponentWizard.appear();
 			await opponentWizard.wait();
-			opponentWizard.waitingStart(0.5);
-			await opponentWizard.wait();
+			await opponentWizard.waitingStart(0.5);
 		})();
 
 		let t = 1;
@@ -192,7 +191,7 @@ export class Game extends EntityC {
 
 	async startFight() {
 		this.state = "attack";
-		this.opponent.wizard.waitingEnd();
+		await this.opponent.wizard.waitingEnd();
 		await this.opponent.wizard.wait();
 		this.curtain.hide();
 		await this.curtain.wait();
@@ -201,10 +200,10 @@ export class Game extends EntityC {
 
 	async pickAttackOrDefensePair() {
 		const playerMonsters = this.player.monsters.entities.filter(
-			(m) => m.state == "visible",
+			(m) => m.state == "visible" || m.state == "winning",
 		).length;
 		const opponentMonsters = this.opponent.monsters.entities.filter(
-			(m) => m.state == "visible",
+			(m) => m.state == "visible" || m.state == "winning",
 		).length;
 
 		if (playerMonsters == 0 && opponentMonsters == 0) {
@@ -285,7 +284,9 @@ export class Game extends EntityC {
 			:	this.player;
 
 		const fighter = pickFighter(
-			attacker.monsters.entities.filter((m) => m.state == "visible"),
+			attacker.monsters.entities.filter(
+				(m) => m.state == "visible" || m.state == "winning",
+			),
 		);
 		const runes = defender.protection.runeCount;
 		const shield = defender.protection.shield;
@@ -305,7 +306,7 @@ export class Game extends EntityC {
 			// Attack the player
 			await Promise.all(
 				attacker.monsters.entities
-					.filter((m) => m.state == "visible")
+					.filter((m) => m.state == "visible" || m.state == "winning")
 					.map(doAttack),
 			);
 			this.doWin(attacker, defender);
@@ -320,6 +321,11 @@ export class Game extends EntityC {
 			fighter.position = { ...destination };
 			void attacker.removeMonster(fighter);
 			shield.fighting();
+			attacker.monsters.entities
+				.filter((m) => m.state == "visible")
+				.forEach((monster: Monster) => {
+					monster.winReact();
+				});
 			await shield.wait();
 			shield.disappear();
 			await Promise.all([
@@ -327,12 +333,9 @@ export class Game extends EntityC {
 				attacker.monsters.entities
 					.filter((m) => m.state == "visible")
 					.map(async (monster: Monster) => {
-						monster.winReact();
 						await monster.wait();
-						monster.setVisible();
 					}),
 			]);
-			void ShieldDown.play();
 		} else {
 			// Destroy runes
 			const destination = pickPosition([], shieldImpactBounds, 0);
@@ -342,7 +345,6 @@ export class Game extends EntityC {
 			await fighter.wait();
 			fighter.position = { ...destination };
 			defender.protection.disappearNRunes(fighter.hp);
-			void ShieldDefends.play({ volume: 0.4 });
 			shield.fighting();
 			await Promise.all([attacker.removeMonster(fighter), shield.wait()]);
 		}
@@ -383,6 +385,12 @@ export class Game extends EntityC {
 
 	reset() {
 		this.state = "intro";
+		if (WinMusic.isPlaying) {
+			void WinMusic.stop();
+		}
+		if (!Music.isPlaying) {
+			void Music.play({ loop: true, volume: 0.5 });
+		}
 		this.round = 0;
 		this.curtain.hide();
 		this.player.reset(true);
@@ -471,15 +479,15 @@ export class Game extends EntityC {
 	async rebuildMana() {
 		this.state = "rebuild";
 		this.curtain.show();
-		this.opponent.wizard.waitingStart(0.5);
+		void this.opponent.wizard.waitingStart(0.5);
 
 		await this.player.rebuildMana();
-		// Wait 0.05 seconds?
+		// TODO: Wait 0.05 seconds?
 	}
 
 	nextRound() {
 		this.state = "buildUp";
-		// game.opponent.addManaPoint();
+		this.opponent.rebuildManaInstant();
 		this.player.previousStartData = this.player.playerData();
 		this.opponent.previousStartData = this.opponent.playerData();
 		this.player.boughtSomething = false;

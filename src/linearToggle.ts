@@ -29,8 +29,22 @@ export class LinearToggle extends EntityC {
 
 	setTarget(target: number, duration: number, delay = 0) {
 		this.target = target;
-		this.speed = 1 / duration;
+		this.speed = duration > 0 ? 1 / duration : 1000000;
 		this.delay = delay;
+	}
+
+	async ensureTarget(
+		target: number,
+		duration: number,
+		delay: number,
+		callback: () => void,
+	) {
+		if (this.target == target) {
+			return;
+		}
+		this.setTarget(target, duration, delay);
+		await this.wait();
+		callback();
 	}
 
 	play(duration: number, delay = 0) {
@@ -38,7 +52,8 @@ export class LinearToggle extends EntityC {
 		this.setTarget(1, duration, delay);
 	}
 
-	wait() {
+	wait(delay = 0) {
+		this.delay += delay;
 		return new Promise<void>((resolve) => {
 			const ticker = this.addTicker(() => {
 				if (this.isIdle) {
@@ -50,6 +65,6 @@ export class LinearToggle extends EntityC {
 	}
 
 	get isIdle() {
-		return Math.abs(this.value - this.target) < 0.001;
+		return this.delay == 0 && Math.abs(this.value - this.target) < 0.001;
 	}
 }

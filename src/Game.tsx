@@ -456,15 +456,17 @@ const ShieldC = ({ shield }: { shield: Shield }) => {
 				<>
 					<sprite
 						texture={RunesSheet.animations.Rune[0]}
-						alpha={1 - shield.nt}
+						alpha={shield.nt}
 						position={{ x: -14, y: 613 }}
 					/>
-					<sprite
-						texture={getNtFrame(ShieldEnd, shield.nt)}
-						blendMode={"add"}
-						position={{ x: -270, y: -149 }}
-						scale={2}
-					/>
+					{shield.nt > 0 && (
+						<sprite
+							texture={getNtFrame(ShieldEnd, 1 - shield.nt)}
+							blendMode={"add"}
+							position={{ x: -270, y: -149 }}
+							scale={2}
+						/>
+					)}
 				</>
 			);
 
