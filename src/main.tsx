@@ -1,4 +1,4 @@
-import { AppC } from "./App.tsx";
+import { AppC } from "./AppC.tsx";
 import { StrictMode } from "react";
 import { Application, extend } from "@pixi/react";
 import { ConvexProvider, ConvexReactClient } from "convex/react";

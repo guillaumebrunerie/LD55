@@ -46,7 +46,7 @@ import {
 	TextBoxAppear,
 	WaitingDot,
 } from "./assets";
-import { GameC, WizardC } from "./Game";
+import { GameC, WizardC } from "./GameC";
 import { wave } from "./ease";
 import { Button } from "./button";
 import { GlobalTimeContext } from "./globalTimeContext";
