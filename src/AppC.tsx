@@ -1,10 +1,5 @@
 import { useState, useEffect, useReducer, type ComponentProps } from "react";
-import {
-	type FederatedPointerEvent,
-	Rectangle,
-	Sprite,
-	Texture,
-} from "pixi.js";
+import { Rectangle, Sprite, Texture } from "pixi.js";
 import { action, runInAction } from "mobx";
 import { sound } from "@pixi/sound";
 import {
@@ -353,6 +348,7 @@ const StartButtons = ({ game }: { game: Game }) => {
 		<>
 			<sprite
 				texture={StartVsComputerDefault}
+				scale={startVsComputer.isActive ? 0.95 : 1}
 				anchor={0.5}
 				position={{
 					x: buttonsLeftX,
@@ -364,6 +360,7 @@ const StartButtons = ({ game }: { game: Game }) => {
 			/>
 			<sprite
 				texture={StartVsHumanOffDefault}
+				scale={startVsPlayer.isActive ? 0.95 : 1}
 				anchor={0.5}
 				position={{
 					x: buttonsRightX,
@@ -380,6 +377,15 @@ const StartButtons = ({ game }: { game: Game }) => {
 
 const RestartVsComputer = ({ game }: { game: Game }) => {
 	const buttons = game.restartButtons;
+
+	const buttonData = useButton({
+		onClick: action(() => {
+			void ClickStart.play();
+			game.startNewGameAgainstComputer();
+		}),
+		enabled: buttons.isOn,
+	});
+
 	return (
 		<sprite
 			texture={getFrame(RestartButtonComputer, 20, buttons.lt)}
@@ -388,14 +394,10 @@ const RestartVsComputer = ({ game }: { game: Game }) => {
 				x: buttonsLeftX,
 				y: buttonsY,
 			}}
+			scale={buttonData.isActive ? 0.95 : 1}
 			alpha={buttons.alpha.value}
 			hitArea={new Rectangle(-100, -100, 200, 200)}
-			cursor="pointer"
-			eventMode="static"
-			onPointerDown={action(() => {
-				void ClickStart.play();
-				game.startNewGameAgainstComputer();
-			})}
+			{...buttonData.props}
 		/>
 	);
 };
@@ -419,24 +421,29 @@ const RestartVsPlayer = ({ game }: { game: Game }) => {
 			"requested"
 		:	"default";
 	const requestPlay = useMutation(api.lobby.requestPlay);
+
+	const buttonData = useButton({
+		onClick: action(() => {
+			void ClickStart.play();
+			if (!game.credentials || !game.opponentId) {
+				return;
+			}
+			void requestPlay({
+				...game.credentials,
+				opponentId: game.opponentId,
+			});
+		}),
+		enabled: buttons.isOn,
+	});
+
 	return (
 		<container
 			x={buttonsRightX}
 			y={buttonsY}
 			alpha={buttons.alpha.value}
+			scale={buttonData.isActive ? 0.95 : 1}
 			hitArea={new Rectangle(-100, -100, 200, 200)}
-			cursor="pointer"
-			eventMode="static"
-			onPointerDown={action(() => {
-				void ClickStart.play();
-				if (!game.credentials || !game.opponentId) {
-					return;
-				}
-				void requestPlay({
-					...game.credentials,
-					opponentId: game.opponentId,
-				});
-			})}
+			{...buttonData.props}
 		>
 			{type == "default" && (
 				<sprite texture={RestartBtnDefault} anchor={0.5} />
@@ -469,9 +476,17 @@ const BackToMenuLeft = ({ game }: { game: Game }) => {
 	const disconnect = useMutation(api.lobby.disconnect);
 	const buttons = game.restartButtons;
 
+	const buttonData = useButton({
+		onClick: action(() => {
+			backToMenu(game, disconnect);
+		}),
+		enabled: buttons.isOn,
+	});
+
 	return (
 		<sprite
 			texture={BackToMenuDefaultLeft}
+			scale={buttonData.isActive ? 0.95 : 1}
 			anchor={0.5}
 			position={{
 				x: buttonsLeftX,
@@ -479,11 +494,7 @@ const BackToMenuLeft = ({ game }: { game: Game }) => {
 			}}
 			alpha={buttons.alpha.value}
 			hitArea={new Rectangle(-100, -100, 200, 200)}
-			cursor="pointer"
-			eventMode="static"
-			onPointerDown={action(() => {
-				backToMenu(game, disconnect);
-			})}
+			{...buttonData.props}
 		/>
 	);
 };
@@ -492,21 +503,25 @@ const BackToMenuRight = ({ game }: { game: Game }) => {
 	const disconnect = useMutation(api.lobby.disconnect);
 	const buttons = game.restartButtons;
 
+	const buttonData = useButton({
+		onClick: action(() => {
+			backToMenu(game, disconnect);
+		}),
+		enabled: buttons.isOn,
+	});
+
 	return (
 		<sprite
 			texture={BackToMenuDefault}
 			anchor={0.5}
+			scale={buttonData.isActive ? 0.95 : 1}
 			position={{
 				x: buttonsRightX,
 				y: buttonsY,
 			}}
 			alpha={buttons.alpha.value}
 			hitArea={new Rectangle(-100, -100, 200, 200)}
-			cursor="pointer"
-			eventMode="static"
-			onPointerDown={action(() => {
-				backToMenu(game, disconnect);
-			})}
+			{...buttonData.props}
 		/>
 	);
 };

@@ -2,7 +2,6 @@ import { getDuration } from "./Animation";
 import {
 	WizardAppear,
 	WizardDie,
-	WizardIdle,
 	WizardMagicEnd,
 	WizardMagicLoop,
 	WizardMagicStart,
@@ -99,12 +98,17 @@ export class Wizard extends EntityC {
 		}
 	}
 
-	appear(delay = 0) {
-		this.appearProgress.setTarget(1, getDuration(WizardAppear, 15), delay);
-		this.waitingProgress.setTarget(0, 0);
-		this.magicProgress.setTarget(0, 0);
+	async appear(delay = 0) {
 		this.isWinning = false;
 		this.isDying = false;
+		if (this.waitingProgress.value > 0) {
+			await this.waitingEnd();
+		}
+		if (this.magicProgress.value > 0) {
+			await this.magicEnd();
+		}
+		this.appearProgress.setTarget(1, getDuration(WizardAppear, 15), delay);
+		await this.wait();
 	}
 
 	async magicStart() {
@@ -172,14 +176,6 @@ export class Wizard extends EntityC {
 		this.magicProgress.setTarget(0, 0);
 		this.isWinning = false;
 		this.isDying = true;
-	}
-
-	disappear() {
-		this.appearProgress.setTarget(0, 0);
-		this.waitingProgress.setTarget(0, 0);
-		this.magicProgress.setTarget(0, 0);
-		this.isWinning = false;
-		this.isDying = false;
 	}
 
 	win() {

@@ -52,7 +52,7 @@ export class Player extends EntityC {
 	reset(doIdle: boolean) {
 		this.boughtSomething = false;
 		if (doIdle) {
-			this.wizard.appear();
+			void this.wizard.appear();
 		} else {
 			this.wizard.die();
 		}

@@ -131,8 +131,7 @@ export class Game extends EntityC {
 
 	async start() {
 		this.logo.appear(0.4);
-		this.player.wizard.appear(1);
-		await this.player.wizard.wait();
+		await this.player.wizard.appear(1);
 		this.player.wizard.lt = 0;
 	}
 
@@ -153,8 +152,7 @@ export class Game extends EntityC {
 		void WizardStart.play();
 		const opponentWizard = this.opponent.wizard;
 		void (async function () {
-			opponentWizard.appear();
-			await opponentWizard.wait();
+			await opponentWizard.appear();
 			await opponentWizard.waitingStart(0.5);
 		})();
 

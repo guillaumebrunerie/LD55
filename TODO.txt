@@ -1,4 +1,9 @@
-- Fix glitches with start/exit/restart:
- * Exit game should stop magic animation
-- Start/restart buttons should trigger on click, not pointerdown
-- (Show current mana points of opponent when playing online)
+# High priority
+
+- Button for waiting to restart against player
+
+# Low priority
+
+- Cron to regularly remove old players/games
+- More code clean up
+- Show current mana points of opponent when playing online
