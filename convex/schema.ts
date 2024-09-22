@@ -26,6 +26,7 @@ export default defineSchema({
 	players: defineTable({
 		token: v.string(),
 		gameId: v.optional(v.id("games")),
+		proposals: v.array(v.id("players")),
 		opponentId: v.optional(v.id("players")),
 		name: v.string(),
 		...player,

@@ -101,6 +101,8 @@ export class Wizard extends EntityC {
 
 	appear(delay = 0) {
 		this.appearProgress.setTarget(1, getDuration(WizardAppear, 15), delay);
+		this.waitingProgress.setTarget(0, 0);
+		this.magicProgress.setTarget(0, 0);
 		this.isWinning = false;
 		this.isDying = false;
 	}

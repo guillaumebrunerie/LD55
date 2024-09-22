@@ -35,6 +35,7 @@ import {
 	PoofedAwayPost,
 	RestartBtnDefault,
 	RestartButtonComputer,
+	RestartButtonIdle,
 	SettingsBoxDefault,
 	SettingsDefault,
 	SettingsOn,
@@ -186,31 +187,24 @@ const clickOutsideLobby = (
 };
 
 const Lobby = ({ game }: { game: Game }) => {
-	const gameId = useQuery(api.player.currentGameId, {
+	const availablePlayers = useQuery(api.lobby.availablePlayers, {
 		playerId: game.credentials?.playerId,
 	});
-	useEffect(() => {
-		if (gameId) {
-			runInAction(() => {
-				game.startNewGameAgainstPlayer(gameId);
-			});
-		}
-	}, [gameId, game]);
-
-	const availablePlayers = useQuery(api.lobby.availablePlayers);
+	const proposals = useQuery(api.lobby.proposals, {
+		playerId: game.credentials?.playerId,
+	});
 	const players =
 		(game.credentials &&
 			availablePlayers
 				?.filter(({ id }) => id !== game.credentials?.playerId)
-				.map(({ id, name, opponentId: theirOpponentId, lastPing }) => {
+				.map(({ id, name, hasInvitedToPlay, lastPing }) => {
 					return {
 						id,
 						name,
 						type:
-							id == game.opponentId ? ("waiting" as const)
-							: theirOpponentId == game.credentials?.playerId ?
-								("requested" as const)
-							:	("default" as const),
+							proposals?.includes(id) ? ("waiting" as const)
+							: hasInvitedToPlay ? ("requested" as const)
+							: ("default" as const),
 						timeSinceLastPing: Date.now() - lastPing,
 					};
 				})) ||
@@ -408,20 +402,56 @@ const RestartVsComputer = ({ game }: { game: Game }) => {
 
 const RestartVsPlayer = ({ game }: { game: Game }) => {
 	const buttons = game.restartButtons;
+
+	const proposals = useQuery(api.lobby.proposals, {
+		playerId: game.credentials?.playerId,
+	});
+	const theirProposals = useQuery(api.lobby.proposals, {
+		playerId: game.opponentId,
+	});
+
+	const type =
+		game.opponentId && proposals?.includes(game.opponentId) ? "waiting"
+		: (
+			game.credentials &&
+			theirProposals?.includes(game.credentials.playerId)
+		) ?
+			"requested"
+		:	"default";
+	const requestPlay = useMutation(api.lobby.requestPlay);
 	return (
-		<sprite
-			texture={RestartBtnDefault}
-			anchor={0.5}
-			position={{
-				x: buttonsRightX,
-				y: buttonsY,
-			}}
+		<container
+			x={buttonsRightX}
+			y={buttonsY}
 			alpha={buttons.alpha.value}
 			hitArea={new Rectangle(-100, -100, 200, 200)}
 			cursor="pointer"
 			eventMode="static"
-			onPointerDown={action(() => {})}
-		/>
+			onPointerDown={action(() => {
+				void ClickStart.play();
+				if (!game.credentials || !game.opponentId) {
+					return;
+				}
+				void requestPlay({
+					...game.credentials,
+					opponentId: game.opponentId,
+				});
+			})}
+		>
+			{type == "default" && (
+				<sprite texture={RestartBtnDefault} anchor={0.5} />
+			)}
+			{type == "requested" && (
+				<sprite
+					texture={getFrame(RestartButtonIdle, 20, buttons.lt)}
+					anchor={0.5}
+				/>
+			)}
+			{type == "waiting" && (
+				<sprite texture={InviteButtonOn} anchor={0.5} />
+			)}
+			{type == "waiting" && <WaitingDots lt={game.lt} />}
+		</container>
 	);
 };
 
@@ -517,9 +547,7 @@ const useSetVolumeAll = () => {
 	};
 };
 
-type SpriteProps = ComponentProps<"sprite">;
-
-const SoundButton = (props: SpriteProps) => {
+const SoundButton = (props: ComponentProps<"sprite">) => {
 	const setVolumeAll = useSetVolumeAll();
 	const toggleSound = () => {
 		setVolumeAll((volume) => 1 - volume);
@@ -542,7 +570,6 @@ const exitGame = (
 ) => {
 	game.state = "intro";
 	game.reset();
-	// app.game = newGame("intro", false);
 	game.menuButton.disappear();
 	if (game.credentials) {
 		void disconnect(game.credentials);
@@ -561,7 +588,7 @@ const clickExitGame = (
 	exitGame(game, disconnect);
 };
 
-const ExitButton = (props: SpriteProps & { game: Game }) => {
+const ExitButton = (props: { game: Game } & ComponentProps<"sprite">) => {
 	const { game, ...spriteProps } = props;
 	const disconnect = useMutation(api.lobby.disconnect);
 	return (
@@ -956,6 +983,17 @@ export const AppC = () => {
 	const [mask, setMask] = useState<Sprite>();
 	const filters = mask ? [darkFilter] : [];
 
+	const gameId = useQuery(api.player.currentGameId, {
+		playerId: game.credentials?.playerId,
+	});
+	useEffect(() => {
+		if (gameId) {
+			runInAction(() => {
+				game.startNewGameAgainstPlayer(gameId);
+			});
+		}
+	}, [gameId, game]);
+
 	return (
 		<GlobalTimeContext.Provider value={app.lt}>
 			<container>
@@ -963,11 +1001,11 @@ export const AppC = () => {
 					texture={Bg}
 					x={0}
 					y={0}
-					eventMode="static"
-					onPointerDown={(e: FederatedPointerEvent) => {
-						const { x, y } = e.global;
-						console.log(`${Math.round(x)}, ${Math.round(y)}`);
-					}}
+					// eventMode="static"
+					// onPointerDown={(e: FederatedPointerEvent) => {
+					// 	const { x, y } = e.global;
+					// 	console.log(`${Math.round(x)}, ${Math.round(y)}`);
+					// }}
 				/>
 				<LogoMoon logo={game.logo} />
 				<sprite texture={Cloud3} position={cloud3} />

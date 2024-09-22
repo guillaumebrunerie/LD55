@@ -1,11 +1,4 @@
-# Prio 1
-
-- Use subclasses (Game, App)
-- Restart game against player
-- Fix glitches with start/exit/restart
+- Fix glitches with start/exit/restart:
+ * Exit game should stop magic animation
 - Start/restart buttons should trigger on click, not pointerdown
-- Fix delay when starting fight
-
-# Prio 2
-
-- Show current mana points of opponent when playing online
+- (Show current mana points of opponent when playing online)

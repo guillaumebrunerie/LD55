@@ -17,6 +17,7 @@ const newPlayer = (): WithoutSystemFields<Doc<"players">> => ({
 	defense: initialDefense,
 	mushrooms: [],
 	monsters: [],
+	proposals: [],
 });
 
 export const createNewPlayer = mutation({
@@ -55,8 +56,27 @@ export const disconnect = mutation({
 	},
 });
 
+export const proposals = query({
+	args: {
+		playerId: v.optional(v.id("players")),
+	},
+	handler: async (ctx, { playerId }) => {
+		if (!playerId) {
+			return;
+		}
+		const player = await ctx.db.get(playerId);
+		return player?.proposals;
+	},
+});
+
 export const availablePlayers = query({
-	handler: async (ctx) => {
+	args: {
+		playerId: v.optional(v.id("players")),
+	},
+	handler: async (ctx, { playerId }) => {
+		if (!playerId) {
+			return null;
+		}
 		const players = await ctx.db
 			.query("players")
 			.filter((q) =>
@@ -69,7 +89,7 @@ export const availablePlayers = query({
 		return players.map((player) => ({
 			id: player._id,
 			name: player.name,
-			opponentId: player.opponentId,
+			hasInvitedToPlay: player.proposals.includes(playerId) || false,
 			lastPing: player.lastPing,
 		}));
 	},
@@ -84,31 +104,46 @@ export const requestPlay = mutation({
 	handler: async (ctx, { playerId, token, opponentId }) => {
 		const player = await ctx.db.get(playerId);
 		const opponent = await ctx.db.get(opponentId);
-		if (
-			!player ||
-			player.gameId ||
-			!opponent ||
-			opponent.gameId ||
-			player.token != token
-		) {
+		if (!player || !opponent || player.token != token) {
 			return;
 		}
-		if (opponent.opponentId == playerId) {
+		if (opponent.gameId && opponent.gameId !== player.gameId) {
+			return;
+		}
+		if (opponent.proposals.includes(playerId)) {
 			// If the opponent already asked us to play, start a game
 			const gameId = await ctx.db.insert("games", {
 				playerId,
 				opponentId,
 				rounds: [],
 			});
-			await ctx.db.patch(playerId, { gameId });
-			await ctx.db.patch(opponentId, { gameId });
+			await ctx.db.patch(playerId, {
+				gameId,
+				proposals: [],
+				mana: initialMana,
+				defense: initialDefense,
+				mushrooms: [],
+				monsters: [],
+			});
+			await ctx.db.patch(opponentId, {
+				gameId,
+				proposals: [],
+				mana: initialMana,
+				defense: initialDefense,
+				mushrooms: [],
+				monsters: [],
+			});
 			return;
-		} else if (opponentId == player.opponentId) {
+		} else if (player.proposals.includes(opponentId)) {
 			// If we already asked them to play, cancel
-			await ctx.db.patch(playerId, { opponentId: undefined });
+			await ctx.db.patch(playerId, {
+				proposals: player.proposals.filter((id) => id != opponentId),
+			});
 		} else {
 			// Otherwise, just remember that we asked them to play
-			await ctx.db.patch(playerId, { opponentId });
+			await ctx.db.patch(playerId, {
+				proposals: [...player.proposals, opponentId],
+			});
 		}
 	},
 });
