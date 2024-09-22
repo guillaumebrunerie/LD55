@@ -1,4 +1,4 @@
-/** Generated on Thu Jul 11 00:17:42 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sun Sep 22 23:47:21 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -21,54 +21,34 @@ import BtnManaOn_ from "../gfx/BtnManaOn.png?texture";
 import Cloud1_ from "../gfx/Cloud1.png?texture";
 import Cloud2_ from "../gfx/Cloud2.png?texture";
 import Cloud3_ from "../gfx/Cloud3.png?texture";
-import ConnectionOff_ from "../gfx/ConnectionOff.png?texture";
-import ConnectionOn_ from "../gfx/ConnectionOn.png?texture";
-import ExitGame_ from "../gfx/ExitGame.png?texture";
 import ExitGameBtn_ from "../gfx/ExitGameBtn.png?texture";
-import ExitOff_ from "../gfx/ExitOff.png?texture";
-import ExitOn_ from "../gfx/ExitOn.png?texture";
 import InactiveSide_ from "../gfx/InactiveSide.png?texture";
 import InactiveSideWhite_ from "../gfx/InactiveSideWhite.png?texture";
 import InviteButtonAccept_ from "../gfx/InviteButtonAccept.png?texture";
 import InviteButtonDefault_ from "../gfx/InviteButtonDefault.png?texture";
-import InviteButtonMatch_ from "../gfx/InviteButtonMatch.png?texture";
 import InviteButtonOn_ from "../gfx/InviteButtonOn.png?texture";
-import LinkGenerated_ from "../gfx/LinkGenerated.png?texture";
 import Logo_ from "../gfx/Logo.png?texture";
 import Mana1_ from "../gfx/Mana1.png?texture";
 import Mana2_ from "../gfx/Mana2.png?texture";
 import ManaPoint_ from "../gfx/ManaPoint.png?texture";
 import ManaPointBlurred_ from "../gfx/ManaPointBlurred.png?texture";
 import Moon_ from "../gfx/Moon.png?texture";
-import PlayerQuitPost_ from "../gfx/PlayerQuitPost.png?texture";
 import PoofedAwayPost_ from "../gfx/PoofedAwayPost.png?texture";
 import RestartBtnDefault_ from "../gfx/RestartBtnDefault.png?texture";
-import RestartBtnDefaultBG_ from "../gfx/RestartBtnDefaultBG.png?texture";
-import RestartBtnDefaultFront1_ from "../gfx/RestartBtnDefaultFront1.png?texture";
-import RestartBtnDefaultFront2_ from "../gfx/RestartBtnDefaultFront2.png?texture";
 import RestartBtnOn_ from "../gfx/RestartBtnOn.png?texture";
-import SettingsBoxDedault_ from "../gfx/SettingsBoxDedault.png?texture";
 import SettingsBoxDefault_ from "../gfx/SettingsBoxDefault.png?texture";
 import SettingsDefault_ from "../gfx/SettingsDefault.png?texture";
 import SettingsOn_ from "../gfx/SettingsOn.png?texture";
 import ShieldLoop_ from "../gfx/ShieldLoop.png?texture";
-import SoundOff_ from "../gfx/SoundOff.png?texture";
 import SoundOffTxt_ from "../gfx/SoundOffTxt.png?texture";
-import SoundOn_ from "../gfx/SoundOn.png?texture";
 import SoundOnTxt_ from "../gfx/SoundOnTxt.png?texture";
-import StartButtonDefault_ from "../gfx/StartButtonDefault.png?texture";
-import StartButtonPressed_ from "../gfx/StartButtonPressed.png?texture";
 import StartVsComputerDefault_ from "../gfx/StartVsComputerDefault.png?texture";
 import StartVsHumanOffDefault_ from "../gfx/StartVsHumanOffDefault.png?texture";
 import StartVsHumanOnDefault_ from "../gfx/StartVsHumanOnDefault.png?texture";
 import TextBox_ from "../gfx/TextBox.png?texture";
 import WaitingDot_ from "../gfx/WaitingDot.png?texture";
-import WaitingPost_ from "../gfx/WaitingPost.png?texture";
-import WizzyWizzy_Mocup_Buttons_ from "../gfx/WizzyWizzy_Mocup_Buttons.jpg?texture";
 
 /** Spritesheets */
-import Font_ from "../gfx/Font.png?spritesheet";
-import Font2_ from "../gfx/Font2.png?spritesheet";
 import LogoStart_ from "../gfx/LogoStart.png?spritesheet";
 import Mana1End_ from "../gfx/Mana1End.png?spritesheet";
 import Mana2End_ from "../gfx/Mana2End.png?spritesheet";
@@ -90,8 +70,6 @@ import ShieldEnd_ from "../gfx/ShieldEnd.png?spritesheet";
 import ShieldHit_ from "../gfx/ShieldHit.png?spritesheet";
 import ShieldStart_ from "../gfx/ShieldStart.png?spritesheet";
 import Spawn_ from "../gfx/Spawn.png?spritesheet";
-import StartVsHumanBtnIdle_ from "../gfx/StartVsHumanBtnIdle.png?spritesheet";
-import StartVsHumanBtnMatch_ from "../gfx/StartVsHumanBtnMatch.png?spritesheet";
 import WizardAppear_ from "../gfx/WizardAppear.png?spritesheet";
 import WizardDie_ from "../gfx/WizardDie.png?spritesheet";
 import WizardIdle_ from "../gfx/WizardIdle.png?spritesheet";
@@ -145,120 +123,156 @@ export const [
 	Cloud1,
 	Cloud2,
 	Cloud3,
-	ConnectionOff,
-	ConnectionOn,
-	ExitGame,
 	ExitGameBtn,
-	ExitOff,
-	ExitOn,
 	InactiveSide,
 	InactiveSideWhite,
 	InviteButtonAccept,
 	InviteButtonDefault,
-	InviteButtonMatch,
 	InviteButtonOn,
-	LinkGenerated,
 	Logo,
 	Mana1,
 	Mana2,
 	ManaPoint,
 	ManaPointBlurred,
 	Moon,
-	PlayerQuitPost,
 	PoofedAwayPost,
 	RestartBtnDefault,
-	RestartBtnDefaultBG,
-	RestartBtnDefaultFront1,
-	RestartBtnDefaultFront2,
 	RestartBtnOn,
-	SettingsBoxDedault,
 	SettingsBoxDefault,
 	SettingsDefault,
 	SettingsOn,
 	ShieldLoop,
-	SoundOff,
 	SoundOffTxt,
-	SoundOn,
 	SoundOnTxt,
-	StartButtonDefault,
-	StartButtonPressed,
 	StartVsComputerDefault,
 	StartVsHumanOffDefault,
 	StartVsHumanOnDefault,
 	TextBox,
 	WaitingDot,
-	WaitingPost,
-	WizzyWizzy_Mocup_Buttons,
-	FontSheet,
-	{ animations: { Font } },
-	Font2Sheet,
-	{ animations: { Font2 } },
 	LogoStartSheet,
-	{ animations: { LogoStart } },
+	{
+		animations: { LogoStart },
+	},
 	Mana1EndSheet,
-	{ animations: { Mana1End } },
+	{
+		animations: { Mana1End },
+	},
 	Mana2EndSheet,
-	{ animations: { Mana2End } },
+	{
+		animations: { Mana2End },
+	},
 	ManaPointStartSheet,
-	{ animations: { ManaPointStart } },
+	{
+		animations: { ManaPointStart },
+	},
 	Monster1DieSheet,
-	{ animations: { Monster1Die } },
+	{
+		animations: { Monster1Die },
+	},
 	Monster1IdleSheet,
-	{ animations: { Monster1Idle } },
+	{
+		animations: { Monster1Idle },
+	},
 	Monster1ReactsSheet,
-	{ animations: { Monster1Reacts } },
+	{
+		animations: { Monster1Reacts },
+	},
 	Monster2DieSheet,
-	{ animations: { Monster2Die } },
+	{
+		animations: { Monster2Die },
+	},
 	Monster2IdleSheet,
-	{ animations: { Monster2Idle } },
+	{
+		animations: { Monster2Idle },
+	},
 	Monster2ReactsSheet,
-	{ animations: { Monster2Reacts } },
+	{
+		animations: { Monster2Reacts },
+	},
 	Monster3DieSheet,
-	{ animations: { Monster3Die } },
+	{
+		animations: { Monster3Die },
+	},
 	Monster3DiesSheet,
-	{ animations: { Monster3Dies } },
+	{
+		animations: { Monster3Dies },
+	},
 	Monster3IdleSheet,
-	{ animations: { Monster3Idle } },
+	{
+		animations: { Monster3Idle },
+	},
 	Monster3ReactsSheet,
-	{ animations: { Monster3Reacts } },
+	{
+		animations: { Monster3Reacts },
+	},
 	RestartButtonComputerSheet,
-	{ animations: { RestartButtonComputer } },
+	{
+		animations: { RestartButtonComputer },
+	},
 	RestartButtonIdleSheet,
-	{ animations: { RestartButtonIdle } },
+	{
+		animations: { RestartButtonIdle },
+	},
 	RunesSheet,
-	{ animations: { Runes } },
+	{
+		animations: { Runes },
+	},
 	ShieldEndSheet,
-	{ animations: { ShieldEnd } },
+	{
+		animations: { ShieldEnd },
+	},
 	ShieldHitSheet,
-	{ animations: { ShieldHit } },
+	{
+		animations: { ShieldHit },
+	},
 	ShieldStartSheet,
-	{ animations: { ShieldStart } },
+	{
+		animations: { ShieldStart },
+	},
 	SpawnSheet,
-	{ animations: { Spawn } },
-	StartVsHumanBtnIdleSheet,
-	{ animations: { StartVsHumanBtnIdle } },
-	StartVsHumanBtnMatchSheet,
-	{ animations: { StartVsHumanBtnMatch } },
+	{
+		animations: { Spawn },
+	},
 	WizardAppearSheet,
-	{ animations: { WizardAppear } },
+	{
+		animations: { WizardAppear },
+	},
 	WizardDieSheet,
-	{ animations: { WizardDie } },
+	{
+		animations: { WizardDie },
+	},
 	WizardIdleSheet,
-	{ animations: { WizardIdle } },
+	{
+		animations: { WizardIdle },
+	},
 	WizardMagicEndSheet,
-	{ animations: { WizardMagicEnd } },
+	{
+		animations: { WizardMagicEnd },
+	},
 	WizardMagicLoopSheet,
-	{ animations: { WizardMagicLoop } },
+	{
+		animations: { WizardMagicLoop },
+	},
 	WizardMagicStartSheet,
-	{ animations: { WizardMagicStart } },
+	{
+		animations: { WizardMagicStart },
+	},
 	WizardWaitingEndSheet,
-	{ animations: { WizardWaitingEnd } },
+	{
+		animations: { WizardWaitingEnd },
+	},
 	WizardWaitingLoopSheet,
-	{ animations: { WizardWaitingLoop } },
+	{
+		animations: { WizardWaitingLoop },
+	},
 	WizardWaitingStartSheet,
-	{ animations: { WizardWaitingStart } },
+	{
+		animations: { WizardWaitingStart },
+	},
 	WizardWinSheet,
-	{ animations: { WizardWin } },
+	{
+		animations: { WizardWin },
+	},
 	ClickAttack,
 	ClickDefense,
 	ClickMana,
@@ -299,54 +313,32 @@ export const [
 	Cloud1_,
 	Cloud2_,
 	Cloud3_,
-	ConnectionOff_,
-	ConnectionOn_,
-	ExitGame_,
 	ExitGameBtn_,
-	ExitOff_,
-	ExitOn_,
 	InactiveSide_,
 	InactiveSideWhite_,
 	InviteButtonAccept_,
 	InviteButtonDefault_,
-	InviteButtonMatch_,
 	InviteButtonOn_,
-	LinkGenerated_,
 	Logo_,
 	Mana1_,
 	Mana2_,
 	ManaPoint_,
 	ManaPointBlurred_,
 	Moon_,
-	PlayerQuitPost_,
 	PoofedAwayPost_,
 	RestartBtnDefault_,
-	RestartBtnDefaultBG_,
-	RestartBtnDefaultFront1_,
-	RestartBtnDefaultFront2_,
 	RestartBtnOn_,
-	SettingsBoxDedault_,
 	SettingsBoxDefault_,
 	SettingsDefault_,
 	SettingsOn_,
 	ShieldLoop_,
-	SoundOff_,
 	SoundOffTxt_,
-	SoundOn_,
 	SoundOnTxt_,
-	StartButtonDefault_,
-	StartButtonPressed_,
 	StartVsComputerDefault_,
 	StartVsHumanOffDefault_,
 	StartVsHumanOnDefault_,
 	TextBox_,
 	WaitingDot_,
-	WaitingPost_,
-	WizzyWizzy_Mocup_Buttons_,
-	Font_,
-	Font_,
-	Font2_,
-	Font2_,
 	LogoStart_,
 	LogoStart_,
 	Mana1End_,
@@ -389,10 +381,6 @@ export const [
 	ShieldStart_,
 	Spawn_,
 	Spawn_,
-	StartVsHumanBtnIdle_,
-	StartVsHumanBtnIdle_,
-	StartVsHumanBtnMatch_,
-	StartVsHumanBtnMatch_,
 	WizardAppear_,
 	WizardAppear_,
 	WizardDie_,
