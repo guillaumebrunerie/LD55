@@ -28,7 +28,10 @@ import {
 	LogoStart,
 	Moon,
 	PoofedAwayPost,
+	RestartBtnAcceptInvitation,
 	RestartBtnDefault,
+	RestartBtnInvite,
+	RestartBtnWaitingToAccept,
 	RestartButtonComputer,
 	RestartButtonIdle,
 	SettingsBoxDefault,
@@ -446,18 +449,19 @@ const RestartVsPlayer = ({ game }: { game: Game }) => {
 			{...buttonData.props}
 		>
 			{type == "default" && (
-				<sprite texture={RestartBtnDefault} anchor={0.5} />
+				<sprite texture={RestartBtnInvite} anchor={0.5} />
 			)}
 			{type == "requested" && (
-				<sprite
-					texture={getFrame(RestartButtonIdle, 20, buttons.lt)}
-					anchor={0.5}
-				/>
+				<sprite texture={RestartBtnAcceptInvitation} anchor={0.5} />
 			)}
 			{type == "waiting" && (
-				<sprite texture={InviteButtonOn} anchor={0.5} />
+				<sprite texture={RestartBtnWaitingToAccept} anchor={0.5} />
 			)}
-			{type == "waiting" && <WaitingDots lt={game.lt} />}
+			{type == "waiting" && (
+				<container x={45} y={-5}>
+					<WaitingDots lt={game.lt} />
+				</container>
+			)}
 		</container>
 	);
 };

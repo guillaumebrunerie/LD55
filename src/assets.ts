@@ -1,4 +1,4 @@
-/** Generated on Sun Sep 22 23:47:21 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Sun Sep 29 23:45:01 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -34,8 +34,11 @@ import ManaPoint_ from "../gfx/ManaPoint.png?texture";
 import ManaPointBlurred_ from "../gfx/ManaPointBlurred.png?texture";
 import Moon_ from "../gfx/Moon.png?texture";
 import PoofedAwayPost_ from "../gfx/PoofedAwayPost.png?texture";
+import RestartBtnAcceptInvitation_ from "../gfx/RestartBtnAcceptInvitation.png?texture";
 import RestartBtnDefault_ from "../gfx/RestartBtnDefault.png?texture";
+import RestartBtnInvite_ from "../gfx/RestartBtnInvite.png?texture";
 import RestartBtnOn_ from "../gfx/RestartBtnOn.png?texture";
+import RestartBtnWaitingToAccept_ from "../gfx/RestartBtnWaitingToAccept.png?texture";
 import SettingsBoxDefault_ from "../gfx/SettingsBoxDefault.png?texture";
 import SettingsDefault_ from "../gfx/SettingsDefault.png?texture";
 import SettingsOn_ from "../gfx/SettingsOn.png?texture";
@@ -136,8 +139,11 @@ export const [
 	ManaPointBlurred,
 	Moon,
 	PoofedAwayPost,
+	RestartBtnAcceptInvitation,
 	RestartBtnDefault,
+	RestartBtnInvite,
 	RestartBtnOn,
+	RestartBtnWaitingToAccept,
 	SettingsBoxDefault,
 	SettingsDefault,
 	SettingsOn,
@@ -150,129 +156,67 @@ export const [
 	TextBox,
 	WaitingDot,
 	LogoStartSheet,
-	{
-		animations: { LogoStart },
-	},
+	{ animations: { LogoStart } },
 	Mana1EndSheet,
-	{
-		animations: { Mana1End },
-	},
+	{ animations: { Mana1End } },
 	Mana2EndSheet,
-	{
-		animations: { Mana2End },
-	},
+	{ animations: { Mana2End } },
 	ManaPointStartSheet,
-	{
-		animations: { ManaPointStart },
-	},
+	{ animations: { ManaPointStart } },
 	Monster1DieSheet,
-	{
-		animations: { Monster1Die },
-	},
+	{ animations: { Monster1Die } },
 	Monster1IdleSheet,
-	{
-		animations: { Monster1Idle },
-	},
+	{ animations: { Monster1Idle } },
 	Monster1ReactsSheet,
-	{
-		animations: { Monster1Reacts },
-	},
+	{ animations: { Monster1Reacts } },
 	Monster2DieSheet,
-	{
-		animations: { Monster2Die },
-	},
+	{ animations: { Monster2Die } },
 	Monster2IdleSheet,
-	{
-		animations: { Monster2Idle },
-	},
+	{ animations: { Monster2Idle } },
 	Monster2ReactsSheet,
-	{
-		animations: { Monster2Reacts },
-	},
+	{ animations: { Monster2Reacts } },
 	Monster3DieSheet,
-	{
-		animations: { Monster3Die },
-	},
+	{ animations: { Monster3Die } },
 	Monster3DiesSheet,
-	{
-		animations: { Monster3Dies },
-	},
+	{ animations: { Monster3Dies } },
 	Monster3IdleSheet,
-	{
-		animations: { Monster3Idle },
-	},
+	{ animations: { Monster3Idle } },
 	Monster3ReactsSheet,
-	{
-		animations: { Monster3Reacts },
-	},
+	{ animations: { Monster3Reacts } },
 	RestartButtonComputerSheet,
-	{
-		animations: { RestartButtonComputer },
-	},
+	{ animations: { RestartButtonComputer } },
 	RestartButtonIdleSheet,
-	{
-		animations: { RestartButtonIdle },
-	},
+	{ animations: { RestartButtonIdle } },
 	RunesSheet,
-	{
-		animations: { Runes },
-	},
+	{ animations: { Runes } },
 	ShieldEndSheet,
-	{
-		animations: { ShieldEnd },
-	},
+	{ animations: { ShieldEnd } },
 	ShieldHitSheet,
-	{
-		animations: { ShieldHit },
-	},
+	{ animations: { ShieldHit } },
 	ShieldStartSheet,
-	{
-		animations: { ShieldStart },
-	},
+	{ animations: { ShieldStart } },
 	SpawnSheet,
-	{
-		animations: { Spawn },
-	},
+	{ animations: { Spawn } },
 	WizardAppearSheet,
-	{
-		animations: { WizardAppear },
-	},
+	{ animations: { WizardAppear } },
 	WizardDieSheet,
-	{
-		animations: { WizardDie },
-	},
+	{ animations: { WizardDie } },
 	WizardIdleSheet,
-	{
-		animations: { WizardIdle },
-	},
+	{ animations: { WizardIdle } },
 	WizardMagicEndSheet,
-	{
-		animations: { WizardMagicEnd },
-	},
+	{ animations: { WizardMagicEnd } },
 	WizardMagicLoopSheet,
-	{
-		animations: { WizardMagicLoop },
-	},
+	{ animations: { WizardMagicLoop } },
 	WizardMagicStartSheet,
-	{
-		animations: { WizardMagicStart },
-	},
+	{ animations: { WizardMagicStart } },
 	WizardWaitingEndSheet,
-	{
-		animations: { WizardWaitingEnd },
-	},
+	{ animations: { WizardWaitingEnd } },
 	WizardWaitingLoopSheet,
-	{
-		animations: { WizardWaitingLoop },
-	},
+	{ animations: { WizardWaitingLoop } },
 	WizardWaitingStartSheet,
-	{
-		animations: { WizardWaitingStart },
-	},
+	{ animations: { WizardWaitingStart } },
 	WizardWinSheet,
-	{
-		animations: { WizardWin },
-	},
+	{ animations: { WizardWin } },
 	ClickAttack,
 	ClickDefense,
 	ClickMana,
@@ -326,8 +270,11 @@ export const [
 	ManaPointBlurred_,
 	Moon_,
 	PoofedAwayPost_,
+	RestartBtnAcceptInvitation_,
 	RestartBtnDefault_,
+	RestartBtnInvite_,
 	RestartBtnOn_,
+	RestartBtnWaitingToAccept_,
 	SettingsBoxDefault_,
 	SettingsDefault_,
 	SettingsOn_,
