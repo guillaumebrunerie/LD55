@@ -1,4 +1,4 @@
-/** Generated on Sun Sep 29 23:45:01 CEST 2024 by 'tools/generate-assets.sh' */
+/** Generated on Tue Oct  1 00:11:49 CEST 2024 by 'tools/generate-assets.sh' */
 
 /* eslint-disable */
 // @ts-nocheck
@@ -89,18 +89,10 @@ import ClickAttack_ from "../audio/ClickAttack.mp3?sound";
 import ClickDefense_ from "../audio/ClickDefense.mp3?sound";
 import ClickMana_ from "../audio/ClickMana.mp3?sound";
 import ClickStart_ from "../audio/ClickStart.mp3?sound";
-import Connect_ from "../audio/Connect.mp3?sound";
-import Flower1Mana_ from "../audio/Flower1Mana.mp3?sound";
-import Flower2Mana_ from "../audio/Flower2Mana.mp3?sound";
-import Flower3Mana_ from "../audio/Flower3Mana.mp3?sound";
-import Flower4Mana_ from "../audio/Flower4Mana.mp3?sound";
 import Flower5Mana_ from "../audio/Flower5Mana.mp3?sound";
 import ManaCreated_ from "../audio/ManaCreated.mp3?sound";
 import MonsterAttacks_ from "../audio/MonsterAttacks.mp3?sound";
-import MonsterSwoosh_ from "../audio/MonsterSwoosh.mp3?sound";
-import MonstersClash_ from "../audio/MonstersClash.mp3?sound";
 import Music_ from "../audio/Music.mp3?sound";
-import Notification_ from "../audio/Notification.mp3?sound";
 import ShieldDefends_ from "../audio/ShieldDefends.mp3?sound";
 import ShieldDown_ from "../audio/ShieldDown.mp3?sound";
 import TextBoxAppear_ from "../audio/TextBoxAppear.mp3?sound";
@@ -221,18 +213,10 @@ export const [
 	ClickDefense,
 	ClickMana,
 	ClickStart,
-	Connect,
-	Flower1Mana,
-	Flower2Mana,
-	Flower3Mana,
-	Flower4Mana,
 	Flower5Mana,
 	ManaCreated,
 	MonsterAttacks,
-	MonsterSwoosh,
-	MonstersClash,
 	Music,
-	Notification,
 	ShieldDefends,
 	ShieldDown,
 	TextBoxAppear,
@@ -352,18 +336,10 @@ export const [
 	ClickDefense_,
 	ClickMana_,
 	ClickStart_,
-	Connect_,
-	Flower1Mana_,
-	Flower2Mana_,
-	Flower3Mana_,
-	Flower4Mana_,
 	Flower5Mana_,
 	ManaCreated_,
 	MonsterAttacks_,
-	MonsterSwoosh_,
-	MonstersClash_,
 	Music_,
-	Notification_,
 	ShieldDefends_,
 	ShieldDown_,
 	TextBoxAppear_,
