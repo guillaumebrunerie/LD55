@@ -449,10 +449,13 @@ const RestartVsPlayer = ({ game }: { game: Game }) => {
 			{...buttonData.props}
 		>
 			{type == "default" && (
-				<sprite texture={RestartBtnInvite} anchor={0.5} />
+				<sprite texture={RestartBtnDefault} anchor={0.5} />
 			)}
 			{type == "requested" && (
-				<sprite texture={RestartBtnAcceptInvitation} anchor={0.5} />
+				<sprite
+					texture={getFrame(RestartButtonIdle, 20, buttons.lt)}
+					anchor={0.5}
+				/>
 			)}
 			{type == "waiting" && (
 				<sprite texture={RestartBtnWaitingToAccept} anchor={0.5} />
