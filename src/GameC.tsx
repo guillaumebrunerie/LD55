@@ -413,7 +413,6 @@ const RuneC = ({ item, i }: { item: Rune; i: number }) => {
 const ShieldC = ({ shield }: { shield: Shield }) => {
 	switch (shield.state) {
 		case "hidden":
-		case "waitingToAppear":
 			return null;
 
 		case "fadeOut":
