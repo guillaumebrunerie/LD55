@@ -45,10 +45,42 @@
 			width: 100%;
 			max-width: 177.77vh;
 		}
+		#container img {
+			position: absolute;
+		}
+		#dot1 {
+			animation: dot 1.6s infinite;
+			opacity: calc(var(--lt) * 4 - 1);
+		}
+		#dot2 {
+			animation: dot 1.6s infinite;
+			opacity: calc(var(--lt) * 4 - 2);
+		}
+		#dot3 {
+			animation: dot 1.6s infinite;
+			opacity: calc(var(--lt) * 4 - 3);
+		}
+		@property --lt {
+			syntax: "<number>"; /* <- defined as type number for the transition to work */
+			initial-value: 0;
+			inherits: false;
+		}
+		@keyframes dot {
+			0% {
+				--lt: 0;
+				animation-timing-function: linear;
+			}
+			100% {
+				--lt: 1;
+			}
+		}
 	</style>
 	<body>
 		<div id="container">
-			<!-- <img src="gfx/Loading.png" /> -->
+			<img src="gfx/LoadingTxt.png" />
+			<img id="dot1" src="gfx/LoadingDot1.png" />
+			<img id="dot2" src="gfx/LoadingDot2.png" />
+			<img id="dot3" src="gfx/LoadingDot3.png" />
 		</div>
 		<script type="module" src="/src/main.tsx"></script>
 	</body>
